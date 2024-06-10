@@ -132,7 +132,7 @@ const PlaceholderScreen = () => {
           <View style={styles.tabBarContainer}>
             {routes.map((route, index) => {
               const active = index === activeIndex
-              const { options } = descriptors[route.key]
+              const { options } = descriptors[route.key] 
     
               return (
                 <TabBarComponent
