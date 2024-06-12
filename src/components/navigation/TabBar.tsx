@@ -7,12 +7,17 @@ import {
   Text,
   LayoutChangeEvent,
 } from 'react-native'
-import { NavigationContainer } from '@react-navigation/native'
 import { BottomTabBarProps, BottomTabNavigationOptions, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { useAnimatedStyle, withTiming, useDerivedValue } from 'react-native-reanimated'
+import Icon2 from 'react-native-vector-icons/FontAwesome'
 import Svg, { Path } from 'react-native-svg'
-import Lottie from 'lottie-react-native'
+import Home from '../products/screens/Home'
+import Voucher from '../products/screens/Voucher'
+import ScanHome from '../products/screens/ScanHome'
+import Cart from '../products/screens/Cart'
+import Profile from '../products/screens/Profile'
+
 
 // ------------------------------------------------------------------
 
@@ -28,39 +33,63 @@ const TabBar = () =>{
           <StatusBar barStyle="light-content" />
           <>
             <Tab.Navigator
+           // screenOptions={{tabBarHideOnKeyboard: true}}
               tabBar={(props) => <AnimatedTabBar {...props} />}
             >
               <Tab.Screen
                 name="Home"
                 options={{
+                  headerShown: false,
                   // @ts-ignore
-                  tabBarIcon: ({ ref }) => <Lottie ref={ref} loop={false} source={require('../../images/home.icon.json')} style={styles.icon} />,
+                tabBarIcon: ({ color, size }) => (
+                    <Icon2 name="home" style={styles.icon} />
+                  ),
                 }}
-                component={PlaceholderScreen}
+                component={Home}
               />
               <Tab.Screen
-                name="Upload"
+                name="Voucher"
                 options={{
+                  headerShown: false,
                   // @ts-ignore
-                  tabBarIcon: ({ ref }) => <Lottie ref={ref} loop={false} source={require('../../images/upload.icon.json')} style={styles.icon} />,
+                  tabBarIcon: ({ color, size }) => (
+                    <Icon2 name="home" style={styles.icon} />
+                  ),
                 }}
-                component={PlaceholderScreen}
+                component={Voucher}
               />
               <Tab.Screen
-                name="Chat"
+                name="QR"
                 options={{
+                  headerShown: false,
                   // @ts-ignore
-                  tabBarIcon: ({ ref }) => <Lottie ref={ref} loop={false} source={require('../../images/chat.icon.json')} style={styles.icon} />,
+                  tabBarIcon: ({ color, size }) => (
+                    <Icon2 name="home" style={styles.icon} />
+                  ),
                 }}
-                component={PlaceholderScreen}
+                component={ScanHome}
               />
               <Tab.Screen
-                name="Settings"
+                name="Cart"
                 options={{
+                  headerShown: false,
                   // @ts-ignore
-                  tabBarIcon: ({ ref }) => <Lottie ref={ref} loop={false} source={require('../../images/settings.icon.json')} style={styles.icon} />,
+                  tabBarIcon: ({ color, size }) => (
+                    <Icon2 name="home" style={styles.icon} />
+                  ),
                 }}
-                component={PlaceholderScreen}
+                component={Cart}
+              />
+              <Tab.Screen
+                name="Profile"
+                options={{
+                  headerShown: false,
+                  // @ts-ignore
+                  tabBarIcon: ({ color, size }) => (
+                    <Icon2 name="home" style={styles.icon} />
+                  ),
+                }}
+                component={Profile}
               />
             </Tab.Navigator>
           </>

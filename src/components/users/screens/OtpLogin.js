@@ -16,29 +16,6 @@ import LinearGradient from 'react-native-linear-gradient';
 const OtpLogin = ({navigation}) => {
   const [opt, setOtp] = useState('');
 
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true); // Bàn phím đang hiển thị
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false); // Bàn phím đã ẩn
-      }
-    );
-
-    // Dọn dẹp listeners khi component bị unmount
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
-
   const DismissKeyboardHOC = Comp => {
     return ({children, ...props}) => (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -102,23 +79,22 @@ const OtpLogin = ({navigation}) => {
         </View>
    
       {/* button login */}
-        {!isKeyboardVisible && (
-            <View style={{
+      
+         <View style={{
         
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                marginBottom: 20,
-              }}>
- <TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
-        <Text
-          // onPress={handleLogin}
-          style={styles.textLogin}>
-          Xác nhận
-        </Text>
-      </TouchableOpacity>
-            </View>
-       
-      )}
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        marginBottom: 20,
+      }}>
+<TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
+<Text
+  // onPress={handleLogin}
+  style={styles.textLogin}>
+  Xác nhận
+</Text>
+</TouchableOpacity>
+    </View>
+
       
     </LinearGradient>
   );
