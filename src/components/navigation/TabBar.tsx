@@ -10,13 +10,15 @@ import {
 import { BottomTabBarProps, BottomTabNavigationOptions, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { useAnimatedStyle, withTiming, useDerivedValue } from 'react-native-reanimated'
-import Icon2 from 'react-native-vector-icons/FontAwesome'
 import Svg, { Path } from 'react-native-svg'
 import Home from '../products/screens/Home'
 import Voucher from '../products/screens/Voucher'
-import ScanHome from '../products/screens/ScanHome'
 import Cart from '../products/screens/Cart'
 import Profile from '../products/screens/Profile'
+import IconHome from 'react-native-vector-icons/AntDesign'
+import IconVoucher from 'react-native-vector-icons/AntDesign'
+import IconCart from 'react-native-vector-icons/AntDesign'
+import IconUser from 'react-native-vector-icons/AntDesign'
 
 
 // ------------------------------------------------------------------
@@ -42,7 +44,7 @@ const TabBar = () =>{
                   headerShown: false,
                   // @ts-ignore
                 tabBarIcon: ({ color, size }) => (
-                    <Icon2 name="home" style={styles.icon} />
+                    <IconHome name="home" style={styles.icon} size={24} />
                   ),
                 }}
                 component={Home}
@@ -53,21 +55,10 @@ const TabBar = () =>{
                   headerShown: false,
                   // @ts-ignore
                   tabBarIcon: ({ color, size }) => (
-                    <Icon2 name="home" style={styles.icon} />
+                    <IconVoucher name="gift" style={styles.icon} size={24}/>
                   ),
                 }}
                 component={Voucher}
-              />
-              <Tab.Screen
-                name="QR"
-                options={{
-                  headerShown: false,
-                  // @ts-ignore
-                  tabBarIcon: ({ color, size }) => (
-                    <Icon2 name="home" style={styles.icon} />
-                  ),
-                }}
-                component={ScanHome}
               />
               <Tab.Screen
                 name="Cart"
@@ -75,7 +66,7 @@ const TabBar = () =>{
                   headerShown: false,
                   // @ts-ignore
                   tabBarIcon: ({ color, size }) => (
-                    <Icon2 name="home" style={styles.icon} />
+                    <IconCart name="shoppingcart" style={styles.icon} size={24}/>
                   ),
                 }}
                 component={Cart}
@@ -86,7 +77,7 @@ const TabBar = () =>{
                   headerShown: false,
                   // @ts-ignore
                   tabBarIcon: ({ color, size }) => (
-                    <Icon2 name="home" style={styles.icon} />
+                    <IconUser name="user" style={styles.icon} size={24}/>
                   ),
                 }}
                 component={Profile}
@@ -101,7 +92,7 @@ const TabBar = () =>{
 
 const PlaceholderScreen = () => {
     return (
-      <View style={{ flex: 1, backgroundColor: '#604AE6' }} />
+      <View style={{ flex: 1, backgroundColor: 'red' }} />
     )
   }
   
@@ -153,7 +144,7 @@ const PlaceholderScreen = () => {
             style={[styles.activeBackground, animatedStyles]}
           >
             <Path
-              fill="#604AE6"
+              fill="#E8900C"
               d="M20 0H0c11.046 0 20 8.953 20 20v5c0 19.33 15.67 35 35 35s35-15.67 35-35v-5c0-11.045 8.954-20 20-20H20z"
             />
           </AnimatedSvg>
@@ -262,8 +253,9 @@ const PlaceholderScreen = () => {
         alignItems: 'center'
       },
       icon: {
-        height: 36,
-        width: 36,
+        // height: 36,
+        // width: 36,
+        color:'#E8900C'
       }
     })
     

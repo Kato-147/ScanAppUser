@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView
 } from 'react-native';
 import React, {useState} from 'react';
 import CustomInput from '../../fragment/CustomInput';
@@ -13,15 +14,6 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const Login = ({navigation}) => {
   const [sdt, setSdt] = useState('');
-
-  const DismissKeyboardHOC = Comp => {
-    return ({children, ...props}) => (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <Comp {...props}>{children}</Comp>
-      </TouchableWithoutFeedback>
-    );
-  };
-  const DismissKeyboardView = DismissKeyboardHOC(View);
 
   const handleRegister = () => {
     navigation.navigate('Register');
@@ -36,61 +28,65 @@ navigation.navigate('OtpLogin');
   };
 
   return (
-    <LinearGradient colors={['#C55402', '#CE8025', '#FFB266']} style={styles.container}>
-      {/* Mã QR */}
-      <DismissKeyboardView>
+    
+    <KeyboardAvoidingView>
+    <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
+    <LinearGradient colors={['#C55402', '#CE8025', '#FFB266']} style={{width:'100%', height:'100%', padding: 24}}>
+     
+     {/* Mã QR */}
+       <Icon name='qrcode' style={styles.iconQr} onPress={handleQR}/>
 
+       <Text style={styles.labelQR}>Quét mã QR</Text>
+     {/* Input text */}
 
-        <Icon name='qrcode' style={styles.iconQr} onPress={handleQR}/>
+     {/* Input Text */}
+     <CustomInput
+       containerStyle={{marginTop: 20}}
+       placeholder={'Email'}
+       onChangeText={setSdt}
+     />
 
-        <Text style={styles.labelQR}>Quét mã QR</Text>
-      </DismissKeyboardView>
-      {/* Input text */}
+     {/* button login */}
+     <View style={{marginTop: 40}}>
+       <TouchableOpacity style={styles.btnLogin} onPress={handleOtpLogin}>
+         <Text
+           // onPress={handleLogin}
+           style={styles.textLogin}>
+           Đăng nhập
+         </Text>
+       </TouchableOpacity>
+     </View>
 
-      {/* Input Text */}
-      <CustomInput
-        containerStyle={{marginTop: 20}}
-        placeholder={'Email'}
-        onChangeText={setSdt}
-      />
+     <View>
+       <View style={styles.lineView} />
+     </View>
 
-      {/* button login */}
-      <View style={{marginTop: 40}}>
-        <TouchableOpacity style={styles.btnLogin} onPress={handleOtpLogin}>
-          <Text
-            // onPress={handleLogin}
-            style={styles.textLogin}>
-            Đăng nhập
-          </Text>
-        </TouchableOpacity>
-      </View>
+     {/* Register */}
+     <View style={{alignItems: 'center'}}>
+       <Text style={styles.labelSigup}>Bạn chưa có tài khoản ?</Text>
+       <TouchableOpacity onPress={handleRegister}>
+         <Text style={styles.textSignup}>Đăng ký ngay</Text>
+       </TouchableOpacity>
+     </View>
 
-      <View>
-        <View style={styles.lineView} />
-      </View>
+     {/* Nói linh tinh */}
+     <View
+       style={{
+         flex: 1,
+         alignItems: 'center',
+         justifyContent: 'flex-end',
+         marginBottom: 20,
+       }}>
+       <Text style={{textAlign: 'center'}}>
+         Bằng việc đăng nhập, bạn đồng ý tuân thủ {'\n'} Điều khoản và điều
+         kiện {'\n'} & Chính sách bảo mật của chúng tôi
+       </Text>
+     </View>
+   </LinearGradient>
+    </TouchableWithoutFeedback>
+  </KeyboardAvoidingView>
 
-      {/* Register */}
-      <View style={{alignItems: 'center'}}>
-        <Text style={styles.labelSigup}>Bạn chưa có tài khoản ?</Text>
-        <TouchableOpacity onPress={handleRegister}>
-          <Text style={styles.textSignup}>Đăng ký ngay</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Nói linh tinh */}
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          marginBottom: 20,
-        }}>
-        <Text style={{textAlign: 'center'}}>
-          Bằng việc đăng nhập, bạn đồng ý tuân thủ {'\n'} Điều khoản và điều
-          kiện {'\n'} & Chính sách bảo mật của chúng tôi
-        </Text>
-      </View>
-    </LinearGradient>
+   
   );
 };
 
