@@ -31,7 +31,8 @@ const SearchBar = ({value, updateSearch, style}) => {
               setQuery(text);
               updateSearch(text);
               if (error) setError(false);
-            } else setError('Please only enter alphabets');
+            } 
+            else setError('Please only enter alphabets');
           }}
         />
         {query ? (

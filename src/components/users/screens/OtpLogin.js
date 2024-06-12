@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon2 from 'react-native-vector-icons/Ionicons';
@@ -16,87 +16,78 @@ import LinearGradient from 'react-native-linear-gradient';
 const OtpLogin = ({navigation}) => {
   const [opt, setOtp] = useState('');
 
-  const DismissKeyboardHOC = Comp => {
-    return ({children, ...props}) => (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <Comp {...props}>{children}</Comp>
-      </TouchableWithoutFeedback>
-    );
-  };
-  const DismissKeyboardView = DismissKeyboardHOC(View);
-
-  const handleBack = () =>{
+  const handleBack = () => {
     navigation.navigate('Login');
-  }
+  };
 
-  const handleHome = () =>{
+  const handleHome = () => {
     navigation.navigate('tab');
-  }
+  };
 
   return (
-    <LinearGradient colors={['#C55402', '#CE8025', '#FFB266']} style={styles.container}>
-        <View>
-        <DismissKeyboardView>
+
+    <KeyboardAvoidingView>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <LinearGradient
+      colors={['#C55402', '#CE8025', '#FFB266']}
+      style={styles.container}>
+      <View>
         {/* Header */}
         <View style={styles.header}>
-
-            <TouchableOpacity onPress={handleBack}>
+          <TouchableOpacity onPress={handleBack}>
             <Icon2 name="chevron-back-outline" style={styles.iconBack} />
-            </TouchableOpacity>
-          
+          </TouchableOpacity>
 
           <Text style={styles.labelLogin}>Đăng nhập</Text>
           <View />
         </View>
 
         {/* Image */}
-        
+
         <Image
           style={styles.image}
           source={require('../../../images/phoneVerify.png')}
         />
-      
-       
-      </DismissKeyboardView>
-      {/* Otp */}
-      <View>
-        <Text style={styles.textOtp}>Mã OTP đã được gửi về Email</Text>
 
-        {/* Input Text */}
-        <CustomInput
-          containerStyle={{marginTop: 5}}
-          placeholder={'Nhập mã Otp'}
-          onChangeText={setOtp}
-        />
+        {/* Otp */}
+        <View>
+          <Text style={styles.textOtp}>Mã OTP đã được gửi về Email</Text>
 
-  {/* Send Otp */}
-  <TouchableOpacity
-        style={{alignSelf: 'flex-end', marginTop: 10}}>
-        <Text style={{alignSelf:'flex-end'}}>Gửi lại mã Otp</Text>
-      </TouchableOpacity>
+          {/* Input Text */}
+          <CustomInput
+            containerStyle={{marginTop: 5}}
+            placeholder={'Nhập mã Otp'}
+            onChangeText={setOtp}
+          />
 
-      </View>
+          {/* Send Otp */}
+          <TouchableOpacity style={{alignSelf: 'flex-end', marginTop: 10}}>
+            <Text style={{alignSelf: 'flex-end'}}>Gửi lại mã Otp</Text>
+          </TouchableOpacity>
         </View>
-   
-      {/* button login */}
-      
-         <View style={{
-        
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        marginBottom: 20,
-      }}>
-<TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
-<Text
-  // onPress={handleLogin}
-  style={styles.textLogin}>
-  Xác nhận
-</Text>
-</TouchableOpacity>
-    </View>
+      </View>
 
-      
+      {/* button login */}
+
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          marginBottom: 20,
+        }}>
+        <TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
+          <Text
+            // onPress={handleLogin}
+            style={styles.textLogin}>
+            Xác nhận
+          </Text>
+        </TouchableOpacity>
+      </View>
     </LinearGradient>
+    </TouchableWithoutFeedback>
+  </KeyboardAvoidingView>
+
+   
   );
 };
 
@@ -108,9 +99,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     display: 'flex',
-    flexDirection:'column',
-    justifyContent:'space-between',
-    backgroundColor:'white'
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
   },
   header: {
     flexDirection: 'row',
