@@ -5,13 +5,17 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  FlatList,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 import React, {useState} from 'react';
 import SearchBar from '../../fragment/SearchBar';
 import IconQr from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SliderBox} from 'react-native-image-slider-box';
 
-const Home = () => {
+const Home = props => {
+  const {navigation} = props;
   const [value, setValue] = useState();
 
   const updateSearch = value => {
@@ -31,6 +35,26 @@ const Home = () => {
     require('../../../images/phoneVerify.png'),
   ];
 
+  const renderItem = ({item}) => {
+    const {_id, image, name, description} = item;
+    console.log(image,"<<<<<<<<<<<<<");
+    return (
+      
+        <TouchableOpacity
+          onPress={() => {
+            // console.log(_id)
+            // navigation.navigate('Detail', { newsId: _id });
+          }}>
+          <View style={styles.itemFlatlist}>
+            <Image style={styles.imageVoucherItem} source={image} />
+            <Text>{name}</Text>
+            <Text>{description}</Text>
+          </View>
+        </TouchableOpacity>
+  
+    );
+  };
+
   return (
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -49,7 +73,8 @@ const Home = () => {
           {/* Body */}
           <View style={styles.bodyContainer}>
             {/* Maybe you care */}
-            <View style={{backgroundColor:'blue',justifyContent:'space-evenly'}}>
+            <View
+              style={{backgroundColor: 'blue', justifyContent: 'space-evenly'}}>
               <Text>Có thể bạn quan tâm</Text>
               {/* Baner */}
               <View
@@ -78,14 +103,17 @@ const Home = () => {
               </View>
             </View>
 
-            {/* popular restaurant */}
-            <View style={{backgroundColor:'green'}}>
-              <Text>Các quán thịnh hành</Text>
-            </View>
-
             {/* Voucher */}
-            <View style={{backgroundColor:'pink'}}>
+            <View style={{backgroundColor: 'pink'}}>
               <Text>Voucher không thể bỏ lỡ</Text>
+              <FlatList
+              numColumns={2}
+                showsVerticalScrollIndicator={false}
+                 style={{width:'100%',height:'35%'}}
+                data={data}
+                renderItem={renderItem}
+                keyExtractor={item => item._id}
+              />
             </View>
           </View>
         </View>
@@ -137,7 +165,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     padding: 0,
     margin: 0,
-    display:'none'
+    display: 'none',
   },
   imageStyle: {
     borderRadius: 15,
@@ -145,4 +173,51 @@ const styles = StyleSheet.create({
     height: 50,
     marginTop: 5,
   },
+  imageVoucherItem: {
+    width: 50,
+    height: 50,
+    backgroundColor:"red"
+  },
+  itemFlatlist: {
+     margin: 10, backgroundColor: 'lightgrey', padding: 20 
+  },
 });
+
+const data = [
+  {
+    id: 1,
+    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    name: 'Item 1',
+    description: 'Description for item 1',
+  },
+  {
+    id: 2,
+    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    name: 'Item 2',
+    description: 'Description for item 2',
+  },
+  {
+    id: 3,
+    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    name: 'Item 3',
+    description: 'Description for item 3',
+  },
+  {
+    id: 4,
+    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    name: 'Item 3',
+    description: 'Description for item 3',
+  },
+  {
+    id: 5,
+    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    name: 'Item 3',
+    description: 'Description for item 3',
+  },
+  {
+    id: 6,
+    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    name: 'Item 3',
+    description: 'Description for item 3',
+  },
+];
