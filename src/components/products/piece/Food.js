@@ -15,7 +15,7 @@ export default function Recipes({categories, meals}) {
 
   // Để tính toán chiều rộng của mỗi mục trong lưới
   const renderItem = ({item, index}) => {
-    const marginRight = (index + 1) % 2 === 0 ? 0 : 10;
+    const marginRight = (index + 1) % 1 === 0 ? 0 : 10;
     return (
       <View style={[styles.item, {marginRight}]}>
         <RecipeCard item={item} index={index} navigation={navigation} />
@@ -25,9 +25,7 @@ export default function Recipes({categories, meals}) {
 
   return (
     <View style={{marginHorizontal: 16, marginTop: 12}}>
-      <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
-        Recipes
-      </Text>
+      
       <View>
         {categories.length === 0 || meals.length === 0 ? (
           <Loading style={{marginTop: 80, fontSize: 40}} />
@@ -35,10 +33,10 @@ export default function Recipes({categories, meals}) {
           <FlatList
             data={meals}
             keyExtractor={item => item.idMeal.toString()} // Đảm bảo key là một chuỗi duy nhất
-            numColumns={2}
+           // numColumns={1}
             showsVerticalScrollIndicator={false}
             renderItem={renderItem}
-            columnWrapperStyle={styles.columnWrapper} // Áp dụng phong cách cho các cột
+           // columnWrapperStyle={styles.columnWrapper} // Áp dụng phong cách cho các cột
             onEndReachedThreshold={0.1}
             //refreshing={isLoadingNext}
             //onRefresh={() => refetch({first: ITEM_CNT})}
@@ -57,11 +55,12 @@ const RecipeCard = ({item, index, navigation}) => {
       style={{
         width: '100%',
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         marginBottom: 16,
         marginTop: 4,
-        paddingLeft: isEven ? 0 : 8,
-        paddingRight: isEven ? 8 : 0,
+      //  paddingLeft: isEven ? 0 : 8,
+// paddingRight: isEven ? 8 : 0,
+        flexDirection:'row'
       }}
       // onPress={()=> navigation.navigate('RecipeDetail', {...item})}
     >
@@ -72,10 +71,10 @@ const RecipeCard = ({item, index, navigation}) => {
       <CachedImage
         uri={item.strMealThumb}
         style={{
-          width: '100%',
-          height: index % 3 == 0 ? hp(25) : hp(35),
+          width: hp(8),
+          height: hp(8),
           backgroundColor: '#d4d4d4',
-          borderRadius: 35,
+          borderRadius: 5,
         }}
         sharedTransitionTag={item.strMeal}
       />
@@ -84,7 +83,7 @@ const RecipeCard = ({item, index, navigation}) => {
           fontWeight: '600',
           marginLeft: 8,
           color: '#525252',
-          fontSize: hp(1.5),
+          fontSize: hp(1.8),
         }}>
         {item.strMeal.length > 20
           ? item.strMeal.slice(0, 20) + '...'

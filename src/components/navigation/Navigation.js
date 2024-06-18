@@ -5,6 +5,7 @@ import Register from '../users/screens/Register';
 import ScanQR from '../users/screens/ScanQR';
 import OtpLogin from '../users/screens/OtpLogin';
 import TabBar from './TabBar';
+import ScanHome from '../products/screens/ScanHome';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,10 +18,11 @@ const Navigation = () => {
         <Stack.Screen name="ScanQR" component={ScanQR} />
         <Stack.Screen name="OtpLogin" component={OtpLogin} />
         <Stack.Screen name="tab" component={TabBar} />
+        <Stack.Screen name="ScanHome" component={ScanHome} />
         {/* <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="ScanHome" component={ScanHome} />
+        
         <Stack.Screen name="Voucher" component={Voucher} /> */}
       </Stack.Navigator>
  

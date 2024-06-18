@@ -13,6 +13,7 @@ export default function Categories({categories,activeCategory,handleChangeCatego
         contentContainerStyle={{paddingHorizontal:5}}
         style={{marginTop:20,height: 100}}
       >
+        
         {
             categories.map((cat,index) => {
                 const isActive = cat.strCategory === activeCategory;

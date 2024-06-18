@@ -84,12 +84,12 @@ const Menu = ({navigation}) => {
       {/* Body */}
       <View style={{marginHorizontal: 24}}>
         {/* Restaurant name */}
-        <Text style={{fontSize: 18, color: 'black', fontWeight: 450}}>
-          Quán thịt chó - mời bạn ăn nha
+        <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
+          Thịt chó bà ba - gất ok
         </Text>
 
         {/* Voucher */}
-        <TouchableOpacity style={styles.voucherContainer}>
+        {/* <TouchableOpacity style={styles.voucherContainer}>
           <View style={styles.iconVoucher}>
             <Icon name="tagso" size={24} color="black" />
           </View>
@@ -99,18 +99,16 @@ const Menu = ({navigation}) => {
           <View style={styles.iconVoucher}>
             <Icon name="right" size={24} color="black" />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Menu */}
       <View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 50}}
-          //style={{marginTop: 10}}
-          >
-          {/* categories */}
-          <View>
+      <Text style={{fontSize: hp(2.5), fontWeight: '400', color: '#525252', marginStart: 20}}>
+        Menu
+      </Text>
+         {/* categories */}
+         <View>
             {categories.length > 0 && (
               <Categories
                 categories={categories}
@@ -119,6 +117,12 @@ const Menu = ({navigation}) => {
               />
             )}
           </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: 50}}
+          //style={{marginTop: 10}}
+          >
 
           {/* recipes */}
         <View>

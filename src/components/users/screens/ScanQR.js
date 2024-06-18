@@ -1,11 +1,27 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import {StyleSheet, Text, View, TouchableOpacity, Linking, } from 'react-native'
+import React, {useState} from 'react'
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import { RNCamera } from 'react-native-camera';
+
 
 const ScanQR = () => {
+
+  const [data, setData] = useState('scan something')
+
   return (
+   
+    <QRCodeScanner
+    onRead={({data}) => setData(data)}
+  //  flashMode={RNCamera.Constants.FlashMode.torch}
+  reactivate={true}
+  reactivateTimeout={100}
+  showMarker={true}
+  topContent={
     <View>
-      <Text>ScanQR</Text>
+      <Text>{data}</Text>
     </View>
+  }
+  />
   )
 }
 

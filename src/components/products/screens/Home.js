@@ -13,10 +13,18 @@ import React, {useState} from 'react';
 import SearchBar from '../../fragment/SearchBar';
 import IconQr from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SliderBox} from 'react-native-image-slider-box';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const Home = props => {
   const {navigation} = props;
   const [value, setValue] = useState();
+
+  const handleScanHome = () => {
+    navigation.navigate('ScanHome');
+  };
 
   const updateSearch = value => {
     // setValue(value);
@@ -37,21 +45,19 @@ const Home = props => {
 
   const renderItem = ({item}) => {
     const {_id, image, name, description} = item;
-    console.log(image,"<<<<<<<<<<<<<");
+    console.log(image, '<<<<<<<<<<<<<');
     return (
-      
-        <TouchableOpacity
-          onPress={() => {
-            // console.log(_id)
-            // navigation.navigate('Detail', { newsId: _id });
-          }}>
-          <View style={styles.itemFlatlist}>
-            <Image style={styles.imageVoucherItem} source={image} />
-            <Text>{name}</Text>
-            <Text>{description}</Text>
-          </View>
-        </TouchableOpacity>
-  
+      <TouchableOpacity
+        onPress={() => {
+          // console.log(_id)
+          // navigation.navigate('Detail', { newsId: _id });
+        }}>
+        <View style={styles.itemFlatlist}>
+          <Image style={styles.imageVoucherItem} source={image} />
+          <Text>{name}</Text>
+          <Text>{description}</Text>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -66,24 +72,35 @@ const Home = props => {
               updateSearch={updateSearch}
               // style={{marginTop: '8%'}}
             />
-
-            <IconQr name="qrcode-scan" size={26} style={styles.iconQr} />
+<TouchableOpacity onPress={handleScanHome}>
+<IconQr name="qrcode-scan" size={26} style={styles.iconQr} />
+</TouchableOpacity>
+            
           </View>
 
           {/* Body */}
           <View style={styles.bodyContainer}>
             {/* Maybe you care */}
-            <View
-              style={{backgroundColor: 'blue', justifyContent: 'space-evenly'}}>
-              <Text>Có thể bạn quan tâm</Text>
+            <View style={{justifyContent: 'space-evenly'}}>
+              <Text
+                style={{
+                  marginStart: 24,
+                  fontSize: hp(2.3),
+                  fontWeight: '500',
+                  color: 'black',
+                  marginTop: 10,
+                }}>
+                Có thể bạn quan tâm
+              </Text>
               {/* Baner */}
               <View
                 style={{
                   width: '80%',
-                  height: '55%',
+                  height: hp(15),
                   backgroundColor: 'red',
                   alignSelf: 'center',
                   justifyContent: 'center',
+                  marginVertical: 20,
                 }}>
                 <SliderBox
                   images={images}
@@ -93,9 +110,9 @@ const Home = props => {
                   paginationBoxVerticalPadding={20}
                   autoplay
                   circleLoop
-                  resizeMethod={'resize'}
-                  resizeMode={'cover'}
-                  paginationBoxStyle={styles.paginationBox}
+                  // resizeMethod={'resize'}
+                  // resizeMode={'cover'}
+                  // paginationBoxStyle={styles.paginationBox}
                   dotStyle={styles.dotStyle}
                   ImageComponentStyle={styles.imageStyle}
                   imageLoadingColor="#2196F3"
@@ -104,15 +121,23 @@ const Home = props => {
             </View>
 
             {/* Voucher */}
-            <View style={{backgroundColor: 'pink'}}>
-              <Text>Voucher không thể bỏ lỡ</Text>
+            <View style={{ height: hp(60)}}>
+              <Text style={{
+                  marginStart: 24,
+                  fontSize: hp(2.3),
+                  fontWeight: '500',
+                  color: 'black',
+                  marginTop: 10,
+                }}>Voucher không thể bỏ lỡ</Text>
               <FlatList
-              numColumns={2}
+                numColumns={2}
                 showsVerticalScrollIndicator={false}
-                 style={{width:'100%',height:'35%'}}
+                style={{width: '100%'}}
                 data={data}
                 renderItem={renderItem}
-                keyExtractor={item => item._id}
+                keyExtractor={(item, index) =>
+                  item.id ? item.id.toString() : index.toString()
+                }
               />
             </View>
           </View>
@@ -146,8 +171,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   bodyContainer: {
-    backgroundColor: 'yellow',
+  //  backgroundColor: 'yellow',
     display: 'flex',
+    // width: hp(10)
   },
   paginationBox: {
     position: 'absolute',
@@ -176,48 +202,78 @@ const styles = StyleSheet.create({
   imageVoucherItem: {
     width: 50,
     height: 50,
-    backgroundColor:"red"
+    backgroundColor: 'red',
   },
   itemFlatlist: {
-     margin: 10, backgroundColor: 'lightgrey', padding: 20 
+    margin: 10,
+    backgroundColor: 'lightgrey',
+    padding: 20,
   },
 });
 
 const data = [
   {
-    id: 1,
-    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    id: '1',
+    image: {
+      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+    },
     name: 'Item 1',
     description: 'Description for item 1',
   },
   {
-    id: 2,
-    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    id: '2',
+    image: {
+      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+    },
     name: 'Item 2',
     description: 'Description for item 2',
   },
   {
-    id: 3,
-    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    id: '3',
+    image: {
+      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+    },
     name: 'Item 3',
     description: 'Description for item 3',
   },
   {
-    id: 4,
-    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    id: '4',
+    image: {
+      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+    },
     name: 'Item 3',
     description: 'Description for item 3',
   },
   {
-    id: 5,
-    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    id: '5',
+    image: {
+      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+    },
     name: 'Item 3',
     description: 'Description for item 3',
   },
   {
-    id: 6,
-    image: {uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s'},
+    id: '6',
+    image: {
+      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+    },
     name: 'Item 3',
+    description: 'Description for item 3',
+  },
+  {
+    id: '7',
+    image: {
+      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+    },
+    name: 'Item 3',
+    description: 'Description for item 3',
+  },
+  {
+    id: '6',
+    image: {
+      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+    },
+    name: 'Item 8',
     description: 'Description for item 3',
   },
 ];

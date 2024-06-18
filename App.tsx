@@ -7,8 +7,8 @@ import Menu from './src/components/products/screens/Menu';
 const App = () => {
   return (
     <NavigationContainer>
-      {/* <Navigation /> */}
-      <Menu/>
+      <Navigation />
+      {/* <Menu/> */}
     </NavigationContainer>
   );
 };
