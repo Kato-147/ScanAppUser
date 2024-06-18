@@ -15,6 +15,7 @@ import {
 import {StatusBar} from 'react-native';
 import axios from 'axios';
 import Categories from '../piece/Categories';
+import Recipes from '../piece/Food';
 
 const Menu = ({navigation}) => {
   const handleHome = () => {};
@@ -25,11 +26,11 @@ const Menu = ({navigation}) => {
 
   useEffect(() => {
     getCategories();
-    //getRecipes();
+    getRecipes();
   }, []);
 
   const handleChangeCategory = category => {
-  //  getRecipes(category);
+      getRecipes(category);
     setActiveCategory(category);
     setMeals([]);
   };
@@ -47,6 +48,18 @@ const Menu = ({navigation}) => {
       console.log('error: ', err.message);
     }
   };
+
+  const getRecipes = async(category="Beef") =>{
+    try{
+      const response = await axios.get(`https://themealdb.com/api/json/v1/1/filter.php?c=${category}`);
+      //console.log('got recipes: ',response.data);
+      if(response && response.data){
+        setMeals(response.data.meals);
+      }
+    }catch(err){
+      console.log('error: ',err.message);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -87,25 +100,31 @@ const Menu = ({navigation}) => {
             <Icon name="right" size={24} color="black" />
           </View>
         </TouchableOpacity>
+      </View>
 
-        {/* Menu */}
+      {/* Menu */}
+      <View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: 50}}
+          //style={{marginTop: 10}}
+          >
+          {/* categories */}
+          <View>
+            {categories.length > 0 && (
+              <Categories
+                categories={categories}
+                activeCategory={activeCategory}
+                handleChangeCategory={handleChangeCategory}
+              />
+            )}
+          </View>
+
+          {/* recipes */}
         <View>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 50}}
-            style={{marginTop: 10}}>
-            {/* categories */}
-            <View>
-              {categories.length > 0 && (
-                <Categories
-                  categories={categories}
-                  activeCategory={activeCategory}
-                  handleChangeCategory={handleChangeCategory}
-                />
-              )}
-            </View>
-          </ScrollView>
+          <Recipes meals={meals} categories={categories}/>
         </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -144,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 5,
-    marginBottom: 10,
+  //  marginBottom: 10,
     marginTop: 30,
   },
   iconVoucher: {

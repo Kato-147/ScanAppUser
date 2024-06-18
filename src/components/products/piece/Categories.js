@@ -10,8 +10,8 @@ export default function Categories({categories,activeCategory,handleChangeCatego
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{paddingHorizontal:15}}
-        style={{marginTop:20,flex:1}}
+        contentContainerStyle={{paddingHorizontal:5}}
+        style={{marginTop:20,height: 100}}
       >
         {
             categories.map((cat,index) => {
