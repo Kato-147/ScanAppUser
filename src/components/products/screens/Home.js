@@ -72,10 +72,9 @@ const Home = props => {
               updateSearch={updateSearch}
               // style={{marginTop: '8%'}}
             />
-<TouchableOpacity onPress={handleScanHome}>
-<IconQr name="qrcode-scan" size={26} style={styles.iconQr} />
-</TouchableOpacity>
-            
+            <TouchableOpacity onPress={handleScanHome}>
+              <IconQr name="qrcode-scan" size={26} style={styles.iconQr} />
+            </TouchableOpacity>
           </View>
 
           {/* Body */}
@@ -121,14 +120,17 @@ const Home = props => {
             </View>
 
             {/* Voucher */}
-            <View style={{ height: hp(60)}}>
-              <Text style={{
+            <View style={{height: hp(60)}}>
+              <Text
+                style={{
                   marginStart: 24,
                   fontSize: hp(2.3),
                   fontWeight: '500',
                   color: 'black',
                   marginTop: 10,
-                }}>Voucher không thể bỏ lỡ</Text>
+                }}>
+                Voucher không thể bỏ lỡ
+              </Text>
               <FlatList
                 numColumns={2}
                 showsVerticalScrollIndicator={false}
@@ -171,7 +173,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   bodyContainer: {
-  //  backgroundColor: 'yellow',
+    //  backgroundColor: 'yellow',
     display: 'flex',
     // width: hp(10)
   },

@@ -158,26 +158,5 @@ const styles = StyleSheet.create({
     zIndex: 2,
     margin: 10,
   },
-  voucherContainer: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 5,
-  //  marginBottom: 10,
-    marginTop: 30,
-  },
-  iconVoucher: {
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  voucherText: {
-    color: 'black',
-    fontSize: 14,
-  },
+
 });
