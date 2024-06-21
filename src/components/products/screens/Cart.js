@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -19,9 +19,30 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 
 const Cart = () => {
+  const [quantities, setQuantities] = useState({});
+
+  // Hàm tăng số lượng sản phẩm
+  const increaseQuantity = id => {
+    setQuantities(prev => ({
+      ...prev,
+      [id]: (prev[id] || 0) + 1,
+    }));
+  };
+
+  // Hàm giảm số lượng sản phẩm
+  const decreaseQuantity = id => {
+    setQuantities(prev => ({
+      ...prev,
+      [id]: Math.max((prev[id] || 0) - 1, 0),
+    }));
+  };
+
   const renderItem = ({item}) => {
-    const {_id, image, name, price} = item;
-    console.log(image, '<<<<<<<<<<<<<');
+    const quantity = quantities[item.id] || 0;
+
+    console.log(item, '<<<<<<<<<<<<<<<<<<<<<');
+
+    // console.log(image, '<<<<<<<<<<<<<');
     return (
       <TouchableOpacity
         onPress={() => {
@@ -29,12 +50,27 @@ const Cart = () => {
           // navigation.navigate('Detail', { newsId: _id });
         }}>
         <View style={styles.itemFlatlist}>
-          <Image style={styles.imageVoucherItem} source={image} />
+          <Image style={styles.imageVoucherItem} source={item.image} />
+
+          {/* text info */}
           <View style={{justifyContent: 'space-between'}}>
-            <Text style={{color: 'black', fontSize: hp(2)}}>{name}</Text>
-            <View>
-              <Text>{price}</Text>
-              <View></View>
+            {/* name */}
+            <Text style={{color: 'black', fontSize: hp(2)}}>{item.name}</Text>
+
+            <View style={{flexDirection: 'row', justifyContent:'space-between', width: hp(30)}}>
+              {/* price */}
+              <Text>{item.price}</Text>
+
+              {/* quantity */}
+              <View style={{flexDirection: 'row', display: 'flex', gap: 10}}>
+                <TouchableOpacity onPress={() => decreaseQuantity(item.id)}>
+                  <Icon name="minussquareo" size={24} color='black' />
+                </TouchableOpacity>
+                <Text>{quantity}</Text>
+                <TouchableOpacity onPress={() => increaseQuantity(item.id)}>
+                  <Icon name="plussquareo" size={24} color='black' />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -192,6 +228,9 @@ const styles = StyleSheet.create({
     // alignItems:'center',
     //justifyContent:'center'
   },
+  quantityIcon : {
+
+  }
 });
 
 const data = [
