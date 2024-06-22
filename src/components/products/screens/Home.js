@@ -17,6 +17,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Home = props => {
   const {navigation} = props;
@@ -44,27 +45,29 @@ const Home = props => {
   ];
 
   const renderItem = ({item}) => {
-    const {_id, image, name, description} = item;
-    console.log(image, '<<<<<<<<<<<<<');
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          // console.log(_id)
-          // navigation.navigate('Detail', { newsId: _id });
-        }}>
-        <View style={styles.itemFlatlist}>
-          <Image style={styles.imageVoucherItem} source={image} />
-          <Text>{name}</Text>
-          <Text>{description}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+    //  const {_id, image, name, description} = item;
+      console.log(item.image, '<<<<<<<<<<<<<');
+      return (
+        <TouchableOpacity
+        style={{   }}
+        activeOpacity={1}
+          onPress={() => {
+             console.log(item.id)
+            // navigation.navigate('Detail', { newsId: _id });
+          }}>
+          <View style={styles.itemFlatlist}>
+            <Image style={styles.imageVoucherItem} source={item.image} />
+           <Text>{item.name}</Text>
+            {/* <Text>{item.description}</Text> */}
+          </View>
+        </TouchableOpacity>
+      );
+    };
 
   return (
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
+        <LinearGradient colors={['#FFB266', '#EEEEEE', '#EEEEEE', '#EEEEEE']} style={styles.container}>
           {/* Header */}
           <View style={styles.headerContainer}>
             <SearchBar
@@ -123,18 +126,18 @@ const Home = props => {
             <View style={{height: hp(60)}}>
               <Text
                 style={{
-                  marginStart: 24,
                   fontSize: hp(2.3),
                   fontWeight: '500',
                   color: 'black',
-                  marginTop: 10,
+                  marginTop: 5,
+                  marginStart: 24
                 }}>
                 Voucher không thể bỏ lỡ
               </Text>
               <FlatList
                 numColumns={2}
                 showsVerticalScrollIndicator={false}
-                style={{width: '100%'}}
+                style={{width: hp(45), alignSelf:'center'}}
                 data={data}
                 renderItem={renderItem}
                 keyExtractor={(item, index) =>
@@ -143,7 +146,7 @@ const Home = props => {
               />
             </View>
           </View>
-        </View>
+        </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
@@ -207,9 +210,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   itemFlatlist: {
-    margin: 10,
-    backgroundColor: 'lightgrey',
-    padding: 20,
+    margin: 5,
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 10,
+   // alignSelf:'center',
+    width:hp(21),
+    
   },
 });
 
