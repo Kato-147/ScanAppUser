@@ -45,9 +45,9 @@ const Cart = () => {
     // console.log(image, '<<<<<<<<<<<<<');
     return (
       <TouchableOpacity
+        activeOpacity={1}
         onPress={() => {
-          // console.log(_id)
-          // navigation.navigate('Detail', { newsId: _id });
+          console.log('id', item.id, item.name);
         }}>
         <View style={styles.itemFlatlist}>
           <Image style={styles.imageVoucherItem} source={item.image} />
@@ -57,18 +57,23 @@ const Cart = () => {
             {/* name */}
             <Text style={{color: 'black', fontSize: hp(2)}}>{item.name}</Text>
 
-            <View style={{flexDirection: 'row', justifyContent:'space-between', width: hp(30)}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width: hp(30),
+              }}>
               {/* price */}
               <Text>{item.price}</Text>
 
               {/* quantity */}
               <View style={{flexDirection: 'row', display: 'flex', gap: 10}}>
                 <TouchableOpacity onPress={() => decreaseQuantity(item.id)}>
-                  <Icon name="minussquareo" size={24} color='black' />
+                  <Icon name="minussquareo" size={24} color="black" />
                 </TouchableOpacity>
                 <Text>{quantity}</Text>
                 <TouchableOpacity onPress={() => increaseQuantity(item.id)}>
-                  <Icon name="plussquareo" size={24} color='black' />
+                  <Icon name="plussquareo" size={24} color="black" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -117,16 +122,17 @@ const Cart = () => {
 
           {/* Voucher */}
           <View style={styles.voucherContainer}>
-            <Icon name="tagso" size={24} color="#E8900C" />
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+              <Icon name="tagso" size={24} color="#E8900C" />
 
-            {/* <Text style={styles.voucherText}>Nhập mã Voucher</Text> */}
+              {/* TextInput */}
+              <TextInput
+                // value={query}
+                placeholder="Nhập mã giảm giá"
+                style={styles.voucherTextInput}
+              />
+            </View>
 
-            {/* TextInput */}
-            <TextInput
-              // value={query}
-              placeholder="Nhập mã giảm giá"
-              style={styles.voucherTextInput}
-            />
             <TouchableOpacity
               style={{
                 backgroundColor: '#E8900C',
@@ -224,13 +230,11 @@ const styles = StyleSheet.create({
     borderColor: '#E8900C',
     height: hp(5),
     borderRadius: 8,
-    width: hp(20),
+    width: hp(24),
     // alignItems:'center',
     //justifyContent:'center'
   },
-  quantityIcon : {
-
-  }
+  quantityIcon: {},
 });
 
 const data = [

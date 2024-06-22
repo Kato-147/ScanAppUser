@@ -10,7 +10,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 const Profile = () => {
   return (
     <LinearGradient
-      colors={['#FFB266', '#E0E0E0', '#E0E0E0', '#E0E0E0']}
+      colors={['#FFB266', '#EEEEEE', '#EEEEEE', '#EEEEEE']}
       style={{width: '100%', height: '100%', padding: 24}}>
       {/* Info */}
       <View
