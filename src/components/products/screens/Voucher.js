@@ -21,8 +21,12 @@ import SearchBar from '../../fragment/SearchBar';
 import {SliderBox} from 'react-native-image-slider-box';
 
 
-const Voucher = () => {
+const Voucher = ({navigation}) => {
   const [value, setValue] = useState();
+
+  const handleMyVoucher = () => {
+    navigation.navigate('MyVoucher');
+  }
 
   const updateSearch = value => {
     // setValue(value);
@@ -89,6 +93,7 @@ const Voucher = () => {
 
           {/* See your voucher */}
           <TouchableOpacity
+          onPress={handleMyVoucher}
             activeOpacity={0.8}
             style={styles.seeVoucherContainer}>
             <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>

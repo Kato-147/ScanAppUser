@@ -5,71 +5,97 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ToastAndroid,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
+import LinearGradient from 'react-native-linear-gradient';
+import Icon2 from 'react-native-vector-icons/Ionicons';
+import CustomInput from '../../fragment/CustomInput';
+import {register} from '../UserHTTP';
 
 const Register = ({navigation}) => {
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleRegister = async () => {
+
+    console.log('btn register');
+    if (email === '' || password === '' || fullName === '') {
+      ToastAndroid.show('Vui lòng điền đầy đủ thông tin',ToastAndroid.SHORT);
+      return;
+    }
+
+    try {
+      const response = await register(fullName, email, password);
+      console.log(response);
+      if(response.status ==="succsess"){
+        ToastAndroid.show(response.message, ToastAndroid.SHORT);
+      }
+
+      if (response) {
+        ToastAndroid.show('Register succseccfully', ToastAndroid.SHORT);
+        setTimeout(() => {
+          navigation.navigate('OtpLogin');
+        }, 1000);
+
+      }
+    } catch (error) {
+      console.log(error);
+      ToastAndroid.show('Lỗi đăng ký', ToastAndroid.SHORT);
+    }
+  };
+
   const handleLogin = () => {
     navigation.navigate('Login');
   };
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.login}> Đăng ký </Text>
-      </View>
-      <View style={{marginTop: 20}}>
-        {/* Text input */}
-        <View style={{marginTop: 30}}>
-          <Text style={styles.lableInput}>Số điện thoại :</Text>
-          <TextInput
-            // onChangeText={setEmail}
-            style={styles.input}
-          />
-        </View>
+    <KeyboardAvoidingView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <LinearGradient
+          colors={['#CE8025', '#FFB266', '#E0E0E0']}
+          style={styles.container}>
+          <View>
+            <Text style={styles.login}> Đăng ký </Text>
+          </View>
 
-        {/* Text input */}
-        <View style={{marginTop: 24}}>
-          <Text style={styles.lableInput}>Mật khẩu :</Text>
-          <TextInput
-            // onChangeText={setPassword}
-            style={styles.input}
-            secureTextEntry={true}
-          />
-        </View>
+          <View style={{marginTop: 20}}>
+            {/* Text input */}
 
-        {/* Text input */}
-        <View style={{marginTop: 24}}>
-          <Text style={styles.lableInput}>Nhập mã Otp :</Text>
-          <TextInput
-            // onChangeText={setPassword}
-            style={styles.input}
-          />
-        </View>
-      </View>
+            <CustomInput
+              containerStyle={{marginTop: 20}}
+              placeholder={'Tên'}
+              onChangeText={setFullName}
+            />
 
-      {/* Forgot password & register */}
-      <View
-        style={{
-          marginTop: 24,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-        }}>
-        <TouchableOpacity style={{}}>
-          <Text style={{color: '#191d23'}}>Gửi mã Otp</Text>
-        </TouchableOpacity>
-      </View>
+            <CustomInput
+              containerStyle={{marginTop: 20}}
+              placeholder={'Email'}
+              onChangeText={setEmail}
+            />
 
-      {/* button login */}
-      <View style={{marginTop: 40}}>
-        <TouchableOpacity style={styles.btnLogin}>
-          <Text onPress={handleLogin} style={styles.textLogin}>
-            Xác nhận
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            <CustomInput
+              containerStyle={{marginTop: 20}}
+              placeholder={'Mật khẩu'}
+              onChangeText={setPassword}
+            />
+          </View>
+
+          {/* button login */}
+          <View style={{marginTop: 40}}>
+            <TouchableOpacity style={styles.btnLogin}>
+              <Text onPress={handleRegister} style={styles.textLogin}>
+                Xác nhận
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -81,14 +107,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     display: 'flex',
-    backgroundColor: '#fff',
   },
 
   login: {
     fontSize: 26,
     lineHeight: 40,
     fontWeight: '700',
-    color: '#191919',
+    color: 'white',
     textAlign: 'center',
     marginTop: 40,
   },

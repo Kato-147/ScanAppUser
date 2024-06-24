@@ -29,14 +29,14 @@ const OtpLogin = ({navigation}) => {
     <KeyboardAvoidingView>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <LinearGradient
-      colors={['#C55402', '#CE8025', '#FFB266']}
+      colors={['#CE8025', '#FFB266', '#E0E0E0']}
       style={styles.container}>
       <View>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack}>
+          {/* <TouchableOpacity onPress={handleBack}>
             <Icon2 name="chevron-back-outline" style={styles.iconBack} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <Text style={styles.labelLogin}>Đăng nhập</Text>
           <View />
