@@ -31,7 +31,7 @@ navigation.navigate('OtpLogin');
     
     <KeyboardAvoidingView>
     <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
-    <LinearGradient colors={['#C55402', '#CE8025', '#FFB266']} style={{width:'100%', height:'100%', padding: 24}}>
+    <LinearGradient colors={['#CE8025', '#FFB266', '#E0E0E0']} style={{width:'100%', height:'100%', padding: 24}}>
      
      {/* Mã QR */}
        <Icon name='qrcode' style={styles.iconQr} onPress={handleQR}/>

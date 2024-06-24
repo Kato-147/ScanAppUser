@@ -15,10 +15,7 @@ import Home from '../products/screens/Home'
 import Voucher from '../products/screens/Voucher'
 import Cart from '../products/screens/Cart'
 import Profile from '../products/screens/Profile'
-import IconHome from 'react-native-vector-icons/AntDesign'
-import IconVoucher from 'react-native-vector-icons/AntDesign'
-import IconCart from 'react-native-vector-icons/AntDesign'
-import IconUser from 'react-native-vector-icons/AntDesign'
+import Icon from 'react-native-vector-icons/AntDesign'
 
 
 // ------------------------------------------------------------------
@@ -44,7 +41,7 @@ const TabBar = () =>{
                   headerShown: false,
                   // @ts-ignore
                 tabBarIcon: ({ color, size }) => (
-                    <IconHome name="home" style={styles.icon} size={24} />
+                    <Icon name="home" style={styles.icon} size={24} />
                   ),
                 }}
                 component={Home}
@@ -55,7 +52,7 @@ const TabBar = () =>{
                   headerShown: false,
                   // @ts-ignore
                   tabBarIcon: ({ color, size }) => (
-                    <IconVoucher name="gift" style={styles.icon} size={24}/>
+                    <Icon name="gift" style={styles.icon} size={24}/>
                   ),
                 }}
                 component={Voucher}
@@ -66,7 +63,7 @@ const TabBar = () =>{
                   headerShown: false,
                   // @ts-ignore
                   tabBarIcon: ({ color, size }) => (
-                    <IconCart name="shoppingcart" style={styles.icon} size={24}/>
+                    <Icon name="shoppingcart" style={styles.icon} size={24}/>
                   ),
                 }}
                 component={Cart}
@@ -77,7 +74,7 @@ const TabBar = () =>{
                   headerShown: false,
                   // @ts-ignore
                   tabBarIcon: ({ color, size }) => (
-                    <IconUser name="user" style={styles.icon} size={24}/>
+                    <Icon name="user" style={styles.icon} size={24}/>
                   ),
                 }}
                 component={Profile}
