@@ -3,8 +3,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  TextInput,
-  Image,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
@@ -15,42 +13,43 @@ import LinearGradient from 'react-native-linear-gradient';
 import Icon2 from 'react-native-vector-icons/Ionicons';
 import CustomInput from '../../fragment/CustomInput';
 import {register} from '../UserHTTP';
+import axios from 'axios';
 
 const Register = ({navigation}) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleRegister = async () => {
-
-    console.log('btn register');
-    if (email === '' || password === '' || fullName === '') {
-      ToastAndroid.show('Vui lòng điền đầy đủ thông tin',ToastAndroid.SHORT);
-      return;
-    }
-
-    try {
-      const response = await register(fullName, email, password);
-      console.log(response);
-      if(response.status ==="succsess"){
-        ToastAndroid.show(response.message, ToastAndroid.SHORT);
-      }
-
-      if (response) {
-        ToastAndroid.show('Register succseccfully', ToastAndroid.SHORT);
-        setTimeout(() => {
-          navigation.navigate('OtpLogin');
-        }, 1000);
-
-      }
-    } catch (error) {
-      console.log(error);
-      ToastAndroid.show('Lỗi đăng ký', ToastAndroid.SHORT);
-    }
-  };
+  const [fullName, setFullName] = useState('hihihaha');
+  const [email, setEmail] = useState('oroki147@gmail.com');
+  const [password, setPassword] = useState('Tt123456789');
 
   const handleLogin = () => {
     navigation.navigate('Login');
+  };
+
+  const handleRegister = async () => {
+    console.log('btn register');
+    if (fullName === '' || email === '' || password === '') {
+      ToastAndroid.show('Vui lòng điền đầy đủ thông tin', ToastAndroid.SHORT);
+      return;
+    }
+    try {
+      // Gọi hàm register
+      const response = await register(fullName, email, password);
+      console.log(response, 'response from register');
+
+      // Xử lý phản hồi thành công
+      if (response.status === 'success') {
+        ToastAndroid.show(response.message, ToastAndroid.SHORT);
+        setTimeout(() => {
+          navigation.navigate('OtpLogin', {email});
+        }, 500);
+      }
+      if (response.status === 'fail') {
+        console.log(response.message);
+      }
+    } catch (error) {
+      // Xử lý lỗi và hiển thị thông báo lỗi
+      console.error('Error in handleRegister:', error.message);
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    }
   };
 
   return (
@@ -59,13 +58,19 @@ const Register = ({navigation}) => {
         <LinearGradient
           colors={['#CE8025', '#FFB266', '#E0E0E0']}
           style={styles.container}>
+          {/* header */}
           <View>
-            <Text style={styles.login}> Đăng ký </Text>
+            <TouchableOpacity onPress={handleLogin}>
+              <Icon2 name="chevron-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+
+            <View>
+              <Text style={styles.login}> Đăng ký </Text>
+            </View>
           </View>
 
+          {/* Text input */}
           <View style={{marginTop: 20}}>
-            {/* Text input */}
-
             <CustomInput
               containerStyle={{marginTop: 20}}
               placeholder={'Tên'}
@@ -87,10 +92,8 @@ const Register = ({navigation}) => {
 
           {/* button login */}
           <View style={{marginTop: 40}}>
-            <TouchableOpacity style={styles.btnLogin}>
-              <Text onPress={handleRegister} style={styles.textLogin}>
-                Xác nhận
-              </Text>
+            <TouchableOpacity onPress={handleRegister} style={styles.btnLogin}>
+              <Text style={styles.textLogin}>Xác nhận</Text>
             </TouchableOpacity>
           </View>
         </LinearGradient>

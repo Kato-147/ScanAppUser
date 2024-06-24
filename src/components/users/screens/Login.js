@@ -11,9 +11,13 @@ import React, {useState} from 'react';
 import CustomInput from '../../fragment/CustomInput';
 import Icon from 'react-native-vector-icons/FontAwesome6'
 import LinearGradient from 'react-native-linear-gradient';
+import { login } from '../UserHTTP';
+import { AppConstant } from '../../../helper/AppConstant';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({navigation}) => {
-  const [sdt, setSdt] = useState('');
+  const [email, setEmail] = useState('oroki147@gmail.com');
+  const [password, setPassword] = useState('Tt123456789')
 
   const handleRegister = () => {
     navigation.navigate('Register');
@@ -23,8 +27,36 @@ const Login = ({navigation}) => {
     navigation.navigate('ScanQR');
   };
 
-  const handleOtpLogin = () =>{
-navigation.navigate('OtpLogin');
+  const handleLogin = async () =>{
+    console.log('login');
+
+    if (email === '' || password === '') {
+      ToastAndroid.show('Vui lòng điền đầy đủ thông tin', ToastAndroid.SHORT);
+      return;
+    }
+
+    try {
+      // Gọi hàm login
+      const response = await login(email, password);
+      console.log(response.data.token, 'TOKENNNNNNNN');
+
+      // Xử lý phản hồi thành công
+      if (response.status === 'success') {
+       // ToastAndroid.show(response.message, ToastAndroid.SHORT);
+       await AsyncStorage.setItem('token', JSON.stringify(response.data.token));
+        setTimeout(() => {
+          navigation.navigate('tab');
+        }, 500);
+      }
+      if (response.status === 'fail') {
+        console.log(response.message);
+      }
+    } catch (error) {
+      // Xử lý lỗi và hiển thị thông báo lỗi
+      console.error('Error in handleLogin:', error.message);
+    //  ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    }
+
   };
 
   return (
@@ -37,20 +69,23 @@ navigation.navigate('OtpLogin');
        <Icon name='qrcode' style={styles.iconQr} onPress={handleQR}/>
 
        <Text style={styles.labelQR}>Quét mã QR</Text>
-     {/* Input text */}
 
      {/* Input Text */}
      <CustomInput
        containerStyle={{marginTop: 20}}
        placeholder={'Email'}
-       onChangeText={setSdt}
+       onChangeText={setEmail}
+     />
+     <CustomInput
+       containerStyle={{marginTop: 20}}
+       placeholder={'Mật khẩu'}
+       onChangeText={setPassword}
      />
 
      {/* button login */}
      <View style={{marginTop: 40}}>
-       <TouchableOpacity style={styles.btnLogin} onPress={handleOtpLogin}>
+       <TouchableOpacity style={styles.btnLogin} onPress={handleLogin}>
          <Text
-           // onPress={handleLogin}
            style={styles.textLogin}>
            Đăng nhập
          </Text>

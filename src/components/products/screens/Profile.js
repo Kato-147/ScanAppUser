@@ -1,13 +1,46 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import {Image, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, ToastAndroid} from 'react-native';
+import React,{useEffect, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
+import { infoProfile } from '../ProductsHTTP';
 
 const Profile = () => {
+
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProfileInfo = async () => {
+      try {
+        const data = await infoProfile();
+        setUserInfo(data);
+      } catch (err) {
+        setError(err.message);
+        ToastAndroid.show(err.message, ToastAndroid.LONG);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileInfo();
+  }, []);
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <LinearGradient
       colors={['#FFB266', '#EEEEEE', '#EEEEEE', '#EEEEEE']}
@@ -21,12 +54,20 @@ const Profile = () => {
           paddingVertical: 20,
         }}>
         {/* Avatar */}
+        {userInfo ? (
+        <>
+          <Image source={{ uri: userInfo.img_avatar_url }} style={styles.avatarImage} />
+          
+        </>
+      ) : (
         <View>
-          <Image
-            style={styles.avatarImage}
-            source={require('../../../images/phoneVerify.png')}
-          />
-        </View>
+        <Image
+          style={styles.avatarImage}
+          source={require('../../../images/phoneVerify.png')}
+        />
+      </View>
+      )}
+        
 
         {/* Name */}
         <View style={{justifyContent: 'space-evenly'}}>
