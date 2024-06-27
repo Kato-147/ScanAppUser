@@ -45,8 +45,7 @@ const Home = props => {
   ];
 
   const renderItem = ({item}) => {
-    //  const {_id, image, name, description} = item;
-      console.log(item.image, '<<<<<<<<<<<<<');
+
       return (
         <TouchableOpacity
         style={{   }}

@@ -7,14 +7,21 @@ import {
   TouchableWithoutFeedback,
   View,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon2 from 'react-native-vector-icons/Ionicons';
 import CustomInput from '../../fragment/CustomInput';
 import LinearGradient from 'react-native-linear-gradient';
+import { useRoute } from '@react-navigation/native';
+import { verifyOtp } from '../UserHTTP';
 
 const OtpLogin = ({navigation}) => {
-  const [opt, setOtp] = useState('');
+ 
+  const [verificationCode, setVerificationCode] = useState('');
+
+  const route = useRoute();
+  const { email } = route.params;
 
   const handleBack = () => {
     navigation.navigate('Login');
@@ -24,6 +31,24 @@ const OtpLogin = ({navigation}) => {
     navigation.navigate('tab');
   };
 
+  const handleOtpSubmit = async () => {
+    console.log('send otp');
+    try {
+      const response = await verifyOtp(email, verificationCode); // Gửi email cùng với OTP
+      if (response.status === 'success') {
+        ToastAndroid.show('Xác nhận Otp thành công', ToastAndroid.SHORT);
+       // Alert.alert('Thành công', 'Xác nhận OTP thành công!');
+        // Điều hướng đến trang khác sau khi xác minh thành công
+        navigation.navigate('Login'); // Chuyển đến màn hình login sau khi xác minh otp thành công
+      } else {
+        Alert.alert('Lỗi', 'Mã OTP không hợp lệ, vui lòng thử lại.');
+      }
+    } catch (error) {
+      Alert.alert('Lỗi', 'Đã xảy ra lỗi khi xác minh OTP.');
+      console.log(error);
+    }
+  };
+
   return (
 
     <KeyboardAvoidingView>
@@ -31,14 +56,14 @@ const OtpLogin = ({navigation}) => {
     <LinearGradient
       colors={['#CE8025', '#FFB266', '#E0E0E0']}
       style={styles.container}>
-      <View>
+      <View >
         {/* Header */}
         <View style={styles.header}>
           {/* <TouchableOpacity onPress={handleBack}>
             <Icon2 name="chevron-back-outline" style={styles.iconBack} />
           </TouchableOpacity> */}
 
-          <Text style={styles.labelLogin}>Đăng nhập</Text>
+          <Text style={styles.labelLogin}>Xác thực OTP</Text>
           <View />
         </View>
 
@@ -57,7 +82,7 @@ const OtpLogin = ({navigation}) => {
           <CustomInput
             containerStyle={{marginTop: 5}}
             placeholder={'Nhập mã Otp'}
-            onChangeText={setOtp}
+            onChangeText={setVerificationCode}
           />
 
           {/* Send Otp */}
@@ -77,7 +102,7 @@ const OtpLogin = ({navigation}) => {
         }}>
         <TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
           <Text
-            // onPress={handleLogin}
+             onPress={handleOtpSubmit}
             style={styles.textLogin}>
             Xác nhận
           </Text>
@@ -110,10 +135,6 @@ const styles = StyleSheet.create({
   labelLogin: {
     fontSize: 24,
     fontWeight: '500',
-    color: 'white',
-  },
-  iconBack: {
-    fontSize: 22,
     color: 'white',
   },
   image: {

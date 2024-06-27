@@ -7,6 +7,7 @@ import OtpLogin from '../users/screens/OtpLogin';
 import TabBar from './TabBar';
 import ScanHome from '../products/screens/ScanHome';
 import MyVoucher from '../products/screens/MyVoucher';
+import Menu from '../products/screens/Menu';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ const Navigation = () => {
         <Stack.Screen name="tab" component={TabBar} />
         <Stack.Screen name="ScanHome" component={ScanHome} />
         <Stack.Screen name="MyVoucher" component={MyVoucher} />
+        <Stack.Screen name="Menu" component={Menu} />
         {/* <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Profile" component={Profile} />

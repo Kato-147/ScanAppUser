@@ -1,24 +1,76 @@
-import AxiosInstance from "../../helper/AxiosInstance";
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import AxiosInstance from '../../helper/AxiosInstance';
 
+// Login 
 export const login = async (email, password) => {
-    try {
-      const url = 'users/login';
-      const body = {email, password};
-      const res = await AxiosInstance().post(url, body);
-      return res;
-    } catch (err) {
-      return err;
-    }
-  };
-  
-  export const register = async (fullName, email, password) => {
-    try {
-      const url = 'v1/users/register';
-      const body = {fullName ,email, password};
-      const res = await AxiosInstance().post(url, body);
-      return res;
-    } catch (err) {
+  console.log(email, password);
+  try {
+    const url = 'v1/users/login';
+    const body = {email, password};
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.post(url, body);
+
+    return res;
     
-      console.log('lỗi đăng ký ' + err);
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.message || 'Đăng nhập thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
     }
-  };
+  }
+};
+
+// Register
+ export const register = async (fullName, email, password) => {
+  console.log(fullName, email, password);
+  try {
+    const url = 'v1/users/register'; // Đường dẫn endpoint
+    const body = {fullName, email, password}; // Dữ liệu gửi đi
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.post(url, body); // Gửi yêu cầu
+    return res; // Trả về dữ liệu phản hồi
+  } catch (err) {
+    // Xử lý lỗi chi tiết
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.message || 'Đăng ký thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+
+// Send Otp code
+export const verifyOtp = async (email, verificationCode) => {
+  try {
+    const url = 'v1/users/verify';
+    const body = {email, verificationCode};
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.post(url, body);
+    return res;
+  } catch (err) {
+    // Xử lý lỗi chi tiết
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.message || 'xác thực thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+

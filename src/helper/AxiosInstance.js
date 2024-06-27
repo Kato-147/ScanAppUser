@@ -1,17 +1,18 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AxiosInstance = (contentType = 'application/json') => {
+const AxiosInstance = async (contentType = 'application/json') => {
+  const token = await AsyncStorage.getItem('token');
+
   const axiosInstance = axios.create({
-     baseURL: 'https://pro2052-restaurant-api.onrender.com/'
+    baseURL: 'https://pro2052-restaurant-api.onrender.com/',
   });
 
   axiosInstance.interceptors.request.use(
     async config => {
-      const token = await AsyncStorage.getItem('token');
       config.headers = {
-        Authorization: `Bearer ${token}`,
-      //  Authorization: `Bearer 1fb1d1631cde839435207f07fcab598a`,
+       // Authorization: `Bearer ${token}`,
+       Authorization: `Bearer ${token}`,
         Accept: 'application/json',
         'Content-Type': contentType,
       };
