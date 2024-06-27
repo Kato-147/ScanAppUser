@@ -52,7 +52,7 @@ export const getMenuItem = async (categoryId) => {
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request không cần body
    // console.log(res.data,'=========API MENU ITEM=============');
-    return res; // Trả về dữ liệu từ API
+    return res.data; // Trả về dữ liệu từ API
   } catch (err) {
     if (err.response) {
       console.log('API error:', err.response);

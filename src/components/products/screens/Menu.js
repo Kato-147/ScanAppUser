@@ -16,6 +16,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getCategories} from '../ProductsHTTP';
 import {getMenuItem} from '../ProductsHTTP';
+import Loading from '../../fragment/Loading';
 
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -45,9 +46,9 @@ const Menu = ({navigation}) => {
         const data = await getCategories();
         setCategories(data);
         if (data.length > 0) {
-          setActiveCategory(data._id); // Chọn mục đầu tiên làm mặc định
-          loadMenuItems(activeCategory); // Lấy món ăn cho danh mục đầu tiên
-          console.log(activeCategory,'============');
+          setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
+          loadMenuItems(data[0]._id); // Lấy món ăn cho danh mục đầu tiên
+          console.log(activeCategory, '============');
         }
       } catch (error) {
         console.error(error);
@@ -60,7 +61,7 @@ const Menu = ({navigation}) => {
   }, []);
 
   // get Menu item
-  const loadMenuItems = async (categoryId) => {
+  const loadMenuItems = async categoryId => {
     try {
       const items = await getMenuItem(categoryId);
       setMenuItems(items);
@@ -74,15 +75,15 @@ const Menu = ({navigation}) => {
   }
 
   // Hàm xử lý thay đổi danh mục
-  const handleChangeCategory = (categoryId) => {
-    setActiveCategory(categoryId);  
+  const handleChangeCategory = categoryId => {
+    setActiveCategory(categoryId);
     loadMenuItems(categoryId);
     console.log('Danh mục đang hoạt động:', categoryId);
   };
 
   // Hàm render item cho FlatList danh mục
   const renderItem = ({item}) => {
-    const isActive = item.name === activeCategory;
+    const isActive = item._id === activeCategory;
     const activeButtonStyle = {
       borderColor: isActive ? '#E8900C' : '#757575',
     };
@@ -91,7 +92,7 @@ const Menu = ({navigation}) => {
     };
     return (
       <TouchableOpacity
-        onPress={() => handleChangeCategory(item.name)}
+        onPress={() => handleChangeCategory(item._id)}
         style={styles.touchableOpacityCategories}>
         <View style={[styles.buttonViewCategories, activeButtonStyle]}>
           <Text style={[styles.buttonTextCategories, activeTextStyle]}>
@@ -106,9 +107,16 @@ const Menu = ({navigation}) => {
   const renderMenuItem = ({item}) => {
     return (
       <View style={styles.menuItem}>
-        <Image source={{uri: item.image_url}} style={styles.menuItemImage} />
+        <Image
+          source={{
+            uri: item.image_url
+              ? item.image_url
+              : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+          }}
+          style={styles.menuItemImage}
+        />
         <View style={styles.menuItemInfo}>
-          <Text style={styles.menuItemName}>{item.name}</Text>
+          <Text style={styles.menuItemName} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
           <Text style={styles.menuItemPrice}>{item.price} VND</Text>
         </View>
       </View>
@@ -162,7 +170,7 @@ const Menu = ({navigation}) => {
           )}
         </View>
 
-        <View>
+        <View style={{height:'82%'}}>
           {/* Món ăn */}
           {menuItems.length > 0 ? (
             <FlatList
@@ -173,9 +181,7 @@ const Menu = ({navigation}) => {
               contentContainerStyle={styles.menuList}
             />
           ) : (
-            <Text style={styles.noMenuItems}>
-              Không có món ăn nào trong danh mục này
-            </Text>
+            <Loading style={{marginTop: 100, fontSize: 100}}/>
           )}
         </View>
       </View>
@@ -220,10 +226,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    width: '100%',
+    //  flex: 1,
+    justifyContent: 'flex-start',
+    paddingHorizontal: 15,
     marginVertical: 10,
-    paddingHorizontal: 20,
+    flexDirection: 'row',
   },
   menuItemImage: {
     width: wp(20),
