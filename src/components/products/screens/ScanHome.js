@@ -2,13 +2,24 @@ import { StyleSheet, Text, View, TouchableOpacity, Linking, Alert } from 'react-
 import React,{useState} from 'react'
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ScanHome = () => {
+const ScanHome = ({navigation}) => {
   const [data, setData] = useState('scan something')
+  console.log(data);
+  
+
+  const handleMenu = async() => {
+    navigation.navigate('Menu')
+    // await AsyncStorage.setItem('idMenu', data);
+
+  }
+
   return (
 
     <QRCodeScanner
     onRead={({data}) => setData(data)}
+    
   //  flashMode={RNCamera.Constants.FlashMode.torch}
   reactivate={true}
   reactivateTimeout={100}
@@ -18,6 +29,9 @@ const ScanHome = () => {
       <Text>{data}</Text>
     </View>
   }
+  bottomContent={<TouchableOpacity onPress={handleMenu} >
+    <Text> Menu</Text>
+  </TouchableOpacity>}
   />
 
     // <QRCodeScanner

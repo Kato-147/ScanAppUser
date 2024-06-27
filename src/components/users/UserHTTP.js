@@ -7,8 +7,11 @@ export const login = async (email, password) => {
   try {
     const url = 'v1/users/login';
     const body = {email, password};
-    const res = await AxiosInstance().post(url, body);
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.post(url, body);
+
     return res;
+    
   } catch (err) {
     if (err.response) {
       console.log('API error:', err.response);
@@ -29,7 +32,8 @@ export const login = async (email, password) => {
   try {
     const url = 'v1/users/register'; // Đường dẫn endpoint
     const body = {fullName, email, password}; // Dữ liệu gửi đi
-    const res = await AxiosInstance().post(url, body); // Gửi yêu cầu
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.post(url, body); // Gửi yêu cầu
     return res; // Trả về dữ liệu phản hồi
   } catch (err) {
     // Xử lý lỗi chi tiết
@@ -52,7 +56,8 @@ export const verifyOtp = async (email, verificationCode) => {
   try {
     const url = 'v1/users/verify';
     const body = {email, verificationCode};
-    const res = await AxiosInstance().post(url, body);
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.post(url, body);
     return res;
   } catch (err) {
     // Xử lý lỗi chi tiết

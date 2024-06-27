@@ -6,13 +6,16 @@ import {
 } from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
+import IconLogout from 'react-native-vector-icons/MaterialIcons';
 import { infoProfile } from '../ProductsHTTP';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Profile = () => {
+const Profile = ({navigation}) => {
 
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
 
   useEffect(() => {
     const fetchProfileInfo = async () => {
@@ -21,7 +24,7 @@ const Profile = () => {
         setUserInfo(data);
       } catch (err) {
         setError(err.message);
-        ToastAndroid.show(err.message, ToastAndroid.LONG);
+        ToastAndroid.show(err.message, ToastAndroid.SHORT);
       } finally {
         setLoading(false);
       }
@@ -41,6 +44,23 @@ const Profile = () => {
     );
   }
 
+  const handleLogout = ()=>{
+    console.log("click log out");
+    logout(navigation);
+    console.log(userInfo,'userInfo -->>>>>>>>>>');
+  // setUserInfo(null);
+     //navigation.navigate('Login');
+  }
+
+  const logout = (navigation) => {
+    // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
+    AsyncStorage.clear().then(() => {
+      // setUserInfo(null);
+      // Chuyển sang màn hình chính
+      navigation.navigate('Login');
+    });
+  };
+
   return (
     <LinearGradient
       colors={['#FFB266', '#EEEEEE', '#EEEEEE', '#EEEEEE']}
@@ -56,7 +76,7 @@ const Profile = () => {
         {/* Avatar */}
         {userInfo ? (
         <>
-          <Image source={{ uri: userInfo.img_avatar_url }} style={styles.avatarImage} />
+          <Image source={{ uri: userInfo.data.user.img_avatar_url }} style={styles.avatarImage} />
           
         </>
       ) : (
@@ -71,10 +91,10 @@ const Profile = () => {
 
         {/* Name */}
         <View style={{justifyContent: 'space-evenly'}}>
-          <Text style={{fontSize: hp(3), fontWeight: '500', color: 'black'}}>
-            Nguyen Van A
+          <Text style={{fontSize: hp(3), fontWeight: '500', color: 'black', alignSelf:'center'}}>
+          {userInfo.data.user.fullName}
           </Text>
-          <Text>nguyenvana@gmail.com</Text>
+          <Text>{userInfo.data.user.email}</Text>
         </View>
       </View>
       <Text
@@ -117,9 +137,9 @@ const Profile = () => {
           marginVertical: 20,
           justifyContent: 'space-between',
         }} >
-      <TouchableOpacity style={styles.optionsetting}>
+      <TouchableOpacity style={styles.optionsetting} onPress={handleLogout}>
           <Text style={[styles.textOptionsetting, {color:'#FF3333'}]}>Đăng xuất</Text>
-          <Icon name="right" style={styles.iconOptionsetting} />
+          <IconLogout name="logout" style={styles.iconOptionsetting} />
         </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -140,7 +160,8 @@ const styles = StyleSheet.create({
     width: hp(12),
     height: hp(12),
     borderRadius: 45,
-    backgroundColor: 'white',
+   // backgroundColor: 'red',
+    color:'white'
   },
   textOptionsetting: {
     color: 'black',

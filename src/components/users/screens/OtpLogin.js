@@ -36,7 +36,8 @@ const OtpLogin = ({navigation}) => {
     try {
       const response = await verifyOtp(email, verificationCode); // Gửi email cùng với OTP
       if (response.status === 'success') {
-        Alert.alert('Thành công', 'Xác nhận OTP thành công!');
+        ToastAndroid.show('Xác nhận Otp thành công', ToastAndroid.SHORT);
+       // Alert.alert('Thành công', 'Xác nhận OTP thành công!');
         // Điều hướng đến trang khác sau khi xác minh thành công
         navigation.navigate('Login'); // Chuyển đến màn hình login sau khi xác minh otp thành công
       } else {

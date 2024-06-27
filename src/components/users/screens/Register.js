@@ -16,9 +16,13 @@ import {register} from '../UserHTTP';
 import axios from 'axios';
 
 const Register = ({navigation}) => {
-  const [fullName, setFullName] = useState('hihihaha');
-  const [email, setEmail] = useState('oroki147@gmail.com');
-  const [password, setPassword] = useState('Tt123456789');
+  // const [fullName, setFullName] = useState('hihihaha');
+  // const [email, setEmail] = useState('oroki147@gmail.com');
+  // const [password, setPassword] = useState('Tt123456789');
+
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = () => {
     navigation.navigate('Login');

@@ -1,50 +1,82 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList
+} from 'react-native';
 import React from 'react';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
-import { CachedImage } from '../../../helper/ImageDemo';
+//Categories
 
-export default function Categories({categories,activeCategory,handleChangeCategory}) {
+const Categories = ({ categories, activeCategory, handleChangeCategory }) => {
+  const renderItem = ({ item }) => {
+    const isActive = item.strCategory === activeCategory;
+    const activeButtonStyle = {
+      borderColor: isActive ? '#E8900C' : '#757575',
+    };
+    const activeTextStyle = {
+      color: isActive ? '#E8900C' : '#757575',
+    };
+
+    return (
+      <TouchableOpacity
+        onPress={() => handleChangeCategory(item.strCategory)}
+        style={styles.touchableOpacity}>
+        <View
+          style={[
+            styles.buttonView,
+            activeButtonStyle,
+          ]}>
+          <Text style={[styles.buttonText, activeTextStyle]}>
+            {item.strCategory}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
-    
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{paddingHorizontal:5}}
-        style={{marginTop:20,height: 100}}
-      >
-        
-        {
-            categories.map((cat,index) => {
-                const isActive = cat.strCategory === activeCategory;
-                const activeButtonStyle = {
-                  backgroundColor: isActive ? '#fbbf24' : '#d4d4d8',
-                };
-                return(
-                    <TouchableOpacity
-                        key={index}
-                        onPress={() =>handleChangeCategory(cat.strCategory)}
-                        style={{flex:1,alignItems:'center',marginTop:4}}
-                    >
-                        <View style={[{borderRadius:999,padding:6,marginHorizontal:4},activeButtonStyle]}>
-                            {/* <Image
-                                source={{uri:cat.strCategoryThumb}}
-                                style={{width:hp(6),height:hp(6),borderRadius:999}}
-                            />     */}
-                            <CachedImage 
-                               uri={cat.strCategoryThumb}
-                               style={{width:hp(6),height:hp(6),borderRadius:999}}
-                            />
-                        </View>
-                        <Text style={{fontSize:hp(1.6),color:'#757575'}}>{cat.strCategory}</Text>
-                    </TouchableOpacity>    
-                )
-            })
-        }
+    <FlatList
+      data={categories}
+      horizontal
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={renderItem}
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.flatListContent}
+      style={styles.flatList}
+    />
+  );
+};
 
-      </ScrollView>
+const styles = StyleSheet.create({
+  flatListContent: {
+    paddingHorizontal: 5,
+  },
+  flatList: {
+    marginTop: 20,
+    height: hp(8),
+  },
+  touchableOpacity: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  buttonView: {
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 6,
+    marginHorizontal: 4,
+  },
+  buttonText: {
+    fontSize: hp(2),
+    fontWeight: '500',
+  },
+});
 
-  )
-}
-
-const styles = StyleSheet.create({})
+export default Categories;

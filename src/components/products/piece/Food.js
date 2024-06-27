@@ -11,32 +11,29 @@ import {useNavigation} from '@react-navigation/native';
 export default function Recipes({categories, meals}) {
   const navigation = useNavigation();
 
-  const COLUMN_COUNT = 2;
-
   // Để tính toán chiều rộng của mỗi mục trong lưới
   const renderItem = ({item, index}) => {
-    const marginRight = (index + 1) % 1 === 0 ? 0 : 10;
+
     return (
-      <View style={[styles.item, {marginRight}]}>
+      <View style={[styles.item]}>
         <RecipeCard item={item} index={index} navigation={navigation} />
       </View>
     );
   };
 
   return (
-    <View style={{marginHorizontal: 16, marginTop: 12}}>
-      
+    <View style={{marginHorizontal: 16, marginTop: 2}}>
       <View>
         {categories.length === 0 || meals.length === 0 ? (
-          <Loading style={{marginTop: 80, fontSize: 40}} />
+          <Loading style={{marginTop: 40, fontSize: 40}} />
         ) : (
           <FlatList
             data={meals}
             keyExtractor={item => item.idMeal.toString()} // Đảm bảo key là một chuỗi duy nhất
-           // numColumns={1}
+            // numColumns={1}
             showsVerticalScrollIndicator={false}
             renderItem={renderItem}
-           // columnWrapperStyle={styles.columnWrapper} // Áp dụng phong cách cho các cột
+            // columnWrapperStyle={styles.columnWrapper} // Áp dụng phong cách cho các cột
             onEndReachedThreshold={0.1}
             //refreshing={isLoadingNext}
             //onRefresh={() => refetch({first: ITEM_CNT})}
@@ -49,7 +46,6 @@ export default function Recipes({categories, meals}) {
 }
 
 const RecipeCard = ({item, index, navigation}) => {
-  const isEven = index % 2 == 0;
   return (
     <Pressable
       style={{
@@ -58,16 +54,10 @@ const RecipeCard = ({item, index, navigation}) => {
         justifyContent: 'flex-start',
         marginBottom: 16,
         marginTop: 4,
-      //  paddingLeft: isEven ? 0 : 8,
-// paddingRight: isEven ? 8 : 0,
-        flexDirection:'row'
+        flexDirection: 'row',
       }}
       // onPress={()=> navigation.navigate('RecipeDetail', {...item})}
     >
-      {/* <Image
-                  source={{uri:item.strMealThumb}}
-                  style={{width:'100%',height: index%3 ==0 ? hp(25):hp(35),backgroundColor:'#d4d4d4',borderRadius:35}}
-                />    */}
       <CachedImage
         uri={item.strMealThumb}
         style={{
