@@ -66,3 +66,25 @@ export const getMenuItem = async (categoryId) => {
     }
   }
 };
+
+// get menu item
+export const getTables = async (tableId) => {
+  try {
+    const url = `v1/tables/${tableId}`; // Endpoint API
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.get(url); // GET request không cần body
+   // console.log(res.data,'=========API MENU ITEM=============');
+    return res; // Trả về dữ liệu từ API
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.message || 'Lấy thông tin table thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};

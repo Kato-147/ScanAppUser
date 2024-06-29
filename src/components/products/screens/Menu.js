@@ -31,13 +31,13 @@ const Menu = ({navigation}) => {
   };
 
   // Lấy idMenu từ AsyncStorage #useEffect của lộc
-  // useEffect(() => {
-  //   const idMenu = async () => {
-  //     const id = await AsyncStorage.getItem('idMenu');
-  //     console.log(id, 'ID Menu từ AsyncStorage');
-  //   };
-  //   idMenu();
-  // }, []);
+  useEffect(() => {
+    const idMenu = async () => {
+      const id = await AsyncStorage.getItem('idMenu');
+      console.log(id, 'ID Menu từ AsyncStorage');
+    };
+    idMenu();
+  }, []);
 
   // Lấy dữ liệu các danh mục từ API
   useEffect(() => {
@@ -116,7 +116,12 @@ const Menu = ({navigation}) => {
           style={styles.menuItemImage}
         />
         <View style={styles.menuItemInfo}>
-          <Text style={styles.menuItemName} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
+          <Text
+            style={styles.menuItemName}
+            numberOfLines={1}
+            ellipsizeMode="tail">
+            {item.name}
+          </Text>
           <Text style={styles.menuItemPrice}>{item.price} VND</Text>
         </View>
       </View>
@@ -170,7 +175,7 @@ const Menu = ({navigation}) => {
           )}
         </View>
 
-        <View style={{height:'82%'}}>
+        <View style={{height: '82%'}}>
           {/* Món ăn */}
           {menuItems.length > 0 ? (
             <FlatList
@@ -181,7 +186,7 @@ const Menu = ({navigation}) => {
               contentContainerStyle={styles.menuList}
             />
           ) : (
-            <Loading style={{marginTop: 100, fontSize: 100}}/>
+            <Loading style={{marginTop: 100, fontSize: 100}} />
           )}
         </View>
       </View>
