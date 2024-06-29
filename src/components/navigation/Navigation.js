@@ -8,13 +8,14 @@ import TabBar from './TabBar';
 import ScanHome from '../products/screens/ScanHome';
 import MyVoucher from '../products/screens/MyVoucher';
 import Menu from '../products/screens/Menu';
+import Splash from '../users/screens/Splash';
 
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
   return (
     
-      <Stack.Navigator initialRouteName='Login' screenOptions={{headerShown: false}}>
+      <Stack.Navigator initialRouteName='Splash' screenOptions={{headerShown: false}}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="ScanQR" component={ScanQR} />
@@ -23,11 +24,7 @@ const Navigation = () => {
         <Stack.Screen name="ScanHome" component={ScanHome} />
         <Stack.Screen name="MyVoucher" component={MyVoucher} />
         <Stack.Screen name="Menu" component={Menu} />
-        {/* <Stack.Screen name="Cart" component={Cart} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Profile" component={Profile} />
-        
-        <Stack.Screen name="Voucher" component={Voucher} /> */}
+        <Stack.Screen name="Splash" component={Splash} />
       </Stack.Navigator>
  
   );
