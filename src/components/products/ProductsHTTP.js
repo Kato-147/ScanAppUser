@@ -76,14 +76,14 @@ export const getTables = async (tableId) => {
    // console.log(res.data,'=========API MENU ITEM=============');
     return res; // Trả về dữ liệu từ API
   } catch (err) {
-    if (err.response) {
-      console.log('API error:', err.response);
-      throw new Error(err.response.message || 'Lấy thông tin table thất bại');
-    } else if (err.request) {
-      console.log('No response from API:', err.request);
+    if (err?.response) {
+      console.log('API error:', err?.response);
+      //throw new Error(err?.response?.message || 'Lấy thông tin table thất bại');
+    } else if (err?.request) {
+      console.log('No response from API:', err?.request);
       throw new Error('Không có phản hồi từ máy chủ');
     } else {
-      console.log('Error setting up request:', err.message);
+      console.log('Error setting up request:', err?.message);
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
   }

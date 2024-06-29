@@ -14,7 +14,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getCategories} from '../ProductsHTTP';
+import {getCategories, getTables} from '../ProductsHTTP';
 import {getMenuItem} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
 
@@ -23,6 +23,8 @@ const Menu = ({navigation}) => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('');
+  const [table, setTable] = useState('');
+  const [selectedItems, setSelectedItems] = useState([]);
 
   // Back to home function
   const handleHome = () => {
@@ -30,16 +32,23 @@ const Menu = ({navigation}) => {
     navigation.navigate('Home');
   };
 
-  // Lấy idMenu từ AsyncStorage #useEffect của lộc
+  // Lấy idTable từ AsyncStorage
   useEffect(() => {
-    const idMenu = async () => {
-      const id = await AsyncStorage.getItem('idMenu');
-      console.log(id, 'ID Menu từ AsyncStorage');
+    const idTable = async () => {
+      try {
+        const idTable = await AsyncStorage.getItem('idTable');
+        console.log('ID Table từ AsyncStorage', idTable);
+        const table = await getTables(idTable);
+        console.log('===table==', table);
+        setTable(table);
+      } catch (error) {
+        console.error('Table error', error);
+      }
     };
-    idMenu();
+    idTable();
   }, []);
 
-  // Lấy dữ liệu các danh mục từ API
+  // Get data Categories from API
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -48,7 +57,7 @@ const Menu = ({navigation}) => {
         if (data.length > 0) {
           setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
           loadMenuItems(data[0]._id); // Lấy món ăn cho danh mục đầu tiên
-          console.log(activeCategory, '============');
+          console.log('=====firstCategory=======', activeCategory);
         }
       } catch (error) {
         console.error(error);
@@ -60,7 +69,7 @@ const Menu = ({navigation}) => {
     loadCategories();
   }, []);
 
-  // get Menu item
+  // Get data Menu item from API
   const loadMenuItems = async categoryId => {
     try {
       const items = await getMenuItem(categoryId);
@@ -74,14 +83,14 @@ const Menu = ({navigation}) => {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
-  // Hàm xử lý thay đổi danh mục
+  // Function handle change Categories
   const handleChangeCategory = categoryId => {
     setActiveCategory(categoryId);
     loadMenuItems(categoryId);
-    console.log('Danh mục đang hoạt động:', categoryId);
+    console.log('Danh mục đang hoạt động || category:', categoryId);
   };
 
-  // Hàm render item cho FlatList danh mục
+  // Function render item for flatlist Categories
   const renderItem = ({item}) => {
     const isActive = item._id === activeCategory;
     const activeButtonStyle = {
@@ -103,7 +112,7 @@ const Menu = ({navigation}) => {
     );
   };
 
-  // Hàm render item cho FlatList món ăn
+  // Function render item for flatlist MenuItem
   const renderMenuItem = ({item}) => {
     return (
       <View style={styles.menuItem}>
@@ -115,6 +124,7 @@ const Menu = ({navigation}) => {
           }}
           style={styles.menuItemImage}
         />
+
         <View style={styles.menuItemInfo}>
           <Text
             style={styles.menuItemName}
@@ -122,74 +132,126 @@ const Menu = ({navigation}) => {
             ellipsizeMode="tail">
             {item.name}
           </Text>
-          <Text style={styles.menuItemPrice}>{item.price} VND</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              width: '100%',
+              //  backgroundColor: 'blue',
+              alignItems: 'center',
+            }}>
+            <Text style={styles.menuItemPrice} >{item.price} VND</Text>
+
+            {/* Button Add ItemMenu */}
+            <TouchableOpacity  onPress={() => handleAddItem(item)}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  borderColor: '#E8900C',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: hp(10),
+                  padding: hp(0.5),
+                }}>
+                <Icon name="shoppingcart" size={hp(2.8)} color="#E8900C" />
+                <Text
+                  style={{fontSize: hp(2), fontWeight: 500, color: '#E8900C'}}>
+                  Thêm
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
   };
 
+    // Hàm xử lý khi nhấn nút "Thêm"
+    const handleAddItem = (item) => {
+      console.log(item,'------------');
+      setSelectedItems((prevItems) => [...prevItems, item]);
+    };
+  
+    // Tính tổng giá tiền bằng reduce
+    const totalPrice = selectedItems.reduce((total, item) => total + item.price, 0);
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View
-        style={{
-          width: '100%',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 20,
-          margin: 20,
-        }}>
-        <TouchableOpacity onPress={handleHome}>
-          <Icon style={styles.backIcon} name="left" />
-        </TouchableOpacity>
-        <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
-          Bàn 1
-        </Text>
-      </View>
-
-      {/* Body */}
-
-      {/* Menu */}
-      <View>
-        <Text
-          style={{
-            fontSize: hp(2.5),
-            fontWeight: '400',
-            color: '#525252',
-            marginStart: 20,
-          }}>
-          Menu
-        </Text>
-        {/* categories */}
+      {table?.tableStatus === 'open' ? (
         <View>
-          {categories.length > 0 && (
-            <FlatList
-              horizontal
-              data={categories}
-              keyExtractor={item => item._id.toString()}
-              renderItem={renderItem}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.contentContainer}
-              style={styles.flatList}
-            />
-          )}
-        </View>
+          {/* Header */}
+          <View style={styles.headerContainer}>
+            <TouchableOpacity onPress={handleHome}>
+              <Icon style={styles.backIcon} name="left" />
+            </TouchableOpacity>
+            <Text
+              style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
+              {table?.tableStatus}
+            </Text>
+          </View>
 
-        <View style={{height: '82%'}}>
-          {/* Món ăn */}
-          {menuItems.length > 0 ? (
-            <FlatList
-              data={menuItems}
-              keyExtractor={item => item._id.toString()}
-              renderItem={renderMenuItem}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.menuList}
-            />
-          ) : (
-            <Loading style={{marginTop: 100, fontSize: 100}} />
-          )}
+          {/* Body */}
+
+          {/* Menu */}
+          <View>
+            <Text style={styles.textMenu}>Menu</Text>
+            {/* categories */}
+            <View>
+              {categories.length > 0 && (
+                <FlatList
+                  horizontal
+                  data={categories}
+                  keyExtractor={item => item._id.toString()}
+                  renderItem={renderItem}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.contentContainer}
+                  style={styles.flatList}
+                />
+              )}
+            </View>
+
+            <View style={{height: '70%'}}>
+              {/* Món ăn */}
+              {menuItems.length > 0 ? (
+                <FlatList
+                  data={menuItems}
+                  keyExtractor={item => item._id.toString()}
+                  renderItem={renderMenuItem}
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={styles.menuList}
+                />
+              ) : (
+                <Loading style={{marginTop: 100, fontSize: 100}} />
+              )}
+            </View>
+
+            {/* Thanh toán */}
+            <TouchableOpacity style={styles.paymentContainer}>
+              <View style={{flexDirection:'row', gap: 10, alignItems:'center'}}>
+                
+                <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
+                <View style={styles.lineVertical}/>
+                <View>
+                  <Text style={{fontSize:hp(1.7)}}>Tổng tiền :</Text>
+                  <Text style={{fontSize:hp(2.3), fontWeight: '500', color:'black'}}>{totalPrice} đ</Text>
+                </View>
+              </View>
+
+              {/* pay button */}
+              <View style={styles.payButtonContainer}>
+                <Text style={styles.payButtonText}>ĐẶT MÓN</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      ) : (
+        // --------- Screen data undefined
+        <View style={{alignSelf: 'center'}}>
+          <Text> Bàn không khả dụng </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -237,6 +299,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginVertical: 10,
     flexDirection: 'row',
+    // backgroundColor: 'red',
   },
   menuItemImage: {
     width: wp(20),
@@ -246,6 +309,7 @@ const styles = StyleSheet.create({
   },
   menuItemInfo: {
     flex: 1,
+    justifyContent: 'space-between',
   },
   menuItemName: {
     fontSize: hp(2),
@@ -256,8 +320,8 @@ const styles = StyleSheet.create({
     color: '#757575',
   },
   menuList: {
-    paddingBottom: 30,
-    marginTop: 10,
+    paddingBottom: 20,
+    marginTop: 5,
   },
   noMenuItems: {
     textAlign: 'center',
@@ -265,4 +329,42 @@ const styles = StyleSheet.create({
     color: '#757575',
     fontSize: hp(2),
   },
+  headerContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+    margin: 20,
+  },
+  textMenu: {
+    fontSize: hp(2.5),
+    fontWeight: '400',
+    color: '#525252',
+    marginStart: 20,
+  },
+  paymentContainer: {
+    width: wp(100),
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: hp(10),
+    paddingHorizontal: wp(5),
+
+  },
+  payButtonContainer: {
+    backgroundColor: '#E8900C',
+    borderRadius: 5,
+    padding: 10
+  },
+  lineVertical:{
+    width: 1,  // Chiều rộng của đường thẳng
+    height: hp(5),  // Chiều cao của đường thẳng
+    backgroundColor: '#C0C0C0',  // Màu của đường thẳng
+  },
+  payButtonText:{
+    fontSize:hp(1.8),
+    fontWeight:'500',
+    color:'white'
+  }
 });
