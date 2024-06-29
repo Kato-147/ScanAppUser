@@ -4,6 +4,8 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// id ban 1 : 666c5a75c55050edf1b3168e
+// id ban 3 : 
 
 const ScanHome = ({navigation}) => {
   const [data, setData] = useState('scan something')
