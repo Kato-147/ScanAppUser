@@ -67,14 +67,14 @@ export const getMenuItem = async (categoryId) => {
   }
 };
 
-// get menu item
+// Get Table
 export const getTables = async (tableId) => {
   try {
     const url = `v1/tables/${tableId}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request không cần body
-   // console.log(res.data,'=========API MENU ITEM=============');
-    return res; // Trả về dữ liệu từ API
+   // console.log(res.data,'=========API Table=============');
+    return res.data; // Trả về dữ liệu từ API
   } catch (err) {
     if (err?.response) {
       console.log('API error:', err?.response);

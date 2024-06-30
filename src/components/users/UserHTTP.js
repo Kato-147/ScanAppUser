@@ -74,3 +74,29 @@ export const verifyOtp = async (email, verificationCode) => {
   }
 };
 
+//Update Info User
+export const updateUser = async (img_avatar_url,fullName) => {
+  console.log('>>>>truyền dô ảnh và tên',img_avatar_url,fullName);
+  try {
+    const url = 'v1/users/register'; // Đường dẫn endpoint
+    const body = {img_avatar_url,fullName}; // Dữ liệu gửi đi
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.patch(url, body); // Gửi yêu cầu
+    return res; // Trả về dữ liệu phản hồi
+  } catch (err) {
+    // Xử lý lỗi chi tiết
+    if (err.response) {
+      if (err.response) {
+        console.error('API error:', err.response.data);
+        throw new Error(err.response.data.message || 'Cập nhật thông tin người dùng thất bại');
+      } else if (err.request) {
+        console.error('No response from API:', err.request);
+        throw new Error('Không có phản hồi từ máy chủ');
+      } else {
+        console.error('Error setting up request:', err.message);
+        throw new Error('Lỗi khi thiết lập yêu cầu');
+      }
+    }
+  }
+};
+

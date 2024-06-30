@@ -179,7 +179,7 @@ const Menu = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      {table?.tableStatus === 'open' ? (
+      {table?.status === 'open' ? (
         <View>
           {/* Header */}
           <View style={styles.headerContainer}>
@@ -188,7 +188,7 @@ const Menu = ({navigation}) => {
             </TouchableOpacity>
             <Text
               style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
-              {table?.tableStatus}
+               Bàn {table?.tableNumber}
             </Text>
           </View>
 
@@ -213,7 +213,7 @@ const Menu = ({navigation}) => {
             </View>
 
             <View style={{height: '70%'}}>
-              {/* Món ăn */}
+              {/* Menu Item */}
               {menuItems.length > 0 ? (
                 <FlatList
                   data={menuItems}

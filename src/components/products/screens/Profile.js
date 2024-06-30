@@ -52,6 +52,11 @@ const Profile = ({navigation}) => {
      //navigation.navigate('Login');
   }
 
+  const handleUpdateInfo = () => {
+    console.log('>>>>>>>> click to UpdateInfo Screen');
+    navigation.navigate('UpdateInfo');
+  }
+
   const logout = (navigation) => {
     // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
     AsyncStorage.clear().then(() => {
@@ -114,7 +119,7 @@ const Profile = ({navigation}) => {
           paddingVertical: 20,
           justifyContent: 'space-between',
         }}>
-        <TouchableOpacity style={styles.optionsetting}>
+        <TouchableOpacity style={styles.optionsetting} onPress={handleUpdateInfo} >
           <Text style={styles.textOptionsetting}>Chỉnh sửa thông tin</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
