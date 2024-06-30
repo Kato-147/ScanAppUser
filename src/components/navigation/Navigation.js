@@ -9,6 +9,7 @@ import ScanHome from '../products/screens/ScanHome';
 import MyVoucher from '../products/screens/MyVoucher';
 import Menu from '../products/screens/Menu';
 import Splash from '../users/screens/Splash';
+import UpdateInfo from '../products/screens/UpdateInfo';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,7 @@ const Navigation = () => {
         <Stack.Screen name="MyVoucher" component={MyVoucher} />
         <Stack.Screen name="Menu" component={Menu} />
         <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
       </Stack.Navigator>
  
   );
