@@ -11,11 +11,16 @@ const AxiosInstance = async (contentType = 'application/json') => {
   axiosInstance.interceptors.request.use(
     async config => {
       config.headers = {
-       // Authorization: `Bearer ${token}`,
-       Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         Accept: 'application/json',
         'Content-Type': contentType,
       };
+
+      // Check if data is an instance of FormData
+      if (config.data instanceof FormData) {
+        config.headers['Content-Type'] = 'multipart/form-data';
+      }
+
       return config;
     },
     err => Promise.reject(err),
