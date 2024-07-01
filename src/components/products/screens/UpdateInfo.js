@@ -1,5 +1,6 @@
 import {
   Button,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   PermissionsAndroid,
@@ -10,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState,useCallback} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -18,40 +19,79 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import CustomInput from '../../fragment/CustomInput';
 import {updateUser} from '../../users/UserHTTP';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { infoProfile } from '../ProductsHTTP';
 
 const UpdateInfo = ({navigation}) => {
   const [fullName, setFullName] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [image, setImage] = useState('');
+  const [imageFile, setImageFile] = useState('');
+  const [count, setCount] = useState(0);
 
   const handleUpdate = async () => {
+  //  setCount(count + 1);
     try {
-      // Gọi hàm updateUser với các giá trị mới
-      const updatedUser = await updateUser(fullName, avatarUrl);
-      console.log('Thông tin người dùng đã được cập nhật:', updatedUser);
-      ToastAndroid.show('Cập nhật thành công', ToastAndroid.SHORT);
-      // Xử lý sau khi cập nhật thành công (ví dụ: thông báo thành công)
-    } catch (error) {
-      console.error(error.message);
-      // Xử lý lỗi (ví dụ: thông báo lỗi)
-    }
-  };
-
-  const requestCameraPermission = async () => {
-    try {
-      const checkPermission = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-      );
-
-      if (checkPermission === PermissionsAndroid.RESULTS.GRANTED) {
-        const result = await launchCamera({mediaType:'photo',cameraType:'back'});
-        console.log('Đây là result photo >>>>>>>',result);
-    } else {
-        console.log('bị từ chối ồi');
-    }
+        // create formData 
+      const formData = new FormData();
+      formData.append('fullName', fullName); // change value of fullName in api
+      formData.append('img_avatar_url', {
+        uri: imageFile.uri,
+        type: imageFile.type,
+        name: imageFile.fileName
+      }); // value of photo change value of img_avatar_url in api
+      await updateUser(formData)  // send form data to updatee user
+        .then((success) => {
+            console.log('------------', success);
+            console.log('>>>>>> Return Profile screen');
+            ToastAndroid.show('Cập nhật thành công', ToastAndroid.SHORT);
+           // setCount(count + 1);
+            navigation.navigate('Profile');
+        } ) // value success from api
+        .catch(err => console.log(err, 'err'));
+       
+        
+        
+    
     } catch (error) {
       console.log(error);
     }
   };
+
+
+ const takePhoto = useCallback(async (response) => {
+    if (response.didCancel) return;
+    if (response.errorCode) return;
+    if (response.errorMessage) return;
+    if (response.assets && response.assets.length > 0) {
+        const asset = response.assets[0];
+        
+        setImage(asset.uri); //show photo in screen
+        setImageFile(asset); // send value of imageFile in form data 
+
+        setshowModal(false); //turn off modal
+        
+    }
+}, []);
+
+   // take photo with camera
+   const openCamera = useCallback(async () => {
+    const options = {
+        mediaType: 'photo',
+        quality: 1,
+        saveToPhotos: true,
+    };
+    await launchCamera(options, takePhoto);
+}, []);
+
+// choose photo in library
+const openLibrary = useCallback(async () => {
+    const options = {
+        mediaType: 'photo',
+        quality: 1,
+        saveToPhotos: true,
+    };
+    await launchImageLibrary(options, takePhoto);
+}, []);
 
   //Back to Profile Screen
   const handleBack = () => {
@@ -74,11 +114,21 @@ const UpdateInfo = ({navigation}) => {
 
           {/* Body */}
           <View>
-            <Button title="Chọn ảnh nhé" onPress={requestCameraPermission} />
+            <Button title="chụp" onPress={openCamera} />
+            <Button title="chọn" onPress={openLibrary} />
+            {image != '' ? (
+              <Image source={{uri: image}} style={{width: 50, height: 50}} />
+            ) : (
+              <View style={{width: 50, height: 50, backgroundColor: 'red'}}>
+                <Text style={{color: 'white', fontSize: 24, fontWeight: '500'}}>
+                  HIhihaha
+                </Text>
+              </View>
+            )}
 
             {/* Input Text */}
             <CustomInput
-              containerStyle={{marginTop: 20}}
+              containerStyle={{marginTop: 100}}
               placeholder={'Tên'}
               onChangeText={setFullName}
             />

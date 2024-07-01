@@ -75,14 +75,15 @@ export const verifyOtp = async (email, verificationCode) => {
 };
 
 //Update Info User
-export const updateUser = async (img_avatar_url,fullName) => {
-  console.log('>>>>truyền dô ảnh và tên',img_avatar_url,fullName);
+export const updateUser = async (formData) => {
+  console.log('>>>>truyền dô ảnh và tên',formData);
   try {
-    const url = 'v1/users/register'; // Đường dẫn endpoint
-    const body = {img_avatar_url,fullName}; // Dữ liệu gửi đi
-    const axiosInstance = await AxiosInstance(); // Đợi instance
-    const res = await axiosInstance.patch(url, body); // Gửi yêu cầu
+    const url = 'v1/users/update-me'; // Đường dẫn endpoint
+   // const body = {formData}; // Dữ liệu gửi đi
+    const axiosInstance = await AxiosInstance('multipart/form-data'); // Đợi instance
+    const res = await axiosInstance.patch(url, formData); // Gửi yêu cầu
     return res; // Trả về dữ liệu phản hồi
+    
   } catch (err) {
     // Xử lý lỗi chi tiết
     if (err.response) {

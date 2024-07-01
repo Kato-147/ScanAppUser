@@ -1,0 +1,153 @@
+export const uploadImage= async(formData)=>{
+    try {
+        const axiosInstance=AxiosInstance('multipart/form-data')
+        const url='/media/upload'
+        const response=await axiosInstance.post(url,formData)
+        return response
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+export const insertNews=async(news)=>{
+    console.log(news)
+    try {
+        const url='/articles'
+        const body={
+            title:news.title,
+            content:news.content,
+            image:news.image
+        }
+        const response=await AxiosInstance().post(url,body)
+        return response
+    } catch (error) {
+        console.log(error)
+        throw error
+        
+    }
+}
+
+----------------------------------------------
+
+import { insertNews, uploadImage,getAll } from './NewsHttp'
+import { MyContext } from '../User/UserContext';
+
+const Insert = () => {
+    const [showModal, setshowModal] = useState(false)
+    const [image, setImage] = useState(null)
+ //   const [imagePath, setImagePath] = useState(null)
+
+
+    // nhận hình ảnh từ thư viện
+    const takePhoto = useCallback(async (response) => {
+        if (response.didCancel) return;
+        if (response.errorCode) return;
+        if (response.errorMessage) return;
+        if (response.assets && response.assets.length > 0) {
+            const asset = response.assets[0];
+            // hiện hình
+            setImage(asset.uri);
+            // tắt modal
+            setshowModal(false);
+            // upload image
+            const formData = new FormData();
+            formData.append('img_avatar_url', {
+                uri: asset.uri,
+                type: asset.type,
+                name: asset.fileName,
+            });
+
+            formData.append('fullName', fullName);
+            
+            const result = await uploadImage(formData);
+            console.log('>>>>>upload image: ', result.data.path);
+          //  setImagePath(result.data.path);
+        }
+    }, []);
+
+    // sử dụng lại hàm này
+    const openCamera = useCallback(async () => {
+        const options = {
+            mediaType: 'photo',
+            quality: 1,
+            saveToPhotos: true,
+        };
+        await launchCamera(options, takePhoto);
+        // await launchImageLibrary(options, takePhoto);
+    }, []);
+    const openLibrary = useCallback(async () => {
+        const options = {
+            mediaType: 'photo',
+            quality: 1,
+            saveToPhotos: true,
+        };
+        //await launchCamera(options, takePhoto);
+        await launchImageLibrary(options, takePhoto);
+    }, []);
+
+
+ 
+    return (
+        <View style={styles.container}>
+            <Modal
+                animationType='slide'
+                transparent={true}
+                visible={showModal}
+                onRequestClose={() => setshowModal(false)}
+            >
+                <View style={styles.modalContainer}>
+
+                    <View style={styles.modalContent}>
+                        <View >
+                                <Text>Thêm hình ảnh</Text>
+                         
+                            <TouchableOpacity onPress={() => setshowModal(false)}>
+
+                                <MaterialCommunityIcons name='close' size={20} />
+                            </TouchableOpacity>
+                        </View>
+                        <View >
+                            <TouchableOpacity onPress={() => { openCamera() }}>
+                                <View>
+                                    <MaterialCommunityIcons name='camera' color='black' size={40} />
+                                    <Text style={styles.text1}>Chụp từ camera</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <Text >hoặc</Text>
+                            <TouchableOpacity onPress={() => { openLibrary() }}>
+                                <View >
+                                    <MaterialCommunityIcons name='image-area' color='black' size={40} />
+                                    <Text style={styles.text1}>Lấy từ thư viện</Text>
+                                </View>
+
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+
+                </View>
+            </Modal>
+            <View >
+                {
+                    image ?
+                        <View>
+                            <Image source={{ uri: image }}></Image>
+                            <TouchableOpacity onPress={() => setshowModal(true)}>
+                                <Image source={require('../../media/icEdit.png')}></Image>
+                            </TouchableOpacity>
+                        </View> :
+                        <View >
+
+                            <TouchableOpacity onPress={() => setshowModal(true)}>
+                                <Image source={require('../../media/icPlus.png')}></Image>
+                            </TouchableOpacity>
+                            <Text style={styles.text1}>Add Cover Photo</Text>
+                        </View>
+                }
+            </View>
+
+        </View>
+    )
+}
+
+export default Insert
