@@ -12,7 +12,7 @@ import {
 import React, {useState} from 'react';
 import SearchBar from '../../fragment/SearchBar';
 import IconQr from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SliderBox} from 'react-native-image-slider-box';
+import IconChat from 'react-native-vector-icons/Ionicons';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -33,110 +33,85 @@ const Home = props => {
     console.log(value);
   };
 
-  const images = [
-    require('../../../images/iconQr.png'),
-    require('../../../images/phoneVerify.png'),
-    require('../../../images/iconQr.png'),
-    require('../../../images/phoneVerify.png'),
-    require('../../../images/iconQr.png'),
-    require('../../../images/phoneVerify.png'),
-    require('../../../images/iconQr.png'),
-    require('../../../images/phoneVerify.png'),
-  ];
-
   const renderItem = ({item}) => {
-
-      return (
-        <TouchableOpacity
-        style={{   }}
+    return (
+      <TouchableOpacity
+        style={{}}
         activeOpacity={1}
-          onPress={() => {
-             console.log(item.id)
-            // navigation.navigate('Detail', { newsId: _id });
-          }}>
-          <View style={styles.itemFlatlist}>
-            <Image style={styles.imageVoucherItem} source={item.image} />
-           <Text>{item.name}</Text>
-            {/* <Text>{item.description}</Text> */}
-          </View>
-        </TouchableOpacity>
-      );
-    };
+        onPress={() => {
+          console.log(item.id);
+          // navigation.navigate('Detail', { newsId: _id });
+        }}>
+        <View style={styles.itemFlatlist}>
+          <Image style={styles.imageVoucherItem} source={item.image} />
+          <Text>{item.name}</Text>
+          {/* <Text>{item.description}</Text> */}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <LinearGradient colors={['#FFB266', '#EEEEEE', '#EEEEEE', '#EEEEEE']} style={styles.container}>
+        <LinearGradient
+          colors={['#C96913', '#FFB266', '#EEEEEE', '#EEEEEE']}
+          style={styles.container}>
           {/* Header */}
           <View style={styles.headerContainer}>
             <SearchBar
               value={value}
               updateSearch={updateSearch}
               // style={{marginTop: '8%'}}
+             
             />
-            <TouchableOpacity onPress={handleScanHome}>
-              <IconQr name="qrcode-scan" size={26} style={styles.iconQr} />
+            <TouchableOpacity>
+              <IconChat
+                name="chatbox-ellipses-outline"
+                size={26}
+                color="#E8900C"
+              />
             </TouchableOpacity>
           </View>
 
           {/* Body */}
           <View style={styles.bodyContainer}>
-            {/* Maybe you care */}
-            <View style={{justifyContent: 'space-evenly'}}>
-              <Text
-                style={{
-                  marginStart: 24,
-                  fontSize: hp(2.3),
-                  fontWeight: '500',
-                  color: 'black',
-                  marginTop: 10,
-                }}>
-                Có thể bạn quan tâm
-              </Text>
-              {/* Baner */}
-              <View
-                style={{
-                  width: '80%',
-                  height: hp(15),
-                  backgroundColor: 'red',
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                  marginVertical: 20,
-                }}>
-                <SliderBox
-                  images={images}
-                  sliderBoxHeight={200}
-                  dotColor="#FFEE58"
-                  inactiveDotColor="#90A4AE"
-                  paginationBoxVerticalPadding={20}
-                  autoplay
-                  circleLoop
-                  // resizeMethod={'resize'}
-                  // resizeMode={'cover'}
-                  // paginationBoxStyle={styles.paginationBox}
-                  dotStyle={styles.dotStyle}
-                  ImageComponentStyle={styles.imageStyle}
-                  imageLoadingColor="#2196F3"
-                />
-              </View>
+            {/* Scan Here */}
+            <View
+              style={{justifyContent: 'space-evenly', flexDirection: 'row', alignItems:'center', marginVertical: hp(8)}}>
+              
+                <Text
+                  style={{
+                    marginStart: 24,
+                    fontSize: hp(2.3),
+                    fontWeight: '500',
+                    color: 'white',
+                    marginTop: 10,
+                  }}>
+                  Quét mã để xem Menu
+                </Text>
+                <TouchableOpacity onPress={handleScanHome}>
+                  <IconQr name="qrcode-scan" style={styles.iconQr} />
+                </TouchableOpacity>
+              
             </View>
 
             {/* Voucher */}
             <View style={{height: hp(60)}}>
               <Text
                 style={{
-                  fontSize: hp(2.3),
+                  fontSize: hp(2.8),
                   fontWeight: '500',
                   color: 'black',
                   marginTop: 5,
-                  marginStart: 24
+                  marginStart: 24,
                 }}>
-                Voucher không thể bỏ lỡ
+                Thông báo
               </Text>
               <FlatList
                 numColumns={2}
                 showsVerticalScrollIndicator={false}
-                style={{width: hp(45), alignSelf:'center'}}
+                style={{width: hp(45), alignSelf: 'center'}}
                 data={data}
                 renderItem={renderItem}
                 keyExtractor={(item, index) =>
@@ -163,16 +138,19 @@ const styles = StyleSheet.create({
   },
   iconQr: {
     color: 'white',
+    fontSize: wp(20)
   },
   headerContainer: {
     height: '10%',
-    backgroundColor: '#E8900C',
+   // backgroundColor: '#E8900C',
+    backgroundColor: 'white',
     borderBottomEndRadius: 30,
     borderBottomStartRadius: 30,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
+    
   },
   bodyContainer: {
     //  backgroundColor: 'yellow',
@@ -213,9 +191,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 10,
-   // alignSelf:'center',
-    width:hp(21),
-    
+    // alignSelf:'center',
+    width: hp(21),
   },
 });
 
