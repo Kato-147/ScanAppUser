@@ -82,7 +82,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     flexDirection: 'row',
-    borderRadius:20
+    borderRadius:20,
+    borderWidth: 1,
+    borderColor:'#E8900C'
   },
   container: {
     // height: '100%', width: '100%'

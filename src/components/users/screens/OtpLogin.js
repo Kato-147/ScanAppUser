@@ -13,15 +13,14 @@ import React, {useState, useEffect} from 'react';
 import Icon2 from 'react-native-vector-icons/Ionicons';
 import CustomInput from '../../fragment/CustomInput';
 import LinearGradient from 'react-native-linear-gradient';
-import { useRoute } from '@react-navigation/native';
-import { verifyOtp } from '../UserHTTP';
+import {useRoute} from '@react-navigation/native';
+import {verifyOtp} from '../UserHTTP';
 
 const OtpLogin = ({navigation}) => {
- 
   const [verificationCode, setVerificationCode] = useState('');
 
   const route = useRoute();
-  const { email } = route.params;
+  const {email} = route.params;
 
   const handleBack = () => {
     navigation.navigate('Login');
@@ -37,7 +36,7 @@ const OtpLogin = ({navigation}) => {
       const response = await verifyOtp(email, verificationCode); // Gửi email cùng với OTP
       if (response.status === 'success') {
         ToastAndroid.show('Xác nhận Otp thành công', ToastAndroid.SHORT);
-       // Alert.alert('Thành công', 'Xác nhận OTP thành công!');
+        // Alert.alert('Thành công', 'Xác nhận OTP thành công!');
         // Điều hướng đến trang khác sau khi xác minh thành công
         navigation.navigate('Login'); // Chuyển đến màn hình login sau khi xác minh otp thành công
       } else {
@@ -50,69 +49,64 @@ const OtpLogin = ({navigation}) => {
   };
 
   return (
-
     <KeyboardAvoidingView>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-    <LinearGradient
-      colors={['#CE8025', '#FFB266', '#E0E0E0']}
-      style={styles.container}>
-      <View >
-        {/* Header */}
-        <View style={styles.header}>
-          {/* <TouchableOpacity onPress={handleBack}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <LinearGradient
+          colors={['#CE8025', '#FFB266', '#E0E0E0']}
+          style={styles.container}>
+          <View>
+            {/* Header */}
+            <View style={styles.header}>
+              {/* <TouchableOpacity onPress={handleBack}>
             <Icon2 name="chevron-back-outline" style={styles.iconBack} />
           </TouchableOpacity> */}
 
-          <Text style={styles.labelLogin}>Xác thực OTP</Text>
-          <View />
-        </View>
+              <Text style={styles.labelLogin}>Xác thực OTP</Text>
+              <View />
+            </View>
 
-        {/* Image */}
+            {/* Image */}
 
-        <Image
-          style={styles.image}
-          source={require('../../../images/phoneVerify.png')}
-        />
+            <Image
+              style={styles.image}
+              source={require('../../../images/phoneVerify.png')}
+            />
 
-        {/* Otp */}
-        <View>
-          <Text style={styles.textOtp}>Mã OTP đã được gửi về Email</Text>
+            {/* Otp */}
+            <View>
+              <Text style={styles.textOtp}>Mã OTP đã được gửi về Email</Text>
 
-          {/* Input Text */}
-          <CustomInput
-            containerStyle={{marginTop: 5}}
-            placeholder={'Nhập mã Otp'}
-            onChangeText={setVerificationCode}
-          />
+              {/* Input Text */}
+              <CustomInput
+                containerStyle={{marginTop: 5}}
+                placeholder={'Nhập mã Otp'}
+                onChangeText={setVerificationCode}
+              />
 
-          {/* Send Otp */}
-          <TouchableOpacity style={{alignSelf: 'flex-end', marginTop: 10}}>
-            <Text style={{alignSelf: 'flex-end'}}>Gửi lại mã Otp</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+              {/* Send Otp */}
+              <TouchableOpacity style={{alignSelf: 'flex-end', marginTop: 10}}>
+                <Text style={{alignSelf: 'flex-end'}}>Gửi lại mã Otp</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      {/* button login */}
+          {/* button login */}
 
-      <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          marginBottom: 20,
-        }}>
-        <TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
-          <Text
-             onPress={handleOtpSubmit}
-            style={styles.textLogin}>
-            Xác nhận
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
-    </TouchableWithoutFeedback>
-  </KeyboardAvoidingView>
-
-   
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              marginBottom: 20,
+            }}>
+            <TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
+              <Text onPress={handleOtpSubmit} style={styles.textLogin}>
+                Xác nhận
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

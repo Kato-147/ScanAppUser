@@ -79,7 +79,7 @@ const Profile = ({navigation}) => {
 
   return (
     <LinearGradient
-      colors={['#FFB266', '#EEEEEE', '#EEEEEE', '#EEEEEE']}
+      colors={['#C96913', '#FFB266', '#EEEEEE', '#EEEEEE']}
       style={{width: '100%', height: '100%', padding: 24}}>
       {/* Info */}
       <View
