@@ -21,7 +21,6 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import CustomInput from '../../fragment/CustomInput';
 import {updateUser} from '../../users/UserHTTP';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {infoProfile} from '../ProductsHTTP';
 
 const UpdateInfo = ({navigation}) => {
   const [fullName, setFullName] = useState('');
