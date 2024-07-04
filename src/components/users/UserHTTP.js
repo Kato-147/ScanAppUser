@@ -101,3 +101,28 @@ export const updateUser = async (formData) => {
   }
 };
 
+// Login 
+export const updatePassword = async (currentPassword, newPassword) => {
+  console.log(currentPassword, newPassword);
+  try {
+    const url = 'v1/users/update-password';
+    const body = {currentPassword, newPassword};
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.patch(url, body);
+
+    return res;
+    
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.message || 'Cập nhật mật khẩu thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+

@@ -68,6 +68,11 @@ const Profile = ({navigation}) => {
     navigation.navigate('UpdateInfo');
   };
 
+  const handleUpdatePassword =()=>{
+    console.log('>>>>>>>> click to UpdatePassword Screen');
+    navigation.navigate('UpdatePassword');
+  }
+
   const logout = navigation => {
     // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
     AsyncStorage.clear().then(() => {
@@ -141,6 +146,13 @@ const Profile = ({navigation}) => {
           style={styles.optionsetting}
           onPress={handleUpdateInfo}>
           <Text style={styles.textOptionsetting}>Chỉnh sửa thông tin</Text>
+          <Icon name="right" style={styles.iconOptionsetting} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.optionsetting}
+          onPress={handleUpdatePassword}>
+          <Text style={styles.textOptionsetting}>Thay đổi mật khẩu</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 

@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  ToastAndroid
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import CustomInput from '../../fragment/CustomInput';
@@ -16,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('oroki147@gmail.com');
-  const [password, setPassword] = useState('Tt123456789')
+  const [password, setPassword] = useState('Tt123456')
 
   // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('')
@@ -40,7 +41,6 @@ const Login = ({navigation}) => {
     try {
       // Gọi hàm login
       const response = await login(email, password);
-    //  console.log(response.data.token, 'TOKENNNNNNNN');
 
       // Xử lý phản hồi thành công
       if (response.status === 'success') {
@@ -53,12 +53,16 @@ const Login = ({navigation}) => {
         }, 500);
       }
       if (response.status === 'fail') {
-        console.log(response.message);
+        console.log('status fail >>>>>',response.message);
       }
+      
     } catch (error) {
       // Xử lý lỗi và hiển thị thông báo lỗi
-      console.error('Error in handleLogin:', error.message);
-    //  ToastAndroid.show(error.message, ToastAndroid.SHORT);
+      if(error.message){
+        ToastAndroid.show('Tài khoản hoặc mật khẩu không đúng',ToastAndroid.SHORT);
+      }
+
+      console.log('Error in handleLogin:', error.message);
     }
 
   };

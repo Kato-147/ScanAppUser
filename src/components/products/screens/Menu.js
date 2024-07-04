@@ -74,6 +74,7 @@ const Menu = ({navigation}) => {
     try {
       const items = await getMenuItem(categoryId);
       setMenuItems(items);
+      console.log(items[0]);
     } catch (error) {
       console.error(error);
     }
@@ -170,13 +171,15 @@ const Menu = ({navigation}) => {
 
     // Hàm xử lý khi nhấn nút "Thêm"
     const handleAddItem = (item) => {
-      console.log(item,'------------');
+      console.log('ten mon an --------', item.name);
       setSelectedItems((prevItems) => [...prevItems, item]);
+      console.log('seleted item >>>>>>>>>', selectedItems.length);
+
     };
   
     // Tính tổng giá tiền bằng reduce
     const totalPrice = selectedItems.reduce((total, item) => total + item.price, 0);
-
+    
   return (
     <View style={styles.container}>
       {table?.status === 'open' ? (
@@ -230,8 +233,13 @@ const Menu = ({navigation}) => {
             {/* Thanh toán */}
             <TouchableOpacity style={styles.paymentContainer}>
               <View style={{flexDirection:'row', gap: 10, alignItems:'center'}}>
-                
+                <View style={{ }}>
+                <View style={{width: hp(2.2), height: hp(2.2), backgroundColor: '#E8900C', borderRadius:40, top: hp(-0.8), right: wp(-2.2), position:'absolute', zIndex: 1}}> 
+                  <Text style={{alignSelf:'center', color:'white', fontSize:hp(1.6)}} >{selectedItems.length}</Text>
+                </View>
                 <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
+                </View>
+                
                 <View style={styles.lineVertical}/>
                 <View>
                   <Text style={{fontSize:hp(1.7)}}>Tổng tiền :</Text>

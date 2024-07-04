@@ -21,6 +21,7 @@ const ScanHome = ({navigation}) => {
       navigation.navigate('Menu');
     }
   };
+
   
   const handleScan = ({ data: scannedData }) => {
     setData(scannedData);
@@ -43,11 +44,11 @@ const ScanHome = ({navigation}) => {
         <Text>{data}</Text>
       </View>
     }
-    // bottomContent={
-    //   <TouchableOpacity onPress={() => handleMenu(data)}>
-    //     <Text> Menu</Text>
-    //   </TouchableOpacity>
-    // }
+    bottomContent={
+      <TouchableOpacity onPress={() => handleMenu('666c5a75c55050edf1b3168e')}>
+        <Text> Menu</Text>
+      </TouchableOpacity>
+    }
   />
   )
 }
