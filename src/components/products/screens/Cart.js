@@ -1,4 +1,5 @@
 import {
+  Button,
   FlatList,
   Image,
   Keyboard,
@@ -11,34 +12,94 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from '@react-navigation/native';
 
-const Cart = () => {
+const Cart = ({navigation}) => {
   const [quantities, setQuantities] = useState({});
+  const [cartItems, setCartItems] = useState([]);
+  const isFocused = useIsFocused();
+
+
+  const handleMenu =()=>{
+    console.log('Back to menu');
+    navigation.navigate('Menu');
+  }
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        let items = await AsyncStorage.getItem('cartItems');
+        items = items ? JSON.parse(items) : [];
+        setCartItems(items);
+      } catch (error) {
+        console.error('Error fetching cart items:', error);
+      }
+    };
+
+    fetchCartItems();
+  }, []);
+
+  useEffect(() => {
+    const updateStorage = async () => {
+      try {
+        await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+      } catch (error) {
+        console.error('Error updating cart items in AsyncStorage:', error);
+      }
+    };
+    updateStorage();
+  }, [cartItems]);
+
+  const increaseQuantity = (id) => {
+    setCartItems(prevItems =>
+      prevItems.map(item =>
+        item.id === id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
+    );
+  };
+
+  const decreaseQuantity = (id) => {
+    setCartItems(prevItems =>
+      prevItems.map(item =>
+        item.id === id && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
+    );
+  };
+
+  const handleDeleteItem = (id) => {
+    const updatedCartItems = cartItems.filter(item => item.id !== id);
+    setCartItems(updatedCartItems);
+  };
 
   // Hàm tăng số lượng sản phẩm
-  const increaseQuantity = id => {
-    setQuantities(prev => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1,
-    }));
-  };
+  // const increaseQuantity = id => {
+  //   setQuantities(prev => ({
+  //     ...prev,
+  //     [id]: (prev[id] || 0) + 1,
+  //   }));
+  // };
 
-  // Hàm giảm số lượng sản phẩm
-  const decreaseQuantity = id => {
-    setQuantities(prev => ({
-      ...prev,
-      [id]: Math.max((prev[id] || 0) - 1, 0),
-    }));
-  };
+  // // Hàm giảm số lượng sản phẩm
+  // const decreaseQuantity = id => {
+  //   setQuantities(prev => ({
+  //     ...prev,
+  //     [id]: Math.max((prev[id] || 0) - 1, 0),
+  //   }));
+  // };
 
   const renderItem = ({item}) => {
-    const quantity = quantities[item.id] || 0;
+   // const quantity = quantities[item.id] || 0;
 
     console.log(item, '<<<<<<<<<<<<<<<<<<<<<');
 
@@ -47,10 +108,17 @@ const Cart = () => {
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {
-          console.log('id', item.id, item.name);
+          console.log('id', item._id, item.name);
         }}>
         <View style={styles.itemFlatlist}>
-          <Image style={styles.imageVoucherItem} source={item.image} />
+        <Image
+          source={{
+            uri: item.image_url
+              ? item.image_url
+              : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+          }}
+          style={styles.imageVoucherItem}
+        />
 
           {/* text info */}
           <View style={{justifyContent: 'space-between'}}>
@@ -68,16 +136,19 @@ const Cart = () => {
 
               {/* quantity */}
               <View style={{flexDirection: 'row', display: 'flex', gap: 10}}>
-                <TouchableOpacity onPress={() => decreaseQuantity(item.id)}>
+                <TouchableOpacity onPress={() => decreaseQuantity(item.id, item.option)}>
                   <Icon name="minussquareo" size={24} color="black" />
                 </TouchableOpacity>
-                <Text>{quantity}</Text>
-                <TouchableOpacity onPress={() => increaseQuantity(item.id)}>
+                <Text>{item.quantity}</Text>
+                <TouchableOpacity onPress={() => increaseQuantity(item.id, item.option)}>
                   <Icon name="plussquareo" size={24} color="black" />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
+
+          <Button title="Xóa" onPress={() => handleDeleteItem(item._id)} color="red" />
+
         </View>
       </TouchableOpacity>
     );
@@ -85,16 +156,19 @@ const Cart = () => {
 
   return (
     <KeyboardAvoidingView>
-      <TouchableWithoutFeedback
-        style={styles.container}
-        onPress={Keyboard.dismiss}>
-        <View style={{width: '100%', height: '100%'}}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
           {/* Header */}
           <View style={styles.headerContainer}>
+            <Text
+              style={{fontSize: hp(2.2), fontWeight: '500', color: '#E8900C'}}>
+              GIỎ HÀNG
+            </Text>
+
             {/* Total money */}
-            <View
+            {/* <View
               style={{
-                // backgroundColor: 'red',
+             
                 height: '100%',
                 alignItems: 'flex-start',
                 justifyContent: 'center',
@@ -110,22 +184,22 @@ const Cart = () => {
                 }}>
                 đ 13.000
               </Text>
-            </View>
+            </View> */}
 
             {/* pay button */}
-            <TouchableOpacity style={styles.payBtn}>
+            {/* <TouchableOpacity style={styles.payBtn}>
               <Text style={styles.payText}>Thanh toán</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           {/* Body */}
 
           {/* Voucher */}
-          <View style={styles.voucherContainer}>
+          {/* <View style={styles.voucherContainer}>
             <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
               <Icon name="tagso" size={24} color="#E8900C" />
 
-              {/* TextInput */}
+             
               <TextInput
                 // value={query}
                 placeholder="Nhập mã giảm giá"
@@ -141,20 +215,35 @@ const Cart = () => {
               }}>
               <Text style={{color: 'white', fontSize: hp(2)}}>Áp dụng</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           {/* menu */}
-          <View style={{height: '77%', width: '100%'}}>
+          <View style={{height: hp(82), width: '100%'}}>
             <FlatList
               // numColumns={1}
               showsVerticalScrollIndicator={false}
               style={{width: '100%'}}
-              data={data}
+              data={cartItems}
               renderItem={renderItem}
               keyExtractor={(item, index) =>
                 item.id ? item.id.toString() : index.toString()
               }
             />
+          </View>
+
+          {/* Cart */}
+          <View
+            style={styles.paymentContainer}
+            // onPress={handleCart}
+          >
+            <TouchableOpacity onPress={handleMenu} style={styles.payButtonContainer}>
+              <Text style={styles.payButtonText}> TRỞ LẠI MENU </Text>
+            </TouchableOpacity>
+
+            {/* pay button */}
+            <View style={styles.payButtonContainer}>
+              <Text style={styles.payButtonText}>ĐẶT MÓN</Text>
+            </View>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -170,25 +259,27 @@ const styles = StyleSheet.create({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   headerContainer: {
-    height: hp(7),
+    height: hp(8),
     backgroundColor: 'white',
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.25,
     elevation: 3,
+    paddingHorizontal: wp(8),
   },
-  payBtn: {
-    width: hp(15),
-    height: '100%',
-    backgroundColor: '#E8900C',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  // payBtn: {
+  //   width: hp(15),
+  //   height: '100%',
+  //   backgroundColor: '#E8900C',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
   payText: {
     fontSize: hp(2.2),
     //lineHeight: 16,
@@ -209,32 +300,55 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
   },
-  voucherContainer: {
-    flexDirection: 'row',
+  // voucherContainer: {
+  //   flexDirection: 'row',
+  //   backgroundColor: 'white',
+  //   alignItems: 'center',
+  //   justifyContent: 'space-between',
+  //   paddingHorizontal: 15,
+  //   //  marginBottom: 10,
+  //   marginVertical: 20,
+  //   height: hp(8),
+  // },
+  // iconVoucher: {},
+  // voucherText: {
+  //   color: 'black',
+  //   fontSize: hp(2),
+  // },
+  // voucherTextInput: {
+  //   //  backgroundColor: 'red',
+  //   borderWidth: 1,
+  //   borderColor: '#E8900C',
+  //   height: hp(5),
+  //   borderRadius: 8,
+  //   width: hp(24),
+  //   // alignItems:'center',
+  //   //justifyContent:'center'
+  // },
+ 
+  paymentContainer: {
+    width: wp(100),
     backgroundColor: 'white',
-    alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    //  marginBottom: 10,
-    marginVertical: 20,
-    height: hp(8),
+    alignItems: 'center',
+    height: hp(10),
+    paddingHorizontal: wp(5),
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    elevation: 5,
   },
-  iconVoucher: {},
-  voucherText: {
-    color: 'black',
-    fontSize: hp(2),
+  payButtonContainer: {
+    backgroundColor: '#E8900C',
+    borderRadius: 5,
+    padding: 10,
   },
-  voucherTextInput: {
-    //  backgroundColor: 'red',
-    borderWidth: 1,
-    borderColor: '#E8900C',
-    height: hp(5),
-    borderRadius: 8,
-    width: hp(24),
-    // alignItems:'center',
-    //justifyContent:'center'
+  payButtonText: {
+    fontSize: hp(1.8),
+    fontWeight: '500',
+    color: 'white',
   },
-  quantityIcon: {},
 });
 
 const data = [

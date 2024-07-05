@@ -17,6 +17,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getCategories, getTables} from '../ProductsHTTP';
 import {getMenuItem} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
+import LinearGradient from 'react-native-linear-gradient';
+import { useIsFocused } from '@react-navigation/native';
+
 
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -25,6 +28,8 @@ const Menu = ({navigation}) => {
   const [activeCategory, setActiveCategory] = useState('');
   const [table, setTable] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
+  const isFocused = useIsFocused();
+
 
   // Back to home function
   const handleHome = () => {
@@ -32,7 +37,13 @@ const Menu = ({navigation}) => {
     navigation.navigate('Home');
   };
 
-  // Lấy idTable từ AsyncStorage
+  // Go to Cart Screen
+  const handleCart = () => {
+    console.log('Go to cart screen');
+    navigation.navigate('Cart');
+  };
+
+  // Get idTable from AsyncStorage
   useEffect(() => {
     const idTable = async () => {
       try {
@@ -68,6 +79,22 @@ const Menu = ({navigation}) => {
 
     loadCategories();
   }, []);
+
+  // Add menuItem to Cart
+  const handleAddToCart = async item => {
+    try {
+      let cartItems = await AsyncStorage.getItem('cartItems');
+      cartItems = cartItems ? JSON.parse(cartItems) : [];
+      cartItems.push({...item, quantity: 1});
+      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+      console.log('Item added to cart:', item);
+      console.log('ten mon an --------', item.name);
+      setSelectedItems(prevItems => [...prevItems, item]);
+      console.log('seleted item >>>>>>>>>', selectedItems.length);
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+    }
+  };
 
   // Get data Menu item from API
   const loadMenuItems = async categoryId => {
@@ -141,10 +168,10 @@ const Menu = ({navigation}) => {
               //  backgroundColor: 'blue',
               alignItems: 'center',
             }}>
-            <Text style={styles.menuItemPrice} >{item.price} VND</Text>
+            <Text style={styles.menuItemPrice}>{item.price} VND</Text>
 
             {/* Button Add ItemMenu */}
-            <TouchableOpacity  onPress={() => handleAddItem(item)}>
+            <TouchableOpacity onPress={() => handleAddToCart(item)}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -169,21 +196,25 @@ const Menu = ({navigation}) => {
     );
   };
 
-    // Hàm xử lý khi nhấn nút "Thêm"
-    const handleAddItem = (item) => {
-      console.log('ten mon an --------', item.name);
-      setSelectedItems((prevItems) => [...prevItems, item]);
-      console.log('seleted item >>>>>>>>>', selectedItems.length);
+  // Hàm xử lý khi nhấn nút "Thêm"
+  // const handleAddItem = (item) => {
+  //   console.log('ten mon an --------', item.name);
+  //   setSelectedItems((prevItems) => [...prevItems, item]);
+  //   console.log('seleted item >>>>>>>>>', selectedItems.length);
 
-    };
-  
-    // Tính tổng giá tiền bằng reduce
-    const totalPrice = selectedItems.reduce((total, item) => total + item.price, 0);
-    
+  // };
+
+  // Tính tổng giá tiền bằng reduce
+
+  const totalPrice = selectedItems.reduce(
+    (total, item) => total + item.price,
+    0,
+  );
+
   return (
     <View style={styles.container}>
       {table?.status === 'open' ? (
-        <View>
+        <LinearGradient colors={['#ffff', '#ffff', '#F6F6F6', '#F6F6F6']}>
           {/* Header */}
           <View style={styles.headerContainer}>
             <TouchableOpacity onPress={handleHome}>
@@ -191,7 +222,7 @@ const Menu = ({navigation}) => {
             </TouchableOpacity>
             <Text
               style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
-               Bàn {table?.tableNumber}
+              Bàn {table?.tableNumber}
             </Text>
           </View>
 
@@ -230,30 +261,57 @@ const Menu = ({navigation}) => {
               )}
             </View>
 
-            {/* Thanh toán */}
-            <TouchableOpacity style={styles.paymentContainer}>
-              <View style={{flexDirection:'row', gap: 10, alignItems:'center'}}>
-                <View style={{ }}>
-                <View style={{width: hp(2.2), height: hp(2.2), backgroundColor: '#E8900C', borderRadius:40, top: hp(-0.8), right: wp(-2.2), position:'absolute', zIndex: 1}}> 
-                  <Text style={{alignSelf:'center', color:'white', fontSize:hp(1.6)}} >{selectedItems.length}</Text>
+            {/* Cart */}
+            <TouchableOpacity
+              style={styles.paymentContainer}
+              onPress={handleCart}>
+              <View
+                style={{flexDirection: 'row', gap: 10, alignItems: 'center'}}>
+                <View style={{}}>
+                  <View
+                    style={{
+                      width: hp(2.2),
+                      height: hp(2.2),
+                      backgroundColor: '#E8900C',
+                      borderRadius: 40,
+                      top: hp(-0.8),
+                      right: wp(-2.2),
+                      position: 'absolute',
+                      zIndex: 1,
+                    }}>
+                    <Text
+                      style={{
+                        alignSelf: 'center',
+                        color: 'white',
+                        fontSize: hp(1.6),
+                      }}>
+                      {selectedItems.length}
+                    </Text>
+                  </View>
+                  <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
                 </View>
-                <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
-                </View>
-                
-                <View style={styles.lineVertical}/>
+
+                <View style={styles.lineVertical} />
                 <View>
-                  <Text style={{fontSize:hp(1.7)}}>Tổng tiền :</Text>
-                  <Text style={{fontSize:hp(2.3), fontWeight: '500', color:'black'}}>{totalPrice} đ</Text>
+                  <Text style={{fontSize: hp(1.7)}}>Tổng tiền :</Text>
+                  <Text
+                    style={{
+                      fontSize: hp(2.3),
+                      fontWeight: '500',
+                      color: 'black',
+                    }}>
+                    {totalPrice} đ
+                  </Text>
                 </View>
               </View>
 
               {/* pay button */}
               <View style={styles.payButtonContainer}>
-                <Text style={styles.payButtonText}>ĐẶT MÓN</Text>
+                <Text style={styles.payButtonText}>GIỎ HÀNG</Text>
               </View>
             </TouchableOpacity>
           </View>
-        </View>
+        </LinearGradient>
       ) : (
         // --------- Screen data undefined
         <View style={{alignSelf: 'center'}}>
@@ -358,21 +416,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: hp(10),
     paddingHorizontal: wp(5),
-
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    elevation: 5,
   },
   payButtonContainer: {
     backgroundColor: '#E8900C',
     borderRadius: 5,
-    padding: 10
+    padding: 10,
   },
-  lineVertical:{
-    width: 1,  // Chiều rộng của đường thẳng
-    height: hp(5),  // Chiều cao của đường thẳng
-    backgroundColor: '#C0C0C0',  // Màu của đường thẳng
+  lineVertical: {
+    width: 1, // Chiều rộng của đường thẳng
+    height: hp(5), // Chiều cao của đường thẳng
+    backgroundColor: '#C0C0C0', // Màu của đường thẳng
   },
-  payButtonText:{
-    fontSize:hp(1.8),
-    fontWeight:'500',
-    color:'white'
-  }
+  payButtonText: {
+    fontSize: hp(1.8),
+    fontWeight: '500',
+    color: 'white',
+  },
 });

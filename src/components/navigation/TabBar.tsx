@@ -16,6 +16,7 @@ import Voucher from '../products/screens/Voucher'
 import Cart from '../products/screens/Cart'
 import Profile from '../products/screens/Profile'
 import Icon from 'react-native-vector-icons/AntDesign'
+import Oder from '../products/screens/Oder'
 
 
 // ------------------------------------------------------------------
@@ -58,7 +59,7 @@ const TabBar = () =>{
                 component={Voucher}
               />
               <Tab.Screen
-                name="Cart"
+                name="Oder"
                 options={{
                   headerShown: false,
                   // @ts-ignore
@@ -66,7 +67,7 @@ const TabBar = () =>{
                     <Icon name="shoppingcart" style={styles.icon} size={24}/>
                   ),
                 }}
-                component={Cart}
+                component={Oder}
               />
               <Tab.Screen
                 name="Profile"
