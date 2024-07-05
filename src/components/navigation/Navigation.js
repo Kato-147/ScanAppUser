@@ -11,6 +11,7 @@ import Menu from '../products/screens/Menu';
 import Splash from '../users/screens/Splash';
 import UpdateInfo from '../products/screens/UpdateInfo';
 import UpdatePassword from '../products/screens/UpdatePassword';
+import Cart from '../products/screens/Cart';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,7 @@ const Navigation = () => {
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
         <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
+        <Stack.Screen name="Cart" component={Cart} />
       </Stack.Navigator>
  
   );
