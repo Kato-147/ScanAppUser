@@ -26,18 +26,36 @@ const Cart = ({navigation}) => {
   const [cartItems, setCartItems] = useState([]);
   const isFocused = useIsFocused();
 
-
+console.log(cartItems,'cardddddddddddddddddddddddd');
   const handleMenu =()=>{
     console.log('Back to menu');
     navigation.navigate('Menu');
   }
+  // Hợp nhất các mục trùng lặp dựa trên id và option
+  const mergeCartItems = (items) => {
+    const mergedItems = [];
+    items.forEach(item => {
+      const existingItem = mergedItems.find(
+        mergedItem => mergedItem._id === item._id && mergedItem.option === item.option
+      );
+      if (existingItem) {
+        existingItem.quantity += item.quantity;
+      } else {
+        mergedItems.push({...item});
+      }
+    });
+    return mergedItems;
+  };
 
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
         let items = await AsyncStorage.getItem('cartItems');
         items = items ? JSON.parse(items) : [];
-        setCartItems(items);
+        console.log(items,'itemmmmmmmmmmmmmmmmmmmmmmmm');
+          //setCartItems(items);
+          setCartItems(mergeCartItems(items));
+        
       } catch (error) {
         console.error('Error fetching cart items:', error);
       }
@@ -60,7 +78,7 @@ const Cart = ({navigation}) => {
   const increaseQuantity = (id) => {
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item.id === id
+        item._id === id
           ? { ...item, quantity: item.quantity + 1 }
           : item
       )
@@ -70,7 +88,7 @@ const Cart = ({navigation}) => {
   const decreaseQuantity = (id) => {
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item.id === id && item.quantity > 1
+        item._id === id && item.quantity > 1
           ? { ...item, quantity: item.quantity - 1 }
           : item
       )
@@ -78,7 +96,7 @@ const Cart = ({navigation}) => {
   };
 
   const handleDeleteItem = (id) => {
-    const updatedCartItems = cartItems.filter(item => item.id !== id);
+    const updatedCartItems = cartItems.filter(item => item._id !== id);
     setCartItems(updatedCartItems);
   };
 
@@ -101,7 +119,7 @@ const Cart = ({navigation}) => {
   const renderItem = ({item}) => {
    // const quantity = quantities[item.id] || 0;
 
-    console.log(item, '<<<<<<<<<<<<<<<<<<<<<');
+    console.log(item.name, item.quantity, '<<<<<<<<<<<<<<<<<<<<<');
 
     // console.log(image, '<<<<<<<<<<<<<');
     return (
@@ -136,11 +154,11 @@ const Cart = ({navigation}) => {
 
               {/* quantity */}
               <View style={{flexDirection: 'row', display: 'flex', gap: 10}}>
-                <TouchableOpacity onPress={() => decreaseQuantity(item.id, item.option)}>
+                <TouchableOpacity onPress={() => decreaseQuantity(item._id, item.option)}>
                   <Icon name="minussquareo" size={24} color="black" />
                 </TouchableOpacity>
                 <Text>{item.quantity}</Text>
-                <TouchableOpacity onPress={() => increaseQuantity(item.id, item.option)}>
+                <TouchableOpacity onPress={() => increaseQuantity(item._id, item.option)}>
                   <Icon name="plussquareo" size={24} color="black" />
                 </TouchableOpacity>
               </View>

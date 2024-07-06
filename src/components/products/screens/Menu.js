@@ -27,8 +27,11 @@ const Menu = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('');
   const [table, setTable] = useState('');
-  const [selectedItems, setSelectedItems] = useState([]);
+ // const [selectedItems, setSelectedItems] = useState([]);
   const isFocused = useIsFocused();
+
+ // console.log(selectedItems,'ok');
+
 
 
   // Back to home function
@@ -43,6 +46,13 @@ const Menu = ({navigation}) => {
     navigation.navigate('Cart');
   };
 
+  useEffect(()=>{
+    const unsubcrise = navigation.addListener('focus', ()=>{
+
+    });
+    return unsubcrise
+  },[navigation])
+
   // Get idTable from AsyncStorage
   useEffect(() => {
     const idTable = async () => {
@@ -50,7 +60,7 @@ const Menu = ({navigation}) => {
         const idTable = await AsyncStorage.getItem('idTable');
         console.log('ID Table từ AsyncStorage', idTable);
         const table = await getTables(idTable);
-        console.log('===table==', table);
+      //  console.log('===table==', table);
         setTable(table);
       } catch (error) {
         console.error('Table error', error);
@@ -83,14 +93,28 @@ const Menu = ({navigation}) => {
   // Add menuItem to Cart
   const handleAddToCart = async item => {
     try {
+      console.log(item,'<<<<<<<<<<<<<<<<<<<<<<<<<<<item');
       let cartItems = await AsyncStorage.getItem('cartItems');
-      cartItems = cartItems ? JSON.parse(cartItems) : [];
-      cartItems.push({...item, quantity: 1});
-      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
-      console.log('Item added to cart:', item);
-      console.log('ten mon an --------', item.name);
-      setSelectedItems(prevItems => [...prevItems, item]);
-      console.log('seleted item >>>>>>>>>', selectedItems.length);
+        cartItems = cartItems ? JSON.parse(cartItems) : [];
+
+
+
+ 
+        cartItems.push({...item,quantity:1});
+        await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+
+console.log('xun day//////////////////////////');
+      
+
+      // if(!selectedItems.some((item)=> item._id === item._id)){
+      //   setSelectedItems(prevItems => [...prevItems, item]);
+      // }
+      
+    
+      
+     
+     // console.log('seleted item >>>>>>>>>', selectedItems.length);
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }
@@ -206,10 +230,10 @@ const Menu = ({navigation}) => {
 
   // Tính tổng giá tiền bằng reduce
 
-  const totalPrice = selectedItems.reduce(
-    (total, item) => total + item.price,
-    0,
-  );
+  // const totalPrice = selectedItems.reduce(
+  //   (total, item) => total + item.price,
+  //   0,
+  // );
 
   return (
     <View style={styles.container}>
@@ -285,7 +309,8 @@ const Menu = ({navigation}) => {
                         color: 'white',
                         fontSize: hp(1.6),
                       }}>
-                      {selectedItems.length}
+                      {/* {selectedItems.length} */}
+                      0
                     </Text>
                   </View>
                   <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
@@ -300,7 +325,7 @@ const Menu = ({navigation}) => {
                       fontWeight: '500',
                       color: 'black',
                     }}>
-                    {totalPrice} đ
+                    cc đ
                   </Text>
                 </View>
               </View>
