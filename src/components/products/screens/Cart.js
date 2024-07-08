@@ -24,6 +24,8 @@ import {useIsFocused} from '@react-navigation/native';
 const Cart = ({navigation}) => {
   const [quantities, setQuantities] = useState({});
   const [cartItems, setCartItems] = useState([]);
+  console.log(cartItems,'---------------CartItem');
+  
 
  // console.log(cartItems, 'cardddddddddddddddddddddddd');
   const handleMenu = () => {
@@ -40,7 +42,7 @@ const Cart = ({navigation}) => {
       // Tìm kiếm mục hiện có trong mergedItems có cùng _id và option
       const existingItem = mergedItems.find(
         mergedItem =>
-          mergedItem._id === item._id && mergedItem.option === item.option,
+          mergedItem.id === item.id && mergedItem.option === item.option,
       );
       if (existingItem) {
         // Nếu tồn tại, tăng quantity của mục đó
@@ -86,10 +88,10 @@ const Cart = ({navigation}) => {
   }, [cartItems]);
 
   // plus quantity item
-  const increaseQuantity = id => {
+  const increaseQuantity = (id) => {
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item._id === id ? {...item, quantity: item.quantity + 1} : item,
+        item.id === id ? {...item, quantity: item.quantity + 1} : item,
       ),
     );
   };
@@ -98,7 +100,7 @@ const Cart = ({navigation}) => {
   const decreaseQuantity = id => {
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item._id === id && item.quantity > 1
+        item.id === id && item.quantity > 1
           ? {...item, quantity: item.quantity - 1}
           : item,
       ),
@@ -106,15 +108,15 @@ const Cart = ({navigation}) => {
   };
 
   //Delete item in cart
-  const handleDeleteItem = id => {
-    const updatedCartItems = cartItems.filter(item => item._id !== id);
+  const handleDeleteItem = (id, optionId) => {
+    const updatedCartItems = cartItems.filter(item => item?.id !== id || item?.option?._id !== optionId?._id);
     setCartItems(updatedCartItems);
   };
 
 
   const renderItem = ({item}) => {
-    console.log('Item when render .....: ',item.name, item.quantity);
-    console.log(item);
+    // console.log('Item when render .....: ',item.name, item.quantity);
+ //   console.log(item);
 
     return (
       <TouchableOpacity
@@ -126,8 +128,8 @@ const Cart = ({navigation}) => {
           <Image
             source={{
               // If API have value of image, show image from API. If image != value, show image URL 
-              uri: item.image_url
-                ? item.image_url
+              uri: item?.image
+                ? item?.image
                 : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
             }}
             style={styles.imageVoucherItem}
@@ -150,12 +152,12 @@ const Cart = ({navigation}) => {
               {/* quantity */}
               <View style={{flexDirection: 'row', display: 'flex', gap: 10}}>
                 <TouchableOpacity
-                  onPress={() => decreaseQuantity(item._id, item.option)}>
+                  onPress={() => decreaseQuantity(item.id)}>
                   <Icon name="minussquareo" size={24} color="black" />
                 </TouchableOpacity>
                 <Text>{item.quantity}</Text>
                 <TouchableOpacity
-                  onPress={() => increaseQuantity(item._id, item.option)}>
+                  onPress={() => increaseQuantity(item.id)}>
                   <Icon name="plussquareo" size={24} color="black" />
                 </TouchableOpacity>
               </View>
@@ -164,7 +166,7 @@ const Cart = ({navigation}) => {
 
           <Button
             title="Xóa"
-            onPress={() => handleDeleteItem(item._id)}
+            onPress={() => handleDeleteItem(item.id, item.option)}
             color="red"
           />
         </View>
@@ -243,9 +245,7 @@ const Cart = ({navigation}) => {
               style={{width: '100%'}}
               data={cartItems}
               renderItem={renderItem}
-              keyExtractor={(item, index) =>
-                item.id ? item.id.toString() : index.toString()
-              }
+              keyExtractor={(item,index) => index}
             />
           </View>
 
@@ -370,4 +370,3 @@ const styles = StyleSheet.create({
     color: 'white',
   },
 });
-

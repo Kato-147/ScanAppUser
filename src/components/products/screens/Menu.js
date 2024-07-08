@@ -94,9 +94,10 @@ const Menu = ({navigation}) => {
   
       // Tạo đối tượng mới chỉ với các trường cần thiết
       const cartItem = {
-        name: item.name,
-        id: item._id,
-        option: item.options.find(option => option._id === selectedOptionId),
+        image: item?.image_url,
+        id: item?._id,
+        name: item?.name,
+        option: item?.options?.find(option => option?._id === selectedOptionId),
       };
   
       let cartItems = await AsyncStorage.getItem('cartItems');
@@ -104,7 +105,7 @@ const Menu = ({navigation}) => {
   
       // Kiểm tra xem mặt hàng đã tồn tại trong giỏ hàng hay chưa
       const existingItemIndex = cartItems.findIndex(
-        ci => ci.id === cartItem.id && ci.option._id === selectedOptionId,
+        ci => ci?.id === cartItem?.id && ci?.option?._id === selectedOptionId,
       );
       if (existingItemIndex >= 0) {
         // Nếu đã tồn tại, tăng số lượng lên
