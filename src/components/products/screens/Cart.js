@@ -19,109 +19,103 @@ import {
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
 const Cart = ({navigation}) => {
   const [quantities, setQuantities] = useState({});
   const [cartItems, setCartItems] = useState([]);
-  const isFocused = useIsFocused();
 
-console.log(cartItems,'cardddddddddddddddddddddddd');
-  const handleMenu =()=>{
+ // console.log(cartItems, 'cardddddddddddddddddddddddd');
+  const handleMenu = () => {
     console.log('Back to menu');
     navigation.navigate('Menu');
-  }
+  };
+
   // Hợp nhất các mục trùng lặp dựa trên id và option
-  const mergeCartItems = (items) => {
+  const mergeCartItems = items => {
     const mergedItems = [];
-    items.forEach(item => {
+    items.forEach((item,index) => {
+      console.log(`Index: ${index}, Item:`, item.name); // Log ra index và item hiện tại
+
+      // Tìm kiếm mục hiện có trong mergedItems có cùng _id và option
       const existingItem = mergedItems.find(
-        mergedItem => mergedItem._id === item._id && mergedItem.option === item.option
+        mergedItem =>
+          mergedItem._id === item._id && mergedItem.option === item.option,
       );
       if (existingItem) {
+        // Nếu tồn tại, tăng quantity của mục đó
         existingItem.quantity += item.quantity;
       } else {
+        // Nếu không tồn tại, thêm mục mới vào mergedItems
         mergedItems.push({...item});
       }
     });
-    return mergedItems;
+
+    return mergedItems; // Trả về mảng mergedItems đã hợp nhất
   };
 
+  // Lấy các mục giỏ hàng từ AsyncStorage khi component mount
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
+        // Lấy dữ liệu giỏ hàng từ AsyncStorage
         let items = await AsyncStorage.getItem('cartItems');
+        // Chuyển dữ liệu từ chuỗi JSON thành mảng JavaScript
         items = items ? JSON.parse(items) : [];
-        console.log(items,'itemmmmmmmmmmmmmmmmmmmmmmmm');
-          //setCartItems(items);
-          setCartItems(mergeCartItems(items));
-        
+        // Hợp nhất các mục trùng lặp và cập nhật state
+        setCartItems(mergeCartItems(items));
       } catch (error) {
         console.error('Error fetching cart items:', error);
       }
     };
 
-    fetchCartItems();
+    fetchCartItems(); // Gọi hàm fetchCartItems khi component mount
   }, []);
 
+  // Cập nhật AsyncStorage khi cartItems thay đổi
   useEffect(() => {
     const updateStorage = async () => {
       try {
+        // Lưu trạng thái hiện tại của cartItems vào AsyncStorage
         await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
       } catch (error) {
         console.error('Error updating cart items in AsyncStorage:', error);
       }
     };
-    updateStorage();
+    updateStorage(); // Gọi hàm updateStorage mỗi khi cartItems thay đổi
   }, [cartItems]);
 
-  const increaseQuantity = (id) => {
+  // plus quantity item
+  const increaseQuantity = id => {
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item._id === id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      )
+        item._id === id ? {...item, quantity: item.quantity + 1} : item,
+      ),
     );
   };
 
-  const decreaseQuantity = (id) => {
+  // minus quantity item
+  const decreaseQuantity = id => {
     setCartItems(prevItems =>
       prevItems.map(item =>
         item._id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
+          ? {...item, quantity: item.quantity - 1}
+          : item,
+      ),
     );
   };
 
-  const handleDeleteItem = (id) => {
+  //Delete item in cart
+  const handleDeleteItem = id => {
     const updatedCartItems = cartItems.filter(item => item._id !== id);
     setCartItems(updatedCartItems);
   };
 
-  // Hàm tăng số lượng sản phẩm
-  // const increaseQuantity = id => {
-  //   setQuantities(prev => ({
-  //     ...prev,
-  //     [id]: (prev[id] || 0) + 1,
-  //   }));
-  // };
-
-  // // Hàm giảm số lượng sản phẩm
-  // const decreaseQuantity = id => {
-  //   setQuantities(prev => ({
-  //     ...prev,
-  //     [id]: Math.max((prev[id] || 0) - 1, 0),
-  //   }));
-  // };
 
   const renderItem = ({item}) => {
-   // const quantity = quantities[item.id] || 0;
+    console.log('Item when render .....: ',item.name, item.quantity);
+    console.log(item);
 
-    console.log(item.name, item.quantity, '<<<<<<<<<<<<<<<<<<<<<');
-
-    // console.log(image, '<<<<<<<<<<<<<');
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -129,14 +123,15 @@ console.log(cartItems,'cardddddddddddddddddddddddd');
           console.log('id', item._id, item.name);
         }}>
         <View style={styles.itemFlatlist}>
-        <Image
-          source={{
-            uri: item.image_url
-              ? item.image_url
-              : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-          }}
-          style={styles.imageVoucherItem}
-        />
+          <Image
+            source={{
+              // If API have value of image, show image from API. If image != value, show image URL 
+              uri: item.image_url
+                ? item.image_url
+                : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+            }}
+            style={styles.imageVoucherItem}
+          />
 
           {/* text info */}
           <View style={{justifyContent: 'space-between'}}>
@@ -154,19 +149,24 @@ console.log(cartItems,'cardddddddddddddddddddddddd');
 
               {/* quantity */}
               <View style={{flexDirection: 'row', display: 'flex', gap: 10}}>
-                <TouchableOpacity onPress={() => decreaseQuantity(item._id, item.option)}>
+                <TouchableOpacity
+                  onPress={() => decreaseQuantity(item._id, item.option)}>
                   <Icon name="minussquareo" size={24} color="black" />
                 </TouchableOpacity>
                 <Text>{item.quantity}</Text>
-                <TouchableOpacity onPress={() => increaseQuantity(item._id, item.option)}>
+                <TouchableOpacity
+                  onPress={() => increaseQuantity(item._id, item.option)}>
                   <Icon name="plussquareo" size={24} color="black" />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
 
-          <Button title="Xóa" onPress={() => handleDeleteItem(item._id)} color="red" />
-
+          <Button
+            title="Xóa"
+            onPress={() => handleDeleteItem(item._id)}
+            color="red"
+          />
         </View>
       </TouchableOpacity>
     );
@@ -254,7 +254,9 @@ console.log(cartItems,'cardddddddddddddddddddddddd');
             style={styles.paymentContainer}
             // onPress={handleCart}
           >
-            <TouchableOpacity onPress={handleMenu} style={styles.payButtonContainer}>
+            <TouchableOpacity
+              onPress={handleMenu}
+              style={styles.payButtonContainer}>
               <Text style={styles.payButtonText}> TRỞ LẠI MENU </Text>
             </TouchableOpacity>
 
@@ -343,7 +345,7 @@ const styles = StyleSheet.create({
   //   // alignItems:'center',
   //   //justifyContent:'center'
   // },
- 
+
   paymentContainer: {
     width: wp(100),
     backgroundColor: 'white',
@@ -369,69 +371,3 @@ const styles = StyleSheet.create({
   },
 });
 
-const data = [
-  {
-    id: '1',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Chó hấp xả',
-    price: '120.000',
-  },
-  {
-    id: '2',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Cầy giả heo',
-    price: '80.000',
-  },
-  {
-    id: '3',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Chó om chuối',
-    price: '90.000',
-  },
-  {
-    id: '4',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Mì gói súp xì tin',
-    price: '30.000',
-  },
-  {
-    id: '5',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Cô ca cô hát',
-    price: '15.000',
-  },
-  {
-    id: '6',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'gà giả cầy',
-    price: '70.000',
-  },
-  {
-    id: '7',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Cá chà bặc',
-    price: '500.000',
-  },
-  {
-    id: '8',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Chem chép om dưa',
-    price: '300.000',
-  },
-];
