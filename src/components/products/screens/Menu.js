@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -18,8 +19,7 @@ import {getCategories, getTables} from '../ProductsHTTP';
 import {getMenuItem} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
 import LinearGradient from 'react-native-linear-gradient';
-import { useIsFocused } from '@react-navigation/native';
-
+import {useIsFocused} from '@react-navigation/native';
 
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -27,12 +27,11 @@ const Menu = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('');
   const [table, setTable] = useState('');
- // const [selectedItems, setSelectedItems] = useState([]);
+  const [activeOptions, setActiveOptions] = useState({});
+  // const [selectedItems, setSelectedItems] = useState([]);
   const isFocused = useIsFocused();
 
- // console.log(selectedItems,'ok');
-
-
+  // console.log(selectedItems,'ok');
 
   // Back to home function
   const handleHome = () => {
@@ -46,12 +45,10 @@ const Menu = ({navigation}) => {
     navigation.navigate('Cart');
   };
 
-  useEffect(()=>{
-    const unsubcrise = navigation.addListener('focus', ()=>{
-
-    });
-    return unsubcrise
-  },[navigation])
+  // useEffect(() => {
+  //   const unsubcrise = navigation.addListener('focus', () => {});
+  //   return unsubcrise;
+  // }, [navigation]);
 
   // Get idTable from AsyncStorage
   useEffect(() => {
@@ -60,7 +57,7 @@ const Menu = ({navigation}) => {
         const idTable = await AsyncStorage.getItem('idTable');
         console.log('ID Table từ AsyncStorage', idTable);
         const table = await getTables(idTable);
-      //  console.log('===table==', table);
+        //  console.log('===table==', table);
         setTable(table);
       } catch (error) {
         console.error('Table error', error);
@@ -76,8 +73,8 @@ const Menu = ({navigation}) => {
         const data = await getCategories();
         setCategories(data);
         if (data.length > 0) {
-          setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
-          loadMenuItems(data[0]._id); // Lấy món ăn cho danh mục đầu tiên
+          setActiveCategory(data[3]._id); // Chọn mục đầu tiên làm mặc định
+          loadMenuItems(data[3]._id); // Lấy món ăn cho danh mục đầu tiên
           console.log('=====firstCategory=======', activeCategory);
         }
       } catch (error) {
@@ -91,41 +88,44 @@ const Menu = ({navigation}) => {
   }, []);
 
   // Add menuItem to Cart
-  const handleAddToCart = async item => {
+  const handleAddToCart = async (item, selectedOptionId) => {
     try {
-      console.log(item,'<<<<<<<<<<<<<<<<<<<<<<<<<<<item');
+      console.log(item.name, '<<<<<<<<<<<<<<<<<item');
+  
+      // Tạo đối tượng mới chỉ với các trường cần thiết
+      const cartItem = {
+        name: item.name,
+        id: item._id,
+        option: item.options.find(option => option._id === selectedOptionId),
+      };
+  
       let cartItems = await AsyncStorage.getItem('cartItems');
-        cartItems = cartItems ? JSON.parse(cartItems) : [];
-
-
-
- 
-        cartItems.push({...item,quantity:1});
-        await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
-
-
-console.log('xun day//////////////////////////');
-      
-
-      // if(!selectedItems.some((item)=> item._id === item._id)){
-      //   setSelectedItems(prevItems => [...prevItems, item]);
-      // }
-      
-    
-      
-     
-     // console.log('seleted item >>>>>>>>>', selectedItems.length);
+      cartItems = cartItems ? JSON.parse(cartItems) : [];
+  
+      // Kiểm tra xem mặt hàng đã tồn tại trong giỏ hàng hay chưa
+      const existingItemIndex = cartItems.findIndex(
+        ci => ci.id === cartItem.id && ci.option._id === selectedOptionId,
+      );
+      if (existingItemIndex >= 0) {
+        // Nếu đã tồn tại, tăng số lượng lên
+        cartItems[existingItemIndex].quantity += 1;
+      } else {
+        // Nếu chưa tồn tại, thêm mặt hàng mới vào giỏ hàng
+        cartItems.push({...cartItem, quantity: 1});
+      }
+      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }
   };
+  
 
   // Get data Menu item from API
   const loadMenuItems = async categoryId => {
     try {
       const items = await getMenuItem(categoryId);
       setMenuItems(items);
-      console.log(items[0]);
+    //  console.log(items[0]);
     } catch (error) {
       console.error(error);
     }
@@ -144,6 +144,7 @@ console.log('xun day//////////////////////////');
 
   // Function render item for flatlist Categories
   const renderItem = ({item}) => {
+
     const isActive = item._id === activeCategory;
     const activeButtonStyle = {
       borderColor: isActive ? '#E8900C' : '#757575',
@@ -164,69 +165,110 @@ console.log('xun day//////////////////////////');
     );
   };
 
+  const handleChangeOption = (menuItemId, optionId) => {
+    setActiveOptions({...activeOptions, [menuItemId]: optionId});
+  };
+  
+
+  const handcheck =(id)=>{
+    console.log(id,'ID ITem');
+  }
+
   // Function render item for flatlist MenuItem
   const renderMenuItem = ({item}) => {
+
+    const activeOption = activeOptions[item._id];
+    
+    const isActive = item.options._id === activeOption;
+    const activeButtonStyle = {
+      borderColor: isActive ? '#E8900C' : '#757575',
+    };
+    const activeTextStyle = {
+      color: isActive ? '#E8900C' : '#757575',
+    };
+
     return (
-      <View style={styles.menuItem}>
-        <Image
-          source={{
-            uri: item.image_url
-              ? item.image_url
-              : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-          }}
-          style={styles.menuItemImage}
-        />
+      <TouchableOpacity
+        onPress={() => handcheck(item._id)}>
+        <View style={styles.menuItem}>
+          <Image
+            source={{
+              // If value of Image in API not null, show image : show Image URL
+              uri: item.image_url
+                ? item.image_url
+                : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+            }}
+            style={styles.menuItemImage}
+          />
 
-        <View style={styles.menuItemInfo}>
-          <Text
-            style={styles.menuItemName}
-            numberOfLines={1}
-            ellipsizeMode="tail">
-            {item.name}
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              width: '100%',
-              //  backgroundColor: 'blue',
-              alignItems: 'center',
-            }}>
-            <Text style={styles.menuItemPrice}>{item.price} VND</Text>
+          <View style={styles.menuItemInfo}>
+            <Text
+              style={styles.menuItemName}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {item.name}
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width: '100%',
+                //  backgroundColor: 'blue',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.menuItemPrice}>{item.price} VND</Text>
 
-            {/* Button Add ItemMenu */}
-            <TouchableOpacity onPress={() => handleAddToCart(item)}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  borderColor: '#E8900C',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: hp(10),
-                  padding: hp(0.5),
-                }}>
-                <Icon name="shoppingcart" size={hp(2.8)} color="#E8900C" />
-                <Text
-                  style={{fontSize: hp(2), fontWeight: 500, color: '#E8900C'}}>
-                  Thêm
-                </Text>
-              </View>
-            </TouchableOpacity>
+              {/* Button Add ItemMenu */}
+              <TouchableOpacity onPress={() => handleAddToCart(item, activeOption)}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    borderColor: '#E8900C',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: hp(10),
+                    padding: hp(0.5),
+                  }}>
+                  <Icon name="shoppingcart" size={hp(2.8)} color="#E8900C" />
+                  <Text
+                    style={{
+                      fontSize: hp(2),
+                      fontWeight: 500,
+                      color: '#E8900C',
+                    }}>
+                    Thêm
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+
+        <View style={{height: 1, width: hp(100), backgroundColor: '#C0C0C0'}} />
+
+        {item.options.length > 0 ? (
+          <ScrollView
+            horizontal
+            style={{width: hp(100), height: hp(5), paddingHorizontal: wp(2)}}>
+            {item.options.map((option) => (
+              <TouchableOpacity  onPress={()=>handleChangeOption(item._id, option._id)}>
+                <View
+                  key={option._id}
+                  
+                  style={[{ marginRight: wp(3), borderWidth: 1, borderRadius: 10},activeOption === option._id ?  {borderColor: 'blue'} : {borderColor:'red'}]}>
+                  <Text style={[{}, activeTextStyle]}>{option.name}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        ) : (
+          <View></View>
+        )}
+      </TouchableOpacity>
     );
   };
-
-  // Hàm xử lý khi nhấn nút "Thêm"
-  // const handleAddItem = (item) => {
-  //   console.log('ten mon an --------', item.name);
-  //   setSelectedItems((prevItems) => [...prevItems, item]);
-  //   console.log('seleted item >>>>>>>>>', selectedItems.length);
-
-  // };
 
   // Tính tổng giá tiền bằng reduce
 
@@ -309,8 +351,7 @@ console.log('xun day//////////////////////////');
                         color: 'white',
                         fontSize: hp(1.6),
                       }}>
-                      {/* {selectedItems.length} */}
-                      0
+                      {/* {selectedItems.length} */}0
                     </Text>
                   </View>
                   <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />

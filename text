@@ -1,97 +1,343 @@
-const Cart = ({ navigation }) => {
-  const [cartItems, setCartItems] = useState([]);
+// const Cart = ({ navigation }) => {
+//   const [cartItems, setCartItems] = useState([]);
+
+//   useEffect(() => {
+//     const fetchCartItems = async () => {
+//       try {
+//         let items = await AsyncStorage.getItem('cartItems');
+//         items = items ? JSON.parse(items) : [];
+//         setCartItems(items);
+//       } catch (error) {
+//         console.error('Error fetching cart items:', error);
+//       }
+//     };
+
+//     fetchCartItems();
+//   }, []);
+
+//   useEffect(() => {
+//     const updateStorage = async () => {
+//       try {
+//         await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+//       } catch (error) {
+//         console.error('Error updating cart items in AsyncStorage:', error);
+//       }
+//     };
+//     updateStorage();
+//   }, [cartItems]);
+
+//   const increaseQuantity = (id) => {
+//     setCartItems(prevItems =>
+//       prevItems.map(item =>
+//         item.id === id
+//           ? { ...item, quantity: item.quantity + 1 }
+//           : item
+//       )
+//     );
+//   };
+
+//   const decreaseQuantity = (id) => {
+//     setCartItems(prevItems =>
+//       prevItems.map(item =>
+//         item.id === id && item.quantity > 1
+//           ? { ...item, quantity: item.quantity - 1 }
+//           : item
+//       )
+//     );
+//   };
+
+//   const handleDeleteItem = (id) => {
+//     const updatedCartItems = cartItems.filter(item => item.id !== id);
+//     setCartItems(updatedCartItems);
+//   };
+
+//   const handleCheckout = async () => {
+//     const mergedItems = [];
+//     cartItems.forEach(item => {
+//       const existingItem = mergedItems.find(i => i.id === item.id && i.option === item.option);
+//       if (existingItem) {
+//         existingItem.quantity += item.quantity;
+//       } else {
+//         mergedItems.push({ ...item });
+//       }
+//     });
+
+//     console.log('Items to checkout:', mergedItems);
+//     // Gửi mergedItems lên API
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       <FlatList
+//         data={cartItems}
+//         keyExtractor={(item, index) => index.toString()}
+//         renderItem={({ item }) => (
+//           <View style={styles.item}>
+//             <Text>{item.name}</Text>
+//             <Text>{item.price}</Text>
+//             <Text>{item.option}</Text>
+//             <View style={styles.quantityContainer}>
+//               <Button title="-" onPress={() => decreaseQuantity(item.id)} />
+//               <Text>{item.quantity}</Text>
+//               <Button title="+" onPress={() => increaseQuantity(item.id)} />
+//             </View>
+//             <Button title="Xóa" onPress={() => handleDeleteItem(item.id)} color="red" />
+//           </View>
+//         )}
+//       />
+//       <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+//         <Text style={styles.checkoutButtonText}>Thanh toán</Text>
+//       </TouchableOpacity>
+//     </View>
+//   );
+// };
+
+
+
+// export default Cart;
+
+
+
+const Menu = ({navigation}) => {
+  const [categories, setCategories] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('');
+  const [table, setTable] = useState('');
+  const [activeOption, setActiveOption] = useState('');
+  // const [selectedItems, setSelectedItems] = useState([]);
+  const isFocused = useIsFocused();
+
+  // console.log(selectedItems,'ok');
+
+  // Back to home function
+  const handleHome = () => {
+    console.log('back');
+    navigation.navigate('Home');
+  };
+
+  // Go to Cart Screen
+  const handleCart = () => {
+    console.log('Go to cart screen');
+    navigation.navigate('Cart');
+  };
 
   useEffect(() => {
-    const fetchCartItems = async () => {
+    const unsubcrise = navigation.addListener('focus', () => {});
+    return unsubcrise;
+  }, [navigation]);
+
+  // Get idTable from AsyncStorage
+  useEffect(() => {
+    const idTable = async () => {
       try {
-        let items = await AsyncStorage.getItem('cartItems');
-        items = items ? JSON.parse(items) : [];
-        setCartItems(items);
+        const idTable = await AsyncStorage.getItem('idTable');
+        console.log('ID Table từ AsyncStorage', idTable);
+        const table = await getTables(idTable);
+        //  console.log('===table==', table);
+        setTable(table);
       } catch (error) {
-        console.error('Error fetching cart items:', error);
+        console.error('Table error', error);
       }
     };
-
-    fetchCartItems();
+    idTable();
   }, []);
 
+  // Get data Categories from API
   useEffect(() => {
-    const updateStorage = async () => {
+    const loadCategories = async () => {
       try {
-        await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+        const data = await getCategories();
+        setCategories(data);
+        if (data.length > 0) {
+          setActiveCategory(data[3]._id); // Chọn mục đầu tiên làm mặc định
+          loadMenuItems(data[3]._id); // Lấy món ăn cho danh mục đầu tiên
+          console.log('=====firstCategory=======', activeCategory);
+        }
       } catch (error) {
-        console.error('Error updating cart items in AsyncStorage:', error);
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
-    updateStorage();
-  }, [cartItems]);
 
-  const increaseQuantity = (id) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      )
-    );
-  };
+    loadCategories();
+  }, []);
 
-  const decreaseQuantity = (id) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
-  };
+  // Add menuItem to Cart
+  const handleAddToCart = async (item, selectedOptionId) => {
+    try {
+      console.log(item.name, '<<<<<<<<<<<<<<<<<item');
 
-  const handleDeleteItem = (id) => {
-    const updatedCartItems = cartItems.filter(item => item.id !== id);
-    setCartItems(updatedCartItems);
-  };
+      // Tạo đối tượng mới chỉ với các trường cần thiết
+      const cartItem = {
+        name: item.name,
+        id: item._id,
+        option: item.options.find(option => option._id === selectedOptionId),
+      };
 
-  const handleCheckout = async () => {
-    const mergedItems = [];
-    cartItems.forEach(item => {
-      const existingItem = mergedItems.find(i => i.id === item.id && i.option === item.option);
-      if (existingItem) {
-        existingItem.quantity += item.quantity;
+      let cartItems = await AsyncStorage.getItem('cartItems');
+      cartItems = cartItems ? JSON.parse(cartItems) : [];
+
+      // Kiểm tra xem mặt hàng đã tồn tại trong giỏ hàng hay chưa
+      const existingItemIndex = cartItems.findIndex(
+        ci => ci.id === cartItem.id && ci.option._id === selectedOptionId,
+      );
+      if (existingItemIndex >= 0) {
+        // Nếu đã tồn tại, tăng số lượng lên
+        cartItems[existingItemIndex].quantity += 1;
       } else {
-        mergedItems.push({ ...item });
+        // Nếu chưa tồn tại, thêm mặt hàng mới vào giỏ hàng
+        cartItems.push({...cartItem, quantity: 1});
       }
-    });
-
-    console.log('Items to checkout:', mergedItems);
-    // Gửi mergedItems lên API
+      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+    }
   };
 
-  return (
-    <View style={styles.container}>
-      <FlatList
-        data={cartItems}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text>{item.name}</Text>
-            <Text>{item.price}</Text>
-            <Text>{item.option}</Text>
-            <View style={styles.quantityContainer}>
-              <Button title="-" onPress={() => decreaseQuantity(item.id)} />
-              <Text>{item.quantity}</Text>
-              <Button title="+" onPress={() => increaseQuantity(item.id)} />
-            </View>
-            <Button title="Xóa" onPress={() => handleDeleteItem(item.id)} color="red" />
-          </View>
-        )}
-      />
-      <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
-        <Text style={styles.checkoutButtonText}>Thanh toán</Text>
+  // Get data Menu item from API
+  const loadMenuItems = async categoryId => {
+    try {
+      const items = await getMenuItem(categoryId);
+      setMenuItems(items);
+      console.log(items[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  // Function handle change Categories
+  const handleChangeCategory = categoryId => {
+    setActiveCategory(categoryId);
+    loadMenuItems(categoryId);
+    console.log('Danh mục đang hoạt động || category:', categoryId);
+  };
+
+  // Function render item for flatlist Categories
+  const renderItem = ({item}) => {
+    const isActive = item._id === activeCategory;
+    const activeButtonStyle = {
+      borderColor: isActive ? '#E8900C' : '#757575',
+    };
+    const activeTextStyle = {
+      color: isActive ? '#E8900C' : '#757575',
+    };
+    return (
+      <TouchableOpacity
+        onPress={() => handleChangeCategory(item._id)}
+        style={styles.touchableOpacityCategories}>
+        <View style={[styles.buttonViewCategories, activeButtonStyle]}>
+          <Text style={[styles.buttonTextCategories, activeTextStyle]}>
+            {item.name}
+          </Text>
+        </View>
       </TouchableOpacity>
-    </View>
-  );
-};
+    );
+  };
+
+  const handleChangeOption = optionId => {
+    setActiveOption(optionId);
+    console.log('Options đã chọn || Options :', optionId);
+  };
+
+  // Function render item for flatlist MenuItem
+  const renderMenuItem = ({item}) => {
+    const isActive = item.options._id === activeOption;
+    const activeButtonStyle = {
+      borderColor: isActive ? '#E8900C' : '#757575',
+    };
+    const activeTextStyle = {
+      color: isActive ? '#E8900C' : '#757575',
+    };
+
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          console.log(item.name, item.options.length, '--------------------');
+        }}>
+        <View style={styles.menuItem}>
+          <Image
+            source={{
+              // If value of Image in API not null, show image : show Image URL
+              uri: item.image_url
+                ? item.image_url
+                : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+            }}
+            style={styles.menuItemImage}
+          />
+
+          <View style={styles.menuItemInfo}>
+            <Text
+              style={styles.menuItemName}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {item.name}
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width: '100%',
+                //  backgroundColor: 'blue',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.menuItemPrice}>{item.price} VND</Text>
+
+              {/* Button Add ItemMenu */}
+              <TouchableOpacity onPress={() => handleAddToCart(item)}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    borderColor: '#E8900C',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: hp(10),
+                    padding: hp(0.5),
+                  }}>
+                  <Icon name="shoppingcart" size={hp(2.8)} color="#E8900C" />
+                  <Text
+                    style={{
+                      fontSize: hp(2),
+                      fontWeight: 500,
+                      color: '#E8900C',
+                    }}>
+                    Thêm
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <View style={{height: 1, width: hp(100), backgroundColor: '#C0C0C0'}} />
+
+        {item.options.length > 0 ? (
+          <ScrollView
+            horizontal
+            style={{width: hp(100), height: hp(5), paddingHorizontal: wp(2)}}>
+            {item.options.map(option => (
+              <TouchableOpacity onPress={handleChangeOption(item.options._id)}>
+                <View
+                  key={option._id}
+                  style={[{ marginRight: wp(3), borderWidth: 1, borderRadius: 10}, activeButtonStyle]}>
+                  <Text style={[{}, activeTextStyle]}>{option.name}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        ) : (
+          <View></View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
 
-
-export default Cart;
+        
