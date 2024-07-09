@@ -21,6 +21,8 @@ import Loading from '../../fragment/Loading';
 import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
 
+
+
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);

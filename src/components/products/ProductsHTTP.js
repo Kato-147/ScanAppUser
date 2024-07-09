@@ -88,3 +88,43 @@ export const getTables = async (tableId) => {
     }
   }
 };
+
+// Create Order
+export const postOrder = async (userId, tableId) => {
+  console.log('..UserId ', userId,'...tableId ', tableId);
+  try {
+    // Lấy dữ liệu giỏ hàng từ AsyncStorage
+    let cartItems = await AsyncStorage.getItem('cartItems');
+    cartItems = cartItems ? JSON.parse(cartItems) : [];
+
+    console.log('CartItem When post api ....', cartItems);
+
+    // Chuyển đổi dữ liệu giỏ hàng sang định dạng API yêu cầu
+    const items = cartItems.map(item => ({
+      menuItemId: item.id,
+      quantity: item.quantity,
+      options: item.option || "",
+    }));
+
+    // Dữ liệu để gửi lên API
+    const data = {
+      items: items,
+    };
+
+    // Gửi yêu cầu POST lên API
+    const response = await axios.post(`v1/users/${userId}/tables/${tableId}/orders`, data);
+    
+    // Kiểm tra kết quả trả về từ API
+    if (response.status === 200) {
+      console.log('Order successfully placed:', response.data);
+      // Clear dữ liệu cartItems trong AsyncStorage
+      await AsyncStorage.removeItem('cartItems');
+      console.log('Cart items cleared');
+      
+    } else {
+      console.error('Failed to place order:', response.data);
+    }
+  }catch (error) {
+    console.error('Error placing order:', error);
+  }
+};

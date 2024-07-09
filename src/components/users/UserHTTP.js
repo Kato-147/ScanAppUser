@@ -101,7 +101,7 @@ export const updateUser = async (formData) => {
   }
 };
 
-// Login 
+// updatePassword 
 export const updatePassword = async (currentPassword, newPassword) => {
   console.log(currentPassword, newPassword);
   try {
