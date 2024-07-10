@@ -1,4 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
+import axios from 'axios';
 
 // infor user profile
 export const infoProfile = async () => {
@@ -6,7 +8,8 @@ export const infoProfile = async () => {
     const url = 'v1/users/me'; // Endpoint API
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request không cần body
-    console.log(res);
+   // console.log('--------------HTTP Get Info User',res.data.user._id);
+    await AsyncStorage.setItem('userID', (res.data.user._id));
     return res; // Trả về dữ liệu từ API
   } catch (err) {
     if (err.response) {
@@ -90,35 +93,37 @@ export const getTables = async (tableId) => {
 };
 
 // Create Order
-export const postOrder = async (userId, tableId) => {
-  console.log('..UserId ', userId,'...tableId ', tableId);
+export const postOrder = async ( tableId) => {
+  console.log('...tableId ', tableId);
   try {
     // Lấy dữ liệu giỏ hàng từ AsyncStorage
     let cartItems = await AsyncStorage.getItem('cartItems');
     cartItems = cartItems ? JSON.parse(cartItems) : [];
 
-    console.log('CartItem When post api ....', cartItems);
+   // console.log('CartItem When post api ....', cartItems);
 
     // Chuyển đổi dữ liệu giỏ hàng sang định dạng API yêu cầu
     const items = cartItems.map(item => ({
       menuItemId: item.id,
       quantity: item.quantity,
-      options: item.option || "",
+      options: item.option.name || "",
     }));
 
     // Dữ liệu để gửi lên API
     const data = {
       items: items,
     };
-
+console.log('---------------------', data);
     // Gửi yêu cầu POST lên API
-    const response = await axios.post(`v1/users/${userId}/tables/${tableId}/orders`, data);
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.post(`v1/tables/${tableId}/orders`, data);
     
     // Kiểm tra kết quả trả về từ API
-    if (response.status === 200) {
-      console.log('Order successfully placed:', response.data);
+    if (response.status === 'success') {
+      console.log('--------------------- Order successfully placed:', response.data);
       // Clear dữ liệu cartItems trong AsyncStorage
       await AsyncStorage.removeItem('cartItems');
+      await AsyncStorage.removeItem('idTable');
       console.log('Cart items cleared');
       
     } else {
