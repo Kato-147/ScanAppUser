@@ -20,41 +20,51 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
+import { postOrder } from '../ProductsHTTP';
 
 const Cart = ({navigation}) => {
-  const [quantities, setQuantities] = useState({});
-  const [cartItems, setCartItems] = useState([]);
-  console.log(cartItems,'---------------CartItem');
-  
 
- // console.log(cartItems, 'cardddddddddddddddddddddddd');
+  const [cartItems, setCartItems] = useState([]);
+  const [cartItemUI, setCartItemUI] = useState([])
+ // console.log(cartItemUI, '---------------CartItemUI');
+
+   //console.log(cartItems, 'cardddddddddddddddddddddddd');
   const handleMenu = () => {
     console.log('Back to menu');
     navigation.navigate('Menu');
   };
 
-  // Hợp nhất các mục trùng lặp dựa trên id và option
-  const mergeCartItems = items => {
-    const mergedItems = [];
-    items.forEach((item,index) => {
-      console.log(`Index: ${index}, Item:`, item.name); // Log ra index và item hiện tại
+  const cutStr =(string)=>{
+    return string.length > 30 ? string.slice(0,30)+"..." : string;
+  }
 
-      // Tìm kiếm mục hiện có trong mergedItems có cùng _id và option
+  const handlePlaceOrder = async () => {
+   // const userId = await AsyncStorage.getItem('userID');  // Thay thế bằng userId thực tế
+    const tableId = await AsyncStorage.getItem('idTable');
+  
+    await postOrder( tableId);
+  };
+
+  // Hợp nhất các mục trùng lặp dựa trên id và option
+  const mergeCartItems = (items) => {
+    const mergedItems = [];
+    items.forEach((item) => {
+      // Tìm kiếm mục hiện có trong mergedItems có cùng id và option._id
       const existingItem = mergedItems.find(
-        mergedItem =>
-          mergedItem.id === item.id && mergedItem.option === item.option,
+        (mergedItem) =>
+          mergedItem.id === item.id && mergedItem?.option?._id === item?.option?._id
       );
       if (existingItem) {
         // Nếu tồn tại, tăng quantity của mục đó
         existingItem.quantity += item.quantity;
       } else {
         // Nếu không tồn tại, thêm mục mới vào mergedItems
-        mergedItems.push({...item});
+        mergedItems.push({ ...item });
       }
     });
-
     return mergedItems; // Trả về mảng mergedItems đã hợp nhất
   };
+  
 
   // Lấy các mục giỏ hàng từ AsyncStorage khi component mount
   useEffect(() => {
@@ -64,8 +74,8 @@ const Cart = ({navigation}) => {
         let items = await AsyncStorage.getItem('cartItems');
         // Chuyển dữ liệu từ chuỗi JSON thành mảng JavaScript
         items = items ? JSON.parse(items) : [];
-        // Hợp nhất các mục trùng lặp và cập nhật state
-        setCartItems(mergeCartItems(items));
+        setCartItems(items);
+        setCartItemUI(mergeCartItems(items));
       } catch (error) {
         console.error('Error fetching cart items:', error);
       }
@@ -73,6 +83,18 @@ const Cart = ({navigation}) => {
 
     fetchCartItems(); // Gọi hàm fetchCartItems khi component mount
   }, []);
+
+//   useEffect(()=>{
+// const fetchCartItemUI = async()=>{
+//   try {
+//     setCartItemUI(cartItems);
+//     mergeCartItems(cartItemUI);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+// fetchCartItemUI();
+//   },[])
 
   // Cập nhật AsyncStorage khi cartItems thay đổi
   useEffect(() => {
@@ -88,38 +110,65 @@ const Cart = ({navigation}) => {
   }, [cartItems]);
 
   // plus quantity item
-  const increaseQuantity = (id) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? {...item, quantity: item.quantity + 1} : item,
-      ),
+  const increaseQuantity = (id, option) => {
+    const newItem = cartItems.find(item => item?.id === id && item?.option?._id === option?._id);
+    if (newItem) {
+      setCartItems([...cartItems, newItem]);
+    }
+
+    setCartItemUI((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id && item?.option?._id === option?._id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
     );
   };
 
   // minus quantity item
-  const decreaseQuantity = id => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id && item.quantity > 1
-          ? {...item, quantity: item.quantity - 1}
-          : item,
-      ),
+  const decreaseQuantity = (id, option) => {
+    const itemIndex = cartItems.findIndex(item => item?.id === id && item?.option?._id === option?._id);
+    if (itemIndex !== -1) {
+      const updatedCartItems = [...cartItems];
+      updatedCartItems.splice(itemIndex, 1);
+      setCartItems(updatedCartItems);
+    }
+
+    setCartItemUI((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id && item?.option?._id === option?._id && item?.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
     );
   };
 
   //Delete item in cart
-  const handleDeleteItem = (id, optionId) => {
-    const updatedCartItems = cartItems.filter(item => item?.id !== id || item?.option?._id !== optionId?._id);
-    setCartItems(updatedCartItems);
-  };
+  const handleDeleteItem = (id, option) => {
+    const updatedCartItems = cartItems.filter(
+      (item) => item.id !== id || item?.option?._id !== option?._id
+    );
 
+    const updatedCartItemUI = cartItemUI.filter(
+      (item) => item.id !== id || item?.option?._id !== option?._id
+    );
+
+    setCartItems(updatedCartItems);
+    setCartItemUI(updatedCartItemUI);
+  };
 
   const renderItem = ({item}) => {
     // console.log('Item when render .....: ',item.name, item.quantity);
- //   console.log(item);
+    //   console.log(item);
+
+     // Hợp nhất các mục trùng lặp và cập nhật state
+  //   setCartItems(mergeCartItems(item));
+
+  
 
     return (
       <TouchableOpacity
+      style={{width:hp(90)}}
         activeOpacity={1}
         onPress={() => {
           console.log('id', item._id, item.name);
@@ -127,7 +176,7 @@ const Cart = ({navigation}) => {
         <View style={styles.itemFlatlist}>
           <Image
             source={{
-              // If API have value of image, show image from API. If image != value, show image URL 
+              // If API have value of image, show image from API. If image != value, show image URL
               uri: item?.image
                 ? item?.image
                 : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
@@ -138,7 +187,14 @@ const Cart = ({navigation}) => {
           {/* text info */}
           <View style={{justifyContent: 'space-between'}}>
             {/* name */}
-            <Text style={{color: 'black', fontSize: hp(2)}}>{item.name}</Text>
+            <Text
+             numberOfLines={1} 
+             ellipsizeMode="head"
+            style={{color: 'black', fontSize: hp(2)}}>
+              {cutStr(item.name)}
+            </Text>
+
+            <Text>{item?.option?.name}</Text>
 
             <View
               style={{
@@ -151,19 +207,16 @@ const Cart = ({navigation}) => {
 
               {/* quantity */}
               <View style={{flexDirection: 'row', display: 'flex', gap: 10}}>
-                <TouchableOpacity
-                  onPress={() => decreaseQuantity(item.id)}>
+                <TouchableOpacity onPress={() => decreaseQuantity(item.id, item.option)}>
                   <Icon name="minussquareo" size={24} color="black" />
                 </TouchableOpacity>
                 <Text>{item.quantity}</Text>
-                <TouchableOpacity
-                  onPress={() => increaseQuantity(item.id)}>
+                <TouchableOpacity onPress={() => increaseQuantity(item.id, item.option)}>
                   <Icon name="plussquareo" size={24} color="black" />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-
           <Button
             title="Xóa"
             onPress={() => handleDeleteItem(item.id, item.option)}
@@ -243,9 +296,9 @@ const Cart = ({navigation}) => {
               // numColumns={1}
               showsVerticalScrollIndicator={false}
               style={{width: '100%'}}
-              data={cartItems}
+              data={cartItemUI}
               renderItem={renderItem}
-              keyExtractor={(item,index) => index}
+              keyExtractor={(item, index) => `${item.id}-${item.option}-${index}`}
             />
           </View>
 
@@ -261,9 +314,11 @@ const Cart = ({navigation}) => {
             </TouchableOpacity>
 
             {/* pay button */}
-            <View style={styles.payButtonContainer}>
+            <TouchableOpacity
+            onPress={handlePlaceOrder}
+            style={styles.payButtonContainer}>
               <Text style={styles.payButtonText}>ĐẶT MÓN</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -314,11 +369,10 @@ const styles = StyleSheet.create({
     // backgroundColor: 'red',
   },
   itemFlatlist: {
-    marginVertical: 10,
     backgroundColor: 'white',
-    paddingVertical: 20,
     flexDirection: 'row',
-    width: '100%',
+    alignItems:"center",
+    display:'flex'
   },
   // voucherContainer: {
   //   flexDirection: 'row',

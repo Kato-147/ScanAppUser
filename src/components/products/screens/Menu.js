@@ -21,6 +21,8 @@ import Loading from '../../fragment/Loading';
 import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
 
+
+
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
@@ -97,6 +99,7 @@ const Menu = ({navigation}) => {
         image: item?.image_url,
         id: item?._id,
         name: item?.name,
+        quantity: 0,
         option: item?.options?.find(option => option?._id === selectedOptionId),
       };
   
@@ -104,16 +107,19 @@ const Menu = ({navigation}) => {
       cartItems = cartItems ? JSON.parse(cartItems) : [];
   
       // Kiểm tra xem mặt hàng đã tồn tại trong giỏ hàng hay chưa
-      const existingItemIndex = cartItems.findIndex(
-        ci => ci?.id === cartItem?.id && ci?.option?._id === selectedOptionId,
-      );
-      if (existingItemIndex >= 0) {
-        // Nếu đã tồn tại, tăng số lượng lên
-        cartItems[existingItemIndex].quantity += 1;
-      } else {
-        // Nếu chưa tồn tại, thêm mặt hàng mới vào giỏ hàng
-        cartItems.push({...cartItem, quantity: 1});
-      }
+      // const existingItemIndex = cartItems.findIndex(
+      //   ci => ci?.id === cartItem?.id && ci?.option?._id === selectedOptionId,
+      // );
+
+      cartItems.push({...cartItem, quantity: 1});
+
+      // if (existingItemIndex >= 0) {
+      //   // Nếu đã tồn tại, tăng số lượng lên
+      //   cartItems[existingItemIndex].quantity += 1;
+      // } else {
+      //   // Nếu chưa tồn tại, thêm mặt hàng mới vào giỏ hàng
+        //cartItems.push({...cartItem, quantity: 1});
+      // }
       await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
     } catch (error) {
       console.error('Error adding item to cart:', error);

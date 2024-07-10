@@ -45,9 +45,10 @@ const Login = ({navigation}) => {
       // Xử lý phản hồi thành công
       if (response.status === 'success') {
        // ToastAndroid.show(response.message, ToastAndroid.SHORT);
+    //   await AsyncStorage.setItem('userID', (response.data.token));
        await AsyncStorage.setItem('token', (response.data.token));
-       console.log('======TOKENNNNNNNNN===========');
-       console.log(response.data.token);
+       console.log('======Login===========', response);
+       
         setTimeout(() => {
           navigation.navigate('tab');
         }, 500);

@@ -55,12 +55,21 @@ const Profile = ({navigation}) => {
     );
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     console.log('click log out');
-    logout(navigation);
     console.log(userInfo, 'userInfo -->>>>>>>>>>');
-    // setUserInfo(null);
-    //navigation.navigate('Login');
+    
+    try {
+      // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
+      await AsyncStorage.clear();
+      
+      // Chuyển sang màn hình chính
+      navigation.navigate('Login');
+      
+      console.log('Logged out and navigated to Login screen.');
+    } catch (error) {
+      console.error('Error clearing AsyncStorage:', error);
+    }
   };
 
   const handleUpdateInfo = () => {
@@ -72,15 +81,6 @@ const Profile = ({navigation}) => {
     console.log('>>>>>>>> click to UpdatePassword Screen');
     navigation.navigate('UpdatePassword');
   }
-
-  const logout = navigation => {
-    // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
-    AsyncStorage.clear().then(() => {
-      // setUserInfo(null);
-      // Chuyển sang màn hình chính
-      navigation.navigate('Login');
-    });
-  };
 
   return (
     <LinearGradient
