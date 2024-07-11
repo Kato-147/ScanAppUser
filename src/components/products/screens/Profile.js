@@ -43,6 +43,8 @@ const Profile = ({navigation}) => {
     }
     
   }, [isFocused]);
+
+  //Loading
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
