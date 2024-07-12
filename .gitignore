@@ -72,3 +72,21 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+yarn.lock
+.yarnrc.yml
+
+# ESLint
+.eslintrc.js
+
+#config
+.watchmanconfig
+tsconfig.json
+
+#pakage
+package.json
+
+#Gemfile
+Gemfile
+
+#linhtinh
+text
