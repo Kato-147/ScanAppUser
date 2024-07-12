@@ -38,11 +38,8 @@ const Cart = ({navigation}) => {
   };
 
   const handlePlaceOrder = async () => {
-    // const userId = await AsyncStorage.getItem('userID');  // Thay thế bằng userId thực tế
-    const tableId = await AsyncStorage.getItem('idTable');
-
     try {
-      const response = await postOrder(tableId);
+      const response = await postOrder();
       if (response.status === 'success') {
         await AsyncStorage.removeItem('cartItems');
         await AsyncStorage.removeItem('idTable');
@@ -53,7 +50,7 @@ const Cart = ({navigation}) => {
         console.log('status fail >>>>>', response.message);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -187,7 +184,7 @@ const Cart = ({navigation}) => {
         style={{width: hp(90)}}
         activeOpacity={1}
         onPress={() => {
-          console.log('id', item._id, item.name);
+          console.log('id', item._id, item?.name);
         }}>
         <View style={styles.itemFlatlist}>
           <Image
@@ -207,7 +204,7 @@ const Cart = ({navigation}) => {
               numberOfLines={1}
               ellipsizeMode="head"
               style={{color: 'black', fontSize: hp(2)}}>
-              {cutStr(item.name)}
+              {cutStr(item?.name)}
             </Text>
 
             <Text>{item?.option?.name}</Text>
@@ -277,10 +274,6 @@ const Cart = ({navigation}) => {
               </Text>
             </View> */}
 
-            {/* pay button */}
-            {/* <TouchableOpacity style={styles.payBtn}>
-              <Text style={styles.payText}>Thanh toán</Text>
-            </TouchableOpacity> */}
           </View>
 
           {/* Body */}

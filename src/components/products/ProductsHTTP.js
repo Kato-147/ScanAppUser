@@ -94,20 +94,20 @@ export const getTables = async tableId => {
 };
 
 // Create Order
-export const postOrder = async tableId => {
-  console.log('...tableId ', tableId);
+export const postOrder = async () => {
   try {
     // Lấy dữ liệu giỏ hàng từ AsyncStorage
     let cartItems = await AsyncStorage.getItem('cartItems');
-    cartItems = cartItems ? JSON.parse(cartItems) : [];
+    let tableId = await AsyncStorage.getItem('idTable');
+    console.log('...tableId ', tableId);
 
-    // console.log('CartItem When post api ....', cartItems);
+    cartItems = cartItems ? JSON.parse(cartItems) : [];
 
     // Chuyển đổi dữ liệu giỏ hàng sang định dạng API yêu cầu
     const items = cartItems.map(item => ({
       menuItemId: item.id,
+      options: item.option?.name || '',
       quantity: item.quantity,
-      options: item.option.name || '',
     }));
 
     // Dữ liệu để gửi lên API
@@ -135,17 +135,16 @@ export const getOrderUser = async () => {
     let token = await AsyncStorage.getItem('token');
 
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.get(url,token); // GET request và gửi token user
+    const res = await axiosInstance.get(url, token); // GET request và gửi token user
 
-    console.log('respone from get Order',res);
-   
-   // Trả về dữ liệu từ API
-   return res;
-
+    // Trả về dữ liệu từ API
+    return res;
   } catch (err) {
     if (err.response) {
       console.log('API error:', err.response);
-      throw new Error(err.response.message || 'Lấy thông tin getOrder thất bại');
+      throw new Error(
+        err.response.message || 'Chưa đặt món',
+      );
     } else if (err.request) {
       console.log('No response from API:', err.request);
       throw new Error('Không có phản hồi từ máy chủ');

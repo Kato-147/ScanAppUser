@@ -17,7 +17,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import IconLogout from 'react-native-vector-icons/MaterialIcons';
 import {infoProfile} from '../ProductsHTTP';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
 const Profile = ({navigation}) => {
   const [userInfo, setUserInfo] = useState(null);
@@ -25,9 +25,8 @@ const Profile = ({navigation}) => {
   const [error, setError] = useState(null);
   const isFocused = useIsFocused();
 
-
   useEffect(() => {
-    if(isFocused){
+    if (isFocused) {
       const fetchProfileInfo = async () => {
         try {
           const data = await infoProfile();
@@ -41,7 +40,6 @@ const Profile = ({navigation}) => {
       };
       fetchProfileInfo();
     }
-    
   }, [isFocused]);
 
   //Loading
@@ -60,14 +58,14 @@ const Profile = ({navigation}) => {
   const handleLogout = async () => {
     console.log('click log out');
     console.log(userInfo, 'userInfo -->>>>>>>>>>');
-    
+
     try {
       // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
       await AsyncStorage.clear();
-      
+
       // Chuyển sang màn hình chính
       navigation.navigate('Login');
-      
+
       console.log('Logged out and navigated to Login screen.');
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);
@@ -79,10 +77,10 @@ const Profile = ({navigation}) => {
     navigation.navigate('UpdateInfo');
   };
 
-  const handleUpdatePassword =()=>{
+  const handleUpdatePassword = () => {
     console.log('>>>>>>>> click to UpdatePassword Screen');
     navigation.navigate('UpdatePassword');
-  }
+  };
 
   return (
     <LinearGradient
