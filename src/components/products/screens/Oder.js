@@ -105,7 +105,7 @@ const Oder = () => {
   return (
     <LinearGradient
       colors={['white', 'white', '#FBFAFF', '#FBFAFF']}
-      style={styles.container}>
+      style={styles.container}> //
       {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
