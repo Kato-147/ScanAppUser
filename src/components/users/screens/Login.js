@@ -84,6 +84,7 @@ const Login = ({navigation}) => {
        containerStyle={{marginTop: 20}}
        placeholder={'Email'}
        onChangeText={setEmail}
+       
      />
      <CustomInput
        containerStyle={{marginTop: 20}}

@@ -17,22 +17,22 @@ const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
   return (
-    
-      <Stack.Navigator initialRouteName='Splash' screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="ScanQR" component={ScanQR} />
-        <Stack.Screen name="OtpLogin" component={OtpLogin} />
-        <Stack.Screen name="tab" component={TabBar} />
-        <Stack.Screen name="ScanHome" component={ScanHome} />
-        <Stack.Screen name="MyVoucher" component={MyVoucher} />
-        <Stack.Screen name="Menu" component={Menu} />
-        <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
-        <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
-        <Stack.Screen name="Cart" component={Cart} />
-      </Stack.Navigator>
- 
+    <Stack.Navigator
+      initialRouteName="Splash"
+      screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Register" component={Register} />
+      <Stack.Screen name="ScanQR" component={ScanQR} />
+      <Stack.Screen name="OtpLogin" component={OtpLogin} />
+      <Stack.Screen name="tab" component={TabBar} />
+      <Stack.Screen name="ScanHome" component={ScanHome} />
+      <Stack.Screen name="MyVoucher" component={MyVoucher} />
+      <Stack.Screen name="Menu" component={Menu} />
+      <Stack.Screen name="Splash" component={Splash} />
+      <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
+      <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
+      <Stack.Screen name="Cart" component={Cart} />
+    </Stack.Navigator>
   );
 };
 

@@ -1,8 +1,21 @@
-import { useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {useRef, useState} from 'react';
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const CustomInput = ({ containerStyle, placeholder, onChangeText, error, ...props }) => {
+const CustomInput = ({
+  containerStyle,
+  placeholder,
+  onChangeText,
+  error,
+  ...props
+}) => {
   const [isFocused, setIsFocused] = useState(false);
   const [text, setText] = useState('');
   const [showPassword, setShowPassword] = useState(props.secureTextEntry);
@@ -20,7 +33,7 @@ const CustomInput = ({ containerStyle, placeholder, onChangeText, error, ...prop
     }
   };
 
-  const handleTextChange = (text) => {
+  const handleTextChange = text => {
     setText(text);
     if (onChangeText) {
       onChangeText(text);
@@ -32,7 +45,7 @@ const CustomInput = ({ containerStyle, placeholder, onChangeText, error, ...prop
     }
   };
 
-  const animatedLabel = (toValue) => {
+  const animatedLabel = toValue => {
     Animated.timing(labelPosition, {
       toValue: toValue,
       duration: 200,
@@ -58,8 +71,10 @@ const CustomInput = ({ containerStyle, placeholder, onChangeText, error, ...prop
 
   return (
     <View style={containerStyle}>
-      <View style={[styles.innerContainer, error && { borderColor: 'red' }]}>
-        <Animated.Text style={[styles.label, labelStyle]}>{placeholder}</Animated.Text>
+      <View style={[styles.innerContainer, error && {borderColor: 'red'}]}>
+        <Animated.Text style={[styles.label, labelStyle]}>
+          {placeholder}
+        </Animated.Text>
         <View style={styles.inputContainer}>
           <TextInput
             {...props}
@@ -67,18 +82,19 @@ const CustomInput = ({ containerStyle, placeholder, onChangeText, error, ...prop
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChangeText={handleTextChange}
-            keyboardType='default'
+            keyboardType="default"
             value={text}
             textAlignVertical="center"
-            textContentType={props.secureTextEntry ? 'newPassword' : props.secureTextEntry}
+            textContentType={
+              props.secureTextEntry ? 'newPassword' : props.secureTextEntry
+            }
             secureTextEntry={showPassword}
           />
           {props.secureTextEntry && !!text && (
             <View>
               <TouchableOpacity
-                style={{ width: 24 }}
-                onPress={() => setShowPassword(!showPassword)}
-              >
+                style={{width: 24}}
+                onPress={() => setShowPassword(!showPassword)}>
                 {!showPassword ? (
                   <Icon name="eye-outline" color={'gray'} size={24} />
                 ) : (
@@ -100,7 +116,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 60,
     justifyContent: 'center',
-    marginTop:10,
+    marginTop: 10,
     fontSize: 16,
     lineHeight: 22,
     fontWeight: '350',
@@ -127,6 +143,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginTop: 10,
     paddingLeft: 10,
+    color: 'red',
   },
   errorText: {
     marginTop: 5,

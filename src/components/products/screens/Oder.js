@@ -81,7 +81,7 @@ const Oder = () => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error.response.data.message}</Text>
+        <Text style={styles?.errorText}>{error?.response?.data?.message}</Text>
       </View>
     );
   }
@@ -130,10 +130,8 @@ const Oder = () => {
         </View>
       )}
 
-
-{/* Voucher & payment method */}
-      <View style={{height: hp(42),}}>
-        
+      {/* Voucher & payment method */}
+      <View style={{height: hp(42)}}>
         <View>
           {/* Voucher */}
           <View style={styles.voucherContainer}>
@@ -218,14 +216,13 @@ const Oder = () => {
         </View>
       </View>
 
-{/* Button Order */}
+      {/* Button Order */}
 
       <View>
-      <TouchableOpacity style={styles.orderButton} >
-        <Text style={styles.orderButtonText}>Order</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.orderButton}>
+          <Text style={styles.orderButtonText}>Order</Text>
+        </TouchableOpacity>
       </View>
-
     </LinearGradient>
   );
 };
@@ -345,7 +342,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8900C',
     paddingVertical: 12,
     borderRadius: 8,
-   marginHorizontal: wp(10)
+    marginHorizontal: wp(10),
   },
   orderButtonText: {
     color: '#fff',
