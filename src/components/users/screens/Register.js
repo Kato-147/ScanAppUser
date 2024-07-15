@@ -3,73 +3,106 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  TextInput,
-  Image,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ToastAndroid,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
+import LinearGradient from 'react-native-linear-gradient';
+import Icon2 from 'react-native-vector-icons/Ionicons';
+import CustomInput from '../../fragment/CustomInput';
+import {register} from '../UserHTTP';
+import axios from 'axios';
 
 const Register = ({navigation}) => {
+  // const [fullName, setFullName] = useState('hihihaha');
+  // const [email, setEmail] = useState('oroki147@gmail.com');
+  // const [password, setPassword] = useState('Tt123456789');
+
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const handleLogin = () => {
     navigation.navigate('Login');
   };
 
+  const handleRegister = async () => {
+    console.log('btn register');
+    if (fullName === '' || email === '' || password === '') {
+      ToastAndroid.show('Vui lòng điền đầy đủ thông tin', ToastAndroid.SHORT);
+      return;
+    }
+    try {
+      // Gọi hàm register
+      const response = await register(fullName, email, password);
+      console.log(response, 'response from register');
+
+      // Xử lý phản hồi thành công
+      if (response.status === 'success') {
+        ToastAndroid.show(response.message, ToastAndroid.SHORT);
+        setTimeout(() => {
+          navigation.navigate('OtpLogin', {email});
+        }, 500);
+      }
+      if (response.status === 'fail') {
+        console.log(response.message);
+      }
+    } catch (error) {
+      // Xử lý lỗi và hiển thị thông báo lỗi
+      console.error('Error in handleRegister:', error.message);
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.login}> Đăng ký </Text>
-      </View>
-      <View style={{marginTop: 20}}>
-        {/* Text input */}
-        <View style={{marginTop: 30}}>
-          <Text style={styles.lableInput}>Số điện thoại :</Text>
-          <TextInput
-            // onChangeText={setEmail}
-            style={styles.input}
-          />
-        </View>
+    <KeyboardAvoidingView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <LinearGradient
+          colors={['#CE8025', '#FFB266', '#E0E0E0']}
+          style={styles.container}>
+          {/* header */}
+          <View>
+            <TouchableOpacity onPress={handleLogin}>
+              <Icon2 name="chevron-back-outline" size={24} color="white" />
+            </TouchableOpacity>
 
-        {/* Text input */}
-        <View style={{marginTop: 24}}>
-          <Text style={styles.lableInput}>Mật khẩu :</Text>
-          <TextInput
-            // onChangeText={setPassword}
-            style={styles.input}
-            secureTextEntry={true}
-          />
-        </View>
+            <View>
+              <Text style={styles.login}> Đăng ký </Text>
+            </View>
+          </View>
 
-        {/* Text input */}
-        <View style={{marginTop: 24}}>
-          <Text style={styles.lableInput}>Nhập mã Otp :</Text>
-          <TextInput
-            // onChangeText={setPassword}
-            style={styles.input}
-          />
-        </View>
-      </View>
+          {/* Text input */}
+          <View style={{marginTop: 20}}>
+            <CustomInput
+              containerStyle={{marginTop: 20}}
+              placeholder={'Tên'}
+              onChangeText={setFullName}
+            />
 
-      {/* Forgot password & register */}
-      <View
-        style={{
-          marginTop: 24,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-        }}>
-        <TouchableOpacity style={{}}>
-          <Text style={{color: '#191d23'}}>Gửi mã Otp</Text>
-        </TouchableOpacity>
-      </View>
+            <CustomInput
+              containerStyle={{marginTop: 20}}
+              placeholder={'Email'}
+              onChangeText={setEmail}
+            />
 
-      {/* button login */}
-      <View style={{marginTop: 40}}>
-        <TouchableOpacity style={styles.btnLogin}>
-          <Text onPress={handleLogin} style={styles.textLogin}>
-            Xác nhận
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            <CustomInput
+              containerStyle={{marginTop: 20}}
+              placeholder={'Mật khẩu'}
+              onChangeText={setPassword}
+            />
+          </View>
+
+          {/* button login */}
+          <View style={{marginTop: 40}}>
+            <TouchableOpacity onPress={handleRegister} style={styles.btnLogin}>
+              <Text style={styles.textLogin}>Xác nhận</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -81,14 +114,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     display: 'flex',
-    backgroundColor: '#fff',
   },
 
   login: {
     fontSize: 26,
     lineHeight: 40,
     fontWeight: '700',
-    color: '#191919',
+    color: 'white',
     textAlign: 'center',
     marginTop: 40,
   },

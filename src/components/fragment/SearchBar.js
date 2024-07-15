@@ -31,7 +31,8 @@ const SearchBar = ({value, updateSearch, style}) => {
               setQuery(text);
               updateSearch(text);
               if (error) setError(false);
-            } else setError('Please only enter alphabets');
+            } 
+            else setError('Please only enter alphabets');
           }}
         />
         {query ? (
@@ -78,14 +79,16 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     backgroundColor: 'white',
-    width: '90%',
-    height: 40,
+    width: '100%',
+    height: '100%',
     flexDirection: 'row',
-    borderRadius:20
+    borderRadius:20,
+    borderWidth: 1,
+    borderColor:'#E8900C'
   },
   container: {
-    height: 80,
-    alignItems: 'center',
     // height: '100%', width: '100%'
+    width:'80%',
+    height: 40,
   },
 });
