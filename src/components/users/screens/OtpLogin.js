@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  ToastAndroid
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon2 from 'react-native-vector-icons/Ionicons';
@@ -29,9 +30,23 @@ const OtpLogin = ({navigation}) => {
     navigation.navigate('Login');
   }
 
-  const handleHome = () =>{
-    navigation.navigate('tab');
-  }
+  const handleOtpSubmit = async () => {
+    console.log('send otp');
+    try {
+      const response = await verifyOtp(email, verificationCode); // Gửi email cùng với OTP
+      if (response.status === 'success') {
+        ToastAndroid.show('Xác nhận Otp thành công', ToastAndroid.SHORT);
+        // Alert.alert('Thành công', 'Xác nhận OTP thành công!');
+        // Điều hướng đến trang khác sau khi xác minh thành công
+        navigation.navigate('Login'); // Chuyển đến màn hình login sau khi xác minh otp thành công
+      } else {
+        Alert.alert('Lỗi', 'Mã OTP không hợp lệ, vui lòng thử lại.');
+      }
+    } catch (error) {
+      Alert.alert('Lỗi', 'Đã xảy ra lỗi khi xác minh OTP.');
+      console.log(error);
+    }
+  };
 
   return (
     <LinearGradient colors={['#C55402', '#CE8025', '#FFB266']} style={styles.container}>
@@ -86,7 +101,7 @@ const OtpLogin = ({navigation}) => {
         justifyContent: 'flex-end',
         marginBottom: 20,
       }}>
-<TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
+<TouchableOpacity onPress={handleOtpSubmit} style={styles.btnLogin}>
 <Text
   // onPress={handleLogin}
   style={styles.textLogin}>
