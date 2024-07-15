@@ -81,7 +81,9 @@ const Oder = () => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error.response.data.message}</Text>
+        <Text style={styles.errorText}>{error.response?.data?.message}</Text>
+
+    
       </View>
     );
   }
@@ -106,6 +108,7 @@ const Oder = () => {
     <LinearGradient
       colors={['white', 'white', '#FBFAFF', '#FBFAFF']}
       style={styles.container}> //
+
       {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>

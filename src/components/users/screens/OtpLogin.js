@@ -8,6 +8,7 @@ import {
   View,
   KeyboardAvoidingView,
   Alert,
+  ToastAndroid,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon2 from 'react-native-vector-icons/Ionicons';
@@ -26,9 +27,7 @@ const OtpLogin = ({navigation}) => {
     navigation.navigate('Login');
   };
 
-  const handleHome = () => {
-    navigation.navigate('tab');
-  };
+ 
 
   const handleOtpSubmit = async () => {
     console.log('send otp');
@@ -84,7 +83,7 @@ const OtpLogin = ({navigation}) => {
               />
 
               {/* Send Otp */}
-              <TouchableOpacity style={{alignSelf: 'flex-end', marginTop: 10}}>
+              <TouchableOpacity onPress={handleOtpSubmit} style={{alignSelf: 'flex-end', marginTop: 10}}>
                 <Text style={{alignSelf: 'flex-end'}}>Gửi lại mã Otp</Text>
               </TouchableOpacity>
             </View>
@@ -98,8 +97,8 @@ const OtpLogin = ({navigation}) => {
               justifyContent: 'flex-end',
               marginBottom: 20,
             }}>
-            <TouchableOpacity onPress={handleHome} style={styles.btnLogin}>
-              <Text onPress={handleOtpSubmit} style={styles.textLogin}>
+            <TouchableOpacity onPress={handleOtpSubmit} style={styles.btnLogin}>
+              <Text  style={styles.textLogin}>
                 Xác nhận
               </Text>
             </TouchableOpacity>
