@@ -44,9 +44,9 @@ const calculateTotalPrice = items => {
   }, 0);
 };
 
-const Oder = () => {
+const Oder = ({navigation}) => {
   const [oderItems, setOderItems] = useState([]);
-  const [selectedMethod, setSelectedMethod] = useState('MoMo');
+  const [selectedMethod, setSelectedMethod] = useState('COD');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const isFocused = useIsFocused();
@@ -86,6 +86,10 @@ const Oder = () => {
     );
   }
 
+  const handleHihihaha = () => {
+    navigation.navigate('Hihihaha');
+  };
+
   const renderOrderItem = ({item}) => {
     return (
       <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
@@ -105,8 +109,7 @@ const Oder = () => {
   return (
     <LinearGradient
       colors={['white', 'white', '#FBFAFF', '#FBFAFF']}
-      style={styles.container}> 
-
+      style={styles.container}>
       {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
@@ -117,7 +120,7 @@ const Oder = () => {
       {/* Order Item */}
       {oderItems.length === 0 ? (
         <View>
-          <Text style={{fontSize: hp(4)}} > Đặt món đi ban oi </Text>
+          <Text style={{fontSize: hp(4)}}> Đặt món đi ban oi </Text>
         </View>
       ) : (
         <View style={{height: hp(32)}}>
@@ -131,10 +134,8 @@ const Oder = () => {
         </View>
       )}
 
-
-{/* Voucher & payment method */}
-      <View style={{height: hp(42),}}>
-        
+      {/* Voucher & payment method */}
+      <View style={{height: hp(42)}}>
         <View>
           {/* Voucher */}
           <View style={styles.voucherContainer}>
@@ -163,8 +164,9 @@ const Oder = () => {
             <Text style={styles.title}>Phương thức thanh toán</Text>
 
             <TouchableOpacity
+            activeOpacity={1}
               style={styles.optionContainer}
-              onPress={() => setSelectedMethod('MoMo')}>
+              onPress={() => setSelectedMethod('Zalo')}>
               <View style={styles.optionContent}>
                 <Image
                   source={{
@@ -176,14 +178,15 @@ const Oder = () => {
               </View>
 
               <RadioButton
-                value="MoMo"
-                status={selectedMethod === 'MoMo' ? 'checked' : 'unchecked'}
-                onPress={() => setSelectedMethod('MoMo')}
-                color="#F53360"
+                value="Zalo"
+                status={selectedMethod === 'Zalo' ? 'checked' : 'unchecked'}
+                onPress={() => setSelectedMethod('Zalo')}
+                color="#E8900C"
               />
             </TouchableOpacity>
 
             <TouchableOpacity
+            activeOpacity={1}
               style={styles.optionContainer}
               onPress={() => setSelectedMethod('COD')}>
               <View style={styles.optionContent}>
@@ -199,7 +202,7 @@ const Oder = () => {
                 value="COD"
                 status={selectedMethod === 'COD' ? 'checked' : 'unchecked'}
                 onPress={() => setSelectedMethod('COD')}
-                color="#F53360"
+                color="#E8900C"
               />
             </TouchableOpacity>
           </View>
@@ -219,14 +222,13 @@ const Oder = () => {
         </View>
       </View>
 
-{/* Button Order */}
+      {/* Button Order */}
 
       <View>
-      <TouchableOpacity style={styles.orderButton} >
-        <Text style={styles.orderButtonText}>Order</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={handleHihihaha} style={styles.orderButton}>
+          <Text style={styles.orderButtonText}>Order</Text>
+        </TouchableOpacity>
       </View>
-
     </LinearGradient>
   );
 };
@@ -346,7 +348,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8900C',
     paddingVertical: 12,
     borderRadius: 8,
-   marginHorizontal: wp(10)
+    marginHorizontal: wp(10),
   },
   orderButtonText: {
     color: '#fff',
