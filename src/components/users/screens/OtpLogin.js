@@ -83,7 +83,7 @@ const OtpLogin = ({navigation}) => {
               />
 
               {/* Send Otp */}
-              <TouchableOpacity style={{alignSelf: 'flex-end', marginTop: 10}}>
+              <TouchableOpacity onPress={handleOtpSubmit} style={{alignSelf: 'flex-end', marginTop: 10}}>
                 <Text style={{alignSelf: 'flex-end'}}>Gửi lại mã Otp</Text>
               </TouchableOpacity>
             </View>
