@@ -81,9 +81,7 @@ const Oder = () => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error.response?.data?.message}</Text>
-
-    
+        <Text style={styles.errorText}>{error.response?.data.message}</Text>
       </View>
     );
   }
@@ -95,7 +93,7 @@ const Oder = () => {
         <View style={styles.detailsContainer}>
           <Text style={styles.name}>{item.menuItemId.name}</Text>
           <Text style={styles.price}>{item.menuItemId.price} VND</Text>
-          <Text style={styles.options}>Options: {item.options}</Text>
+          <Text style={styles.options}>Options: {item?.options}</Text>
           <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
         </View>
       </TouchableOpacity>
@@ -107,7 +105,7 @@ const Oder = () => {
   return (
     <LinearGradient
       colors={['white', 'white', '#FBFAFF', '#FBFAFF']}
-      style={styles.container}> //
+      style={styles.container}> 
 
       {/* Header */}
       <View style={styles.headerContainer}>
@@ -119,7 +117,7 @@ const Oder = () => {
       {/* Order Item */}
       {oderItems.length === 0 ? (
         <View>
-          <Text style={{fontSize: hp(4)}}>Đặt món đi ban oi</Text>
+          <Text style={{fontSize: hp(4)}} > Đặt món đi ban oi </Text>
         </View>
       ) : (
         <View style={{height: hp(32)}}>
@@ -195,7 +193,7 @@ const Oder = () => {
                   }}
                   style={styles.logo}
                 />
-                <Text style={styles.optionText}>Thanh toán tiền mặt</Text>
+                <Text style={styles.optionText}> Thanh toán tiền mặt </Text>
               </View>
               <RadioButton
                 value="COD"
