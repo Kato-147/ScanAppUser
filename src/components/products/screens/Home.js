@@ -8,8 +8,9 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import SearchBar from '../../fragment/SearchBar';
 import IconQr from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconChat from 'react-native-vector-icons/Ionicons';
@@ -18,19 +19,32 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
+import {useIsFocused} from '@react-navigation/native';
+import {infoProfile} from '../ProductsHTTP';
+import Loading from '../../fragment/Loading';
 
 const Home = props => {
   const {navigation} = props;
-  const [value, setValue] = useState();
+  const [userInfo, setUserInfo] = useState(null);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      const fetchProfileInfo = async () => {
+        try {
+          const data = await infoProfile();
+          setUserInfo(data);
+        } catch (err) {
+          setError(err.message);
+          ToastAndroid.show(err.message, ToastAndroid.SHORT);
+        }
+      };
+      fetchProfileInfo();
+    }
+  }, [isFocused]);
 
   const handleScanHome = () => {
     navigation.navigate('ScanHome');
-  };
-
-  const updateSearch = value => {
-    // setValue(value);
-    //do your search logic or anything
-    console.log(value);
   };
 
   const renderItem = ({item}) => {
@@ -55,20 +69,48 @@ const Home = props => {
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <LinearGradient
-          colors={['#C96913', '#FFB266', '#EEEEEE', '#EEEEEE']}
+          colors={['#C96913', '#FFB266', '#F6F6F6', '#F6F6F6']}
           style={styles.container}>
           {/* Header */}
           <View style={styles.headerContainer}>
-            <SearchBar
-              value={value}
-              updateSearch={updateSearch}
-              // style={{marginTop: '8%'}}
-             
-            />
+            {userInfo === null ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: wp(80),
+                  gap: wp(5),
+                }}>
+                <ActivityIndicator size="large" color="#0000ff" />
+                {/* style={styles.avatarImage} */}
+              </View>
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: wp(80),
+                  gap: wp(5),
+                }}>
+                <Image
+                  source={{uri: userInfo.data.user.img_avatar_url}}
+                  style={styles.avatarImage}
+                />
+                <Text
+                  style={{
+                    fontSize: hp(2.2),
+                    letterSpacing: 1,
+                    fontWeight: 'bold',
+                    color: '#000000',
+                  }}>
+                  {userInfo.data.user.fullName}
+                </Text>
+              </View>
+            )}
             <TouchableOpacity>
               <IconChat
                 name="chatbox-ellipses-outline"
-                size={26}
+                size={wp(7)}
                 color="#E8900C"
               />
             </TouchableOpacity>
@@ -78,22 +120,25 @@ const Home = props => {
           <View style={styles.bodyContainer}>
             {/* Scan Here */}
             <View
-              style={{justifyContent: 'space-evenly', flexDirection: 'row', alignItems:'center', marginVertical: hp(8)}}>
-              
-                <Text
-                  style={{
-                    marginStart: 24,
-                    fontSize: hp(2.3),
-                    fontWeight: '500',
-                    color: 'white',
-                    marginTop: 10,
-                  }}>
-                  Quét mã để xem Menu
-                </Text>
-                <TouchableOpacity onPress={handleScanHome}>
-                  <IconQr name="qrcode-scan" style={styles.iconQr} />
-                </TouchableOpacity>
-              
+              style={{
+                justifyContent: 'space-evenly',
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginVertical: hp(8),
+              }}>
+              <Text
+                style={{
+                  marginStart: 24,
+                  fontSize: hp(2.3),
+                  fontWeight: '500',
+                  color: 'white',
+                  marginTop: 10,
+                }}>
+                Quét mã để xem Menu
+              </Text>
+              <TouchableOpacity onPress={handleScanHome}>
+                <IconQr name="qrcode-scan" style={styles.iconQr} />
+              </TouchableOpacity>
             </View>
 
             {/* Voucher */}
@@ -138,11 +183,12 @@ const styles = StyleSheet.create({
   },
   iconQr: {
     color: 'white',
-    fontSize: wp(20)
+    fontSize: wp(20),
   },
   headerContainer: {
-    height: '10%',
-   // backgroundColor: '#E8900C',
+    height: hp(10),
+    width: wp(100),
+    // backgroundColor: '#E8900C',
     backgroundColor: 'white',
     borderBottomEndRadius: 30,
     borderBottomStartRadius: 30,
@@ -150,30 +196,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    
   },
   bodyContainer: {
     //  backgroundColor: 'yellow',
     display: 'flex',
     // width: hp(10)
   },
-  paginationBox: {
-    position: 'absolute',
-    bottom: -30,
-    padding: 0,
-    alignItems: 'center',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-  },
-  dotStyle: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 0,
-    padding: 0,
-    margin: 0,
-    display: 'none',
+  avatarImage: {
+    width: hp(6),
+    height: hp(6),
+    borderRadius: 45,
+    // backgroundColor: 'red',
+    color: 'white',
   },
   imageStyle: {
     borderRadius: 15,

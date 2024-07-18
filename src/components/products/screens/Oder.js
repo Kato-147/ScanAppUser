@@ -7,6 +7,9 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -44,6 +47,23 @@ const calculateTotalPrice = items => {
   }, 0);
 };
 
+export const checkPrice = (amount) => {
+  // Kiểm tra nếu amount không hợp lệ (undefined hoặc null)
+  if (amount == null || isNaN(amount)) {
+    return '0';
+  }
+
+  // Chuyển số tiền thành chuỗi và tách phần nguyên và phần thập phân (nếu có)
+  const [integerPart, decimalPart] = amount.toString().split('.');
+
+  // Định dạng phần nguyên bằng cách sử dụng biểu thức chính quy và phương thức replace
+  const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  // Nếu có phần thập phân, ghép phần nguyên đã định dạng với phần thập phân
+  // Nếu không có phần thập phân, chỉ trả về phần nguyên đã định dạng
+  return decimalPart ? `${formattedIntegerPart},${decimalPart}` : formattedIntegerPart;
+};
+
 const Oder = ({navigation}) => {
   const [oderItems, setOderItems] = useState([]);
   const [selectedMethod, setSelectedMethod] = useState('COD');
@@ -65,7 +85,7 @@ const Oder = ({navigation}) => {
           }
         } catch (error) {
           setError(error.message);
-          console.log(error);
+          console.log('-------------', error);
         } finally {
           setLoading(false);
         }
@@ -80,9 +100,17 @@ const Oder = ({navigation}) => {
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error.response?.data.message}</Text>
-      </View>
+      <LinearGradient
+        colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
+        style={styles.errorContainer}>
+        <Image
+          style={styles.errorImage}
+          source={{
+            uri: 'https://i.pinimg.com/564x/55/96/49/559649030e6667d7f8d50fc15afbbd20.jpg',
+          }}
+        />
+        <Text style={styles.errorText}>Bạn chưa đặt món nào cả</Text>
+      </LinearGradient>
     );
   }
 
@@ -93,12 +121,57 @@ const Oder = ({navigation}) => {
   const renderOrderItem = ({item}) => {
     return (
       <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
-        <Image source={{uri: item.menuItemId.image_url}} style={styles.image} />
+        {/* Image wp30 */}
+        <View
+          style={{
+            width: wp(30),
+            height: hp(12),
+            padding: 14,
+            justifyContent: 'center',
+            alignItems: 'center',
+            // borderRadius: 10,
+            //marginRight: wp(2),
+            // backgroundColor: 'red',
+          }}>
+          <Image
+            source={{uri: item.menuItemId.image_url}}
+            style={styles.image}
+          />
+        </View>
+
         <View style={styles.detailsContainer}>
           <Text style={styles.name}>{item.menuItemId.name}</Text>
-          <Text style={styles.price}>{item.menuItemId.price} VND</Text>
-          <Text style={styles.options}>Options: {item?.options}</Text>
-          <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
+          <Text style={styles.price}>
+            {checkPrice(item.menuItemId.price)} đ
+          </Text>
+
+          {/* Options */}
+          {item.options === '' || error ? (
+            <View />
+          ) : (
+            <Text style={styles.options}>{item.options}</Text>
+          )}
+        </View>
+
+        <View
+          style={{
+            width: wp(20),
+            // backgroundColor: 'yellow',
+            height: '100%',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              marginTop: hp(1),
+              backgroundColor: '#E8900C',
+              padding: wp(2),
+              borderRadius: 99,
+            }}>
+            <Icon name="delete" size={wp(5)} color="#ffffff" />
+          </View>
+
+          <Text style={styles.quantity}>x {item.quantity}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -107,129 +180,158 @@ const Oder = ({navigation}) => {
   const totalPrice = calculateTotalPrice(oderItems);
 
   return (
-    <LinearGradient
-      colors={['white', 'white', '#FBFAFF', '#FBFAFF']}
-      style={styles.container}>
-      {/* Header */}
-      <View style={styles.headerContainer}>
-        <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
-          Đặt món
-        </Text>
-      </View>
+    <KeyboardAvoidingView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        {oderItems.length === 0 || error ? (
+          <LinearGradient
+            colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
+            style={styles.errorContainer}>
+            <Image
+              style={styles.errorImage}
+              source={{
+                uri: 'https://i.pinimg.com/564x/55/96/49/559649030e6667d7f8d50fc15afbbd20.jpg',
+              }}
+            />
+            <Text style={styles.errorText}>Bạn chưa đặt món nào cả</Text>
+          </LinearGradient>
+        ) : (
+          <LinearGradient
+            colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
+            style={styles.container}>
+            {/* Header */}
+            <View style={styles.headerContainer}>
+              <Text
+                style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
+                Đặt món
+              </Text>
+            </View>
 
-      {/* Order Item */}
-      {oderItems.length === 0 ? (
-        <View>
-          <Text style={{fontSize: hp(4)}}> Đặt món đi ban oi </Text>
-        </View>
-      ) : (
-        <View style={{height: hp(32)}}>
-          <FlatList
-            data={oderItems}
-            keyExtractor={item => item._id.toString()}
-            renderItem={renderOrderItem}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.menuList}
-          />
-        </View>
-      )}
+            {/* Order Item */}
 
-      {/* Voucher & payment method */}
-      <View style={{height: hp(42)}}>
-        <View>
-          {/* Voucher */}
-          <View style={styles.voucherContainer}>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-              <Icon name="tagso" size={24} color="#E8900C" />
-
-              <TextInput
-                // value={query}
-                placeholder="Nhập mã giảm giá"
-                style={styles.voucherTextInput}
+            <View style={{height: hp(40)}}>
+              <FlatList
+                data={oderItems}
+                keyExtractor={item => item._id.toString()}
+                renderItem={renderOrderItem}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.menuList}
               />
             </View>
 
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#E8900C',
-                padding: hp(1.2),
-                borderRadius: 8,
-              }}>
-              <Text style={{color: 'white', fontSize: hp(2)}}>Áp dụng</Text>
-            </TouchableOpacity>
-          </View>
+            {/* Voucher & payment method */}
+            <View style={{height: hp(35)}}>
+              <View>
+                {/* Voucher */}
+                <View style={styles.voucherContainer}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 10,
+                    }}>
+                    <Icon name="tagso" size={24} color="#E8900C" />
 
-          {/* Payment method */}
-          <View style={{backgroundColor: 'white', paddingHorizontal: 10}}>
-            <Text style={styles.title}>Phương thức thanh toán</Text>
+                    <TextInput
+                      // value={query}
+                      placeholder="Nhập mã giảm giá"
+                      style={styles.voucherTextInput}
+                    />
+                  </View>
 
-            <TouchableOpacity
-            activeOpacity={1}
-              style={styles.optionContainer}
-              onPress={() => setSelectedMethod('Zalo')}>
-              <View style={styles.optionContent}>
-                <Image
-                  source={{
-                    uri: 'https://www.plusweb.vn/uploads/public/2021/06/03/1622682588188_zalopay.png',
-                  }}
-                  style={styles.logo}
-                />
-                <Text style={styles.optionText}>Ví điện tử ZaloPay</Text>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#E8900C',
+                      padding: hp(1.2),
+                      borderRadius: 8,
+                    }}>
+                    <Text style={{color: 'white', fontSize: hp(2)}}>
+                      Áp dụng
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Payment method */}
+                <View style={{paddingHorizontal: 10}}>
+                  <Text style={styles.title}>Phương thức thanh toán</Text>
+
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    style={styles.optionContainer}
+                    onPress={() => setSelectedMethod('COD')}>
+                    <View style={styles.optionContent}>
+                      <Image
+                        source={{
+                          uri: 'https://e7.pngegg.com/pngimages/199/428/png-clipart-paper-computer-icons-money-banknote-united-states-dollar-banknote-rectangle-sign.png',
+                        }}
+                        style={styles.logo}
+                      />
+                      <Text style={styles.optionText}>Thanh toán tiền mặt</Text>
+                    </View>
+                    <RadioButton
+                      value="COD"
+                      status={
+                        selectedMethod === 'COD' ? 'checked' : 'unchecked'
+                      }
+                      onPress={() => setSelectedMethod('COD')}
+                      color="#E8900C"
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    style={styles.optionContainer}
+                    onPress={() => setSelectedMethod('Zalo')}>
+                    <View style={styles.optionContent}>
+                      <Image
+                        source={{
+                          uri: 'https://www.plusweb.vn/uploads/public/2021/06/03/1622682588188_zalopay.png',
+                        }}
+                        style={styles.logo}
+                      />
+                      <Text style={styles.optionText}>Ví điện tử ZaloPay</Text>
+                    </View>
+
+                    <RadioButton
+                      value="Zalo"
+                      status={
+                        selectedMethod === 'Zalo' ? 'checked' : 'unchecked'
+                      }
+                      onPress={() => setSelectedMethod('Zalo')}
+                      color="#E8900C"
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
 
-              <RadioButton
-                value="Zalo"
-                status={selectedMethod === 'Zalo' ? 'checked' : 'unchecked'}
-                onPress={() => setSelectedMethod('Zalo')}
-                color="#E8900C"
-              />
-            </TouchableOpacity>
+              {/* Total Price */}
 
-            <TouchableOpacity
-            activeOpacity={1}
-              style={styles.optionContainer}
-              onPress={() => setSelectedMethod('COD')}>
-              <View style={styles.optionContent}>
-                <Image
-                  source={{
-                    uri: 'https://e7.pngegg.com/pngimages/199/428/png-clipart-paper-computer-icons-money-banknote-united-states-dollar-banknote-rectangle-sign.png',
-                  }}
-                  style={styles.logo}
-                />
-                <Text style={styles.optionText}> Thanh toán tiền mặt </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  padding: wp(6),
+                  width: wp(100),
+                }}>
+                <Text style={styles.totalText}>Tổng tiền : </Text>
+                <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
+                  {checkPrice(totalPrice)} đ{' '}
+                </Text>
               </View>
-              <RadioButton
-                value="COD"
-                status={selectedMethod === 'COD' ? 'checked' : 'unchecked'}
-                onPress={() => setSelectedMethod('COD')}
-                color="#E8900C"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+            </View>
 
-        {/* Total Price */}
+            {/* Button Order */}
 
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            padding: wp(6),
-            width: wp(100),
-          }}>
-          <Text>Tổng tiền : </Text>
-          <Text>{totalPrice}</Text>
-        </View>
-      </View>
-
-      {/* Button Order */}
-
-      <View>
-        <TouchableOpacity onPress={handleHihihaha} style={styles.orderButton}>
-          <Text style={styles.orderButtonText}>Order</Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+            <View style={{height: hp(10)}}>
+              <TouchableOpacity
+                onPress={handleHihihaha}
+                style={styles.orderButton}>
+                <Text style={styles.orderButtonText}>Thanh toán</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+        )}
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -245,10 +347,11 @@ const styles = StyleSheet.create({
     // backgroundColor: 'white',
   },
   headerContainer: {
-    width: '100%',
+    width: wp(100),
     flexDirection: 'row',
     alignItems: 'center',
     height: hp(8),
+    paddingHorizontal: wp(5),
   },
   menuList: {
     paddingBottom: 20,
@@ -263,24 +366,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   itemContainer: {
+    width: wp(100),
+    height: hp(12),
+    marginVertical: 6,
     flexDirection: 'row',
-    marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingBottom: 8,
-    // backgroundColor:'red'
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   image: {
-    width: 80,
-    height: 80,
-    marginRight: 16,
+    width: wp(25),
+    height: wp(25),
+    borderRadius: 10,
+    // resizeMode: 'contain',
   },
   detailsContainer: {
+    // flex: 1,
+    // justifyContent: 'center',
     flex: 1,
-    justifyContent: 'center',
+    height: '100%',
+    justifyContent: 'space-around',
+    width: wp(50),
+    // backgroundColor: '#EEEEEE',
   },
   name: {
-    fontSize: 16,
+    fontSize: hp(2.2),
     fontWeight: 'bold',
   },
   price: {
@@ -297,13 +406,10 @@ const styles = StyleSheet.create({
   },
   voucherContainer: {
     flexDirection: 'row',
-    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 15,
     height: hp(8),
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
   },
   voucherText: {
     color: 'black',
@@ -322,13 +428,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 20,
+    // marginTop: hp(1),
+    color: '#525252',
   },
   optionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
@@ -337,8 +444,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 24,
-    height: 24,
+    width: hp(6),
+    height: hp(4),
     marginRight: 10,
   },
   optionText: {
@@ -355,5 +462,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  totalText: {
+    fontSize: hp(2),
+    color: '#2e2e2e',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  errorContainer: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: hp(5),
+  },
+  errorText: {
+    // alignSelf:'center'
+    fontSize: hp(2.2),
+  },
+  errorImage: {
+    width: hp(10),
+    height: hp(10),
   },
 });

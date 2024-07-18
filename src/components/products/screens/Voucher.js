@@ -58,12 +58,13 @@ const Voucher = ({navigation}) => {
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <LinearGradient
-          colors={['#FFB266', '#EEEEEE', '#EEEEEE', '#EEEEEE']}
+          colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
           style={styles.container}>
 
           {/* Search bar */}
-          <SearchBar style={{alignSelf:'center', marginTop: 10 }} value={value} updateSearch={updateSearch} />
-
+          <View style={{width: wp(100), height: hp(6.2), justifyContent:'center', paddingHorizontal: wp(5)}}>
+            <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>Voucher</Text>
+          </View>
           {/* Baner */}
           <View
             style={{

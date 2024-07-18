@@ -25,12 +25,18 @@ const Profile = ({navigation}) => {
   const [error, setError] = useState(null);
   const isFocused = useIsFocused();
 
+  const [log, setlog] = useState('')
+
+  
+
   useEffect(() => {
     if (isFocused) {
       const fetchProfileInfo = async () => {
         try {
           const data = await infoProfile();
           setUserInfo(data);
+          setlog(data.data.user.email)
+          console.log( 'userInfo -->>>>>>>>>>',log);
         } catch (err) {
           setError(err.message);
           ToastAndroid.show(err.message, ToastAndroid.SHORT);
@@ -57,15 +63,18 @@ const Profile = ({navigation}) => {
 
   const handleLogout = async () => {
     console.log('click log out');
-    console.log(userInfo, 'userInfo -->>>>>>>>>>');
-
     try {
       // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
       await AsyncStorage.clear();
 
       // Chuyển sang màn hình chính
-      navigation.navigate('Login');
-
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+      
+      const token = await AsyncStorage.getItem('token');
+      console.log("asyncStorage------------", token);
       console.log('Logged out and navigated to Login screen.');
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);
@@ -84,7 +93,7 @@ const Profile = ({navigation}) => {
 
   return (
     <LinearGradient
-      colors={['#C96913', '#FFB266', '#EEEEEE', '#EEEEEE']}
+      colors={['#C96913', '#FFB266', '#F6F6F6', '#F6F6F6']}
       style={{width: '100%', height: '100%', padding: 24}}>
       {/* Info */}
       <View

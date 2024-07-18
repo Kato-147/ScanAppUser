@@ -6,22 +6,26 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
-  ToastAndroid
+  ToastAndroid,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import CustomInput from '../../fragment/CustomInput';
-import Icon from 'react-native-vector-icons/FontAwesome6'
+import Icon from 'react-native-vector-icons/FontAwesome6';
 import LinearGradient from 'react-native-linear-gradient';
-import { login } from '../UserHTTP';
+import {login} from '../UserHTTP';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('oroki147@gmail.com');
-  const [password, setPassword] = useState('Tt123456')
+  const [password, setPassword] = useState('Tt123456');
 
   // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('')
- 
+
   const handleRegister = () => {
     navigation.navigate('Register');
   };
@@ -30,7 +34,7 @@ const Login = ({navigation}) => {
     navigation.navigate('ScanQR');
   };
 
-  const handleLogin = async () =>{
+  const handleLogin = async () => {
     console.log('login');
 
     if (email === '' || password === '') {
@@ -44,93 +48,89 @@ const Login = ({navigation}) => {
 
       // Xử lý phản hồi thành công
       if (response.status === 'success') {
-       // ToastAndroid.show(response.message, ToastAndroid.SHORT);
-    //   await AsyncStorage.setItem('userID', (response.data.token));
-       await AsyncStorage.setItem('token', (response.data.token));
-       console.log('======Login===========', response);
-       
+        await AsyncStorage.setItem('token', response.data.token);
+        console.log('======Login===========', response);
+
         setTimeout(() => {
           navigation.navigate('tab');
         }, 500);
       }
       if (response.status === 'fail') {
-        console.log('status fail >>>>>',response.message);
+        console.log('status fail >>>>>', response.message);
       }
-      
     } catch (error) {
       // Xử lý lỗi và hiển thị thông báo lỗi
-      if(error.message){
-        ToastAndroid.show('Tài khoản hoặc mật khẩu không đúng',ToastAndroid.SHORT);
+      if (error.message) {
+        ToastAndroid.show(
+          'Tài khoản hoặc mật khẩu không đúng',
+          ToastAndroid.SHORT,
+        );
       }
 
       console.log('Error in handleLogin:', error.message);
     }
-
   };
 
   return (
-    
     <KeyboardAvoidingView>
-    <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
-    <LinearGradient colors={['#CE8025', '#FFB266', '#E0E0E0']} style={{width:'100%', height:'100%', padding: 24}}>
-     
-     {/* Mã QR */}
-       <Icon name='qrcode' style={styles.iconQr} onPress={handleQR}/>
+      <TouchableWithoutFeedback
+        style={styles.container}
+        onPress={Keyboard.dismiss}>
+        <LinearGradient
+          colors={['#C55402', '#CE8025', '#CE8025', '#EEEEEE']}
+          style={{width: '100%', height: '100%', padding: 24}}>
+          {/* Mã QR */}
+          <Icon name="qrcode" style={styles.iconQr} onPress={handleQR} />
 
-       <Text style={styles.labelQR}>Quét mã QR</Text>
+          <Text style={styles.labelQR}>Quét mã QR</Text>
 
-     {/* Input Text */}
-     <CustomInput
-       containerStyle={{marginTop: 20}}
-       placeholder={'Email'}
-       onChangeText={setEmail}
-     />
-     <CustomInput
-       containerStyle={{marginTop: 20}}
-       placeholder={'Mật khẩu'}
-       onChangeText={setPassword}
-     />
+          {/* Input Text */}
+          <CustomInput
+            containerStyle={{marginTop: 20}}
+            placeholder={'Email'}
+            onChangeText={setEmail}
+          />
+          <CustomInput
+            containerStyle={{marginTop: 20}}
+            placeholder={'Mật khẩu'}
+            onChangeText={setPassword}
+          />
 
-     {/* button login */}
-     <View style={{marginTop: 40}}>
-       <TouchableOpacity style={styles.btnLogin} onPress={handleLogin}>
-         <Text
-           style={styles.textLogin}>
-           Đăng nhập
-         </Text>
-       </TouchableOpacity>
-     </View>
+          {/* button login */}
+          <View style={{marginTop: 40}}>
+            <TouchableOpacity style={styles.btnLogin} onPress={handleLogin}>
+              <Text style={styles.textLogin}>Đăng nhập</Text>
+            </TouchableOpacity>
+          </View>
 
-     <View>
-       <View style={styles.lineView} />
-     </View>
+          <View>
+            <View style={styles.lineView} />
+          </View>
 
-     {/* Register */}
-     <View style={{alignItems: 'center'}}>
-       <Text style={styles.labelSigup}>Bạn chưa có tài khoản ?</Text>
-       <TouchableOpacity onPress={handleRegister}>
-         <Text style={styles.textSignup}>Đăng ký ngay</Text>
-       </TouchableOpacity>
-     </View>
+          {/* Register */}
+          <View style={{alignItems: 'center'}}>
+            <Text style={styles.labelSigup}>Bạn chưa có tài khoản ?</Text>
+            <TouchableOpacity onPress={handleRegister}>
+              <Text style={styles.textSignup}>Đăng ký ngay</Text>
+            </TouchableOpacity>
+          </View>
 
-     {/* Nói linh tinh */}
-     <View
-       style={{
-         flex: 1,
-         alignItems: 'center',
-         justifyContent: 'flex-end',
-         marginBottom: 20,
-       }}>
-       <Text style={{textAlign: 'center'}}>
-         Bằng việc đăng nhập, bạn đồng ý tuân thủ {'\n'} Điều khoản và điều
-         kiện {'\n'} & Chính sách bảo mật của chúng tôi
-       </Text>
-     </View>
-   </LinearGradient>
-    </TouchableWithoutFeedback>
-  </KeyboardAvoidingView>
-
-   
+          {/* Nói linh tinh */}
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              marginBottom: 20,
+            }}>
+            <Text style={{textAlign: 'center'}}>
+              Bằng việc đăng nhập, bạn đồng ý tuân thủ {'\n'} Điều khoản và điều
+              kiện {'\n'} & Chính sách bảo mật của chúng tôi
+            </Text>
+          </View>
+        </LinearGradient>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -164,16 +164,18 @@ const styles = StyleSheet.create({
   },
   iconQr: {
     alignSelf: 'center',
-    marginTop: 90,
-    fontSize: 55,
-    color: 'white'
+    marginTop: hp(5),
+    fontSize: hp(10),
+    color: 'white',
   },
   labelQR: {
     alignSelf: 'center',
-    fontSize: 12,
+    fontSize: hp(2.5),
     marginBottom: 50,
     marginTop: 10,
-    color:'white'
+    color: 'white',
+    fontWeight: 'bold',
+    letterSpacing: 1.6,
   },
   lineView: {
     borderTopWidth: 1,

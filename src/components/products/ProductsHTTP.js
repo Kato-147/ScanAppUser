@@ -141,7 +141,7 @@ export const getOrderUser = async () => {
     return res;
   } catch (err) {
     if (err.response) {
-      console.log('API error:', err.response);
+      console.log('API error:', err.response.data);
       throw new Error(
         err.response.message || 'Chưa đặt món',
       );
