@@ -29,70 +29,70 @@ const Hihihaha = () => {
   const [token, setToken] = useState('');
   const [returncode, setReturnCode] = useState('');
 
-  function getCurrentDateYYMMDD() {
-    var todayDate = new Date().toISOString().slice(2, 10);
-    return todayDate.split('-').join('');
-  }
+  // function getCurrentDateYYMMDD() {
+  //   var todayDate = new Date().toISOString().slice(2, 10);
+  //   return todayDate.split('-').join('');
+  // }
 
   async function createOrder(money) {
-    let apptransid = getCurrentDateYYMMDD() + '_' + new Date().getTime();
+    // let apptransid = getCurrentDateYYMMDD() + '_' + new Date().getTime();
 
-    let appid = 2554;
-    let amount = parseInt(money);
-    let appuser = 'ZaloPayDemo';
-    let apptime = new Date().getTime();
-    let embeddata = '{}';
-    let item = '[]';
-    let description = 'Merchant description for order #' + apptransid;
-    let hmacInput =
-      appid +
-      '|' +
-      apptransid +
-      '|' +
-      appuser +
-      '|' +
-      amount +
-      '|' +
-      apptime +
-      '|' +
-      embeddata +
-      '|' +
-      item;
-    let mac = CryptoJS.HmacSHA256(
-      hmacInput,
-      'sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn',
-    );
-    console.log('====================================');
-    console.log('hmacInput: ' + hmacInput);
-    console.log('mac: ' + mac);
-    console.log('====================================');
-    var order = {
-      app_id: appid,
-      app_user: appuser,
-      app_time: apptime,
-      amount: amount,
-      app_trans_id: apptransid,
-      embed_data: embeddata,
-      item: item,
-      description: description,
-      mac: mac,
-    };
+    // let appid = 2554;
+    // let amount = parseInt(money);
+    // let appuser = 'ZaloPayDemo';
+    // let apptime = new Date().getTime();
+    // let embeddata = '{}';
+    // let item = '[]';
+    // let description = 'Merchant description for order #' + apptransid;
+    // let hmacInput =
+    //   appid +
+    //   '|' +
+    //   apptransid +
+    //   '|' +
+    //   appuser +
+    //   '|' +
+    //   amount +
+    //   '|' +
+    //   apptime +
+    //   '|' +
+    //   embeddata +
+    //   '|' +
+    //   item;
+    // let mac = CryptoJS.HmacSHA256(
+    //   hmacInput,
+    //   'sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn',
+    // );
+    // console.log('====================================');
+    // console.log('hmacInput: ' + hmacInput);
+    // console.log('mac: ' + mac);
+    // console.log('====================================');
+    // var order = {
+    //   app_id: appid,
+    //   app_user: appuser,
+    //   app_time: apptime,
+    //   amount: amount,
+    //   app_trans_id: apptransid,
+    //   embed_data: embeddata,
+    //   item: item,
+    //   description: description,
+    //   mac: mac,
+    // };
 
-    console.log(order);
+    // console.log(order);
 
-    let formBody = [];
-    for (let i in order) {
-      var encodedKey = encodeURIComponent(i);
-      var encodedValue = encodeURIComponent(order[i]);
-      formBody.push(encodedKey + '=' + encodedValue);
-    }
-    formBody = formBody.join('&');
+    // let formBody = [];
+    // for (let i in order) {
+    //   var encodedKey = encodeURIComponent(i);
+    //   var encodedValue = encodeURIComponent(order[i]);
+    //   formBody.push(encodedKey + '=' + encodedValue);
+    // }
+    // formBody = formBody.join('&');
     await fetch('https://sb-openapi.zalopay.vn/v2/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
       },
-      body: formBody,
+    //  body: formBody,
     })
       .then(response => response.json())
       .then(resJson => {

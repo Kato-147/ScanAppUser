@@ -20,7 +20,7 @@ import {getMenuItem} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
 import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
-import { checkPrice } from './Oder';
+import {checkPrice} from './Oder';
 
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -65,44 +65,54 @@ const Menu = ({navigation}) => {
 
   // Get idTable from AsyncStorage
   useEffect(() => {
-    const idTable = async () => {
-      try {
-        const idTable = await AsyncStorage.getItem('idTable');
-        console.log('ID Table từ AsyncStorage', idTable);
-        const table = await getTables(idTable);
-        //  console.log('===table==', table);
-        setTable(table);
-      } catch (error) {
-        console.error('Table error', error);
-      }
-    };
     idTable();
-  }, []);
-
-  // Get data Categories from API
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-        if (data.length > 0) {
-          setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
-          loadMenuItems(data[0]._id); // Lấy món ăn cho danh mục đầu tiên
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadCategories();
   }, []);
 
+  const idTable = async () => {
+    try {
+      const idTable = await AsyncStorage.getItem('idTable');
+      console.log('ID Table từ AsyncStorage', idTable);
+      const table = await getTables(idTable);
+      //  console.log('===table==', table);
+      setTable(table);
+    } catch (error) {
+      console.error('Table error', error);
+    }
+  };
+
+  // Get data Categories from API
+  const loadCategories = async () => {
+    try {
+      const data = await getCategories();
+      setCategories(data);
+      if (data.length > 0) {
+        setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
+        loadMenuItems(data[0]._id); // Lấy món ăn cho danh mục đầu tiên
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Add menuItem to Cart
-  const handleAddToCart = async (item, selectedOptionId) => {
+  const handleAddToCart = async item => {
     try {
       console.log(item.name, '<<<<<<<<<<<<<<<<<item');
+
+      const selectedOptionId = activeOptions[item._id];
+      if (!selectedOptionId) {
+        throw new Error('No option selected');
+      }
+
+      const selectedOption = item.options?.find(
+        option => option?._id === selectedOptionId,
+      );
+      if (!selectedOption) {
+        throw new Error('Selected option not found');
+      }
 
       // Tạo đối tượng mới chỉ với các trường cần thiết
       const cartItem = {
@@ -110,13 +120,13 @@ const Menu = ({navigation}) => {
         id: item._id,
         name: item.name,
         price: item.price,
-        quantity: 0,
-        option: item?.options?.find(option => option?._id === selectedOptionId),
+        quantity: 1, // Set initial quantity to 1
+        option: selectedOption,
       };
 
       let cartItems = await AsyncStorage.getItem('cartItems');
       cartItems = cartItems ? JSON.parse(cartItems) : [];
-      cartItems.push({...cartItem, quantity: 1});
+      cartItems.push(cartItem);
       await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
       fetchQuantity();
     } catch (error) {
@@ -129,14 +139,52 @@ const Menu = ({navigation}) => {
     try {
       const items = await getMenuItem(categoryId);
       setMenuItems(items);
-      //  console.log(items[0]);
+
+      // Đặt tùy chọn đầu tiên của mỗi mục làm tùy chọn mặc định
+      const initialOptions = {};
+      items.forEach(item => {
+        if (item.options && item.options.length > 0) {
+          initialOptions[item._id] = item.options[0]._id;
+        }
+      });
+      setActiveOptions(initialOptions);
     } catch (error) {
       console.error(error);
     }
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <LinearGradient
+        style={{width: wp(100), height: hp(100)}}
+        colors={['white', 'white', 'white', '#F6F6F6']}>
+        {/* Header h10 */}
+        <View style={styles.headerContainer}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 20,
+            }}>
+            <TouchableOpacity onPress={handleHome} style={{}}>
+              <Icon style={styles.backIcon} name="left" />
+            </TouchableOpacity>
+            <Text
+              style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
+              Đang tải ...
+            </Text>
+          </View>
+        </View>
+        <View
+          style={{
+            height: hp(90),
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color="blue" />
+        </View>
+      </LinearGradient>
+    );
   }
 
   // Function handle change Categories
@@ -169,69 +217,88 @@ const Menu = ({navigation}) => {
   };
 
   const handleChangeOption = (menuItemId, optionId) => {
-    setActiveOptions({...activeOptions, [menuItemId]: optionId});
-  };
-
-  const handcheck = id => {
-    console.log(id, 'ID ITem');
+    setActiveOptions(prevOptions => ({...prevOptions, [menuItemId]: optionId}));
+    console.log('options', optionId);
   };
 
   // Function render item for flatlist MenuItem
   const renderMenuItem = ({item}) => {
-    const activeOption = activeOptions[item._id];
-
-    const isActive = item.options._id === activeOption;
-    const activeButtonStyle = {
-      borderColor: isActive ? '#E8900C' : '#757575',
-    };
-    const activeTextStyle = {
-      color: isActive ? '#E8900C' : '#757575',
-    };
-
     return (
-      <TouchableOpacity onPress={() => handcheck(item._id)}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => {
+          console.log(item.name);
+        }}>
         <View style={styles.menuItem}>
-          <Image
-            source={{
-              // If value of Image in API not null, show image : show Image URL
-              uri: item.image_url
-                ? item.image_url
-                : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-            }}
-            style={styles.menuItemImage}
-          />
+          {/* Image */}
+          <View
+            style={{
+              width: wp(30),
+              height: hp(13),
+              padding: 14,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              source={{
+                // If value of Image in API not null, show image : show Image URL
+                uri: item.image_url
+                  ? item.image_url
+                  : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+              }}
+              style={styles.menuItemImage}
+            />
+          </View>
 
           <View style={styles.menuItemInfo}>
-            <Text
-              style={styles.menuItemName}
-              numberOfLines={1}
-             // ellipsizeMode="tail"
-              >
+            {/* Name */}
+            <Text style={styles.menuItemName} numberOfLines={1}>
               {item.name}
             </Text>
+
             {item.options.length > 0 ? (
-          <ScrollView
-            horizontal
-            style={{width: hp(100), height: hp(5), paddingHorizontal: wp(2)}}>
-            {item.options.map(option => (
-              <TouchableOpacity
-                onPress={() => handleChangeOption(item._id, option._id)}>
-                <View
-                  key={option._id}
-                  style={[
-                    {marginRight: wp(3), borderWidth: 1, borderRadius: 10},
-                    activeOption === option._id
-                      ? {borderColor: 'blue'}
-                      : {borderColor: 'red'},
-                  ]}>
-                  <Text style={[{}, activeTextStyle]}>{option.name}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        ) : (
-          <View></View>
-        )}
+              <ScrollView
+                horizontal
+                style={{
+                  width: '100%',
+                  height: hp(5),                 
+                }}>
+                {item.options.map(option => {
+                  const isActive = activeOptions[item._id] === option._id;
+
+                  const activeTextOptions = {
+                    color: isActive ? '#E8900C' : '#757575',
+                  };
+
+                  return (
+                    <TouchableOpacity
+                    style={{alignSelf:'center'}}
+                      key={option._id}
+                      onPress={() => handleChangeOption(item._id, option._id)}>
+                      <View
+                        style={[
+                          {
+                            marginRight: wp(3),
+                            borderWidth: 1,
+                            borderRadius: 5,
+                            paddingHorizontal:wp(1)
+                          },
+                          activeOptions[item._id] === option._id
+                            ? {borderColor: '#E8900C'}
+                            : {borderColor: '#757575'},
+                        ]}>
+                        <Text style={[{}, activeTextOptions]}>
+                          {option.name}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            ) : (
+              null
+            )}
+            {/* Price */}
             <View
               style={{
                 flexDirection: 'row',
@@ -240,11 +307,12 @@ const Menu = ({navigation}) => {
                 //  backgroundColor: 'blue',
                 alignItems: 'center',
               }}>
-              <Text style={styles.menuItemPrice}>{checkPrice(item.price)} đ</Text>
+              <Text style={styles.menuItemPrice}>
+                {checkPrice(item.price)} đ
+              </Text>
 
               {/* Button Add ItemMenu */}
-              <TouchableOpacity
-                onPress={() => handleAddToCart(item, activeOption)}>
+              <TouchableOpacity onPress={() => handleAddToCart(item)}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -270,10 +338,6 @@ const Menu = ({navigation}) => {
             </View>
           </View>
         </View>
-
-        <View style={{height: 1, width: hp(100), backgroundColor: '#C0C0C0'}} />
-
-    
       </TouchableOpacity>
     );
   };
@@ -408,27 +472,29 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   menuItem: {
-    width: '100%',
-    //  flex: 1,
+    width: wp(100),
+    // backgroundColor:'red',
     justifyContent: 'flex-start',
     paddingHorizontal: 15,
     marginVertical: 10,
     flexDirection: 'row',
-    // backgroundColor: 'red',
+    height: hp(13),
   },
   menuItemImage: {
-    width: wp(20),
-    height: hp(10),
+    width: wp(25),
+    height: wp(25),
     borderRadius: 10,
     marginRight: 10,
   },
   menuItemInfo: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
+    //backgroundColor:'red'
   },
   menuItemName: {
-    fontSize: hp(2),
-    fontWeight: '500',
+    color: 'black',
+    fontSize: hp(2.2),
+    fontWeight: 'bold',
   },
   menuItemPrice: {
     fontSize: hp(2),

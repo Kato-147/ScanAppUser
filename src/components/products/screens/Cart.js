@@ -27,9 +27,8 @@ import {checkPrice} from '../screens/Oder';
 const Cart = ({navigation}) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartItemUI, setCartItemUI] = useState([]);
-  console.log(cartItemUI, '---------------CartItemUI');
+  //  console.log(cartItemUI, '---------------CartItemUI');
 
-  //console.log(cartItems, 'cardddddddddddddddddddddddd');
   const handleMenu = () => {
     console.log('Back to menu');
     navigation.goBack();
@@ -38,6 +37,7 @@ const Cart = ({navigation}) => {
   const cutStr = (string, maxLength = 30) =>
     string.length > maxLength ? `${string.slice(0, maxLength)}...` : string;
 
+  // Post MenuItems to API
   const handlePlaceOrder = async () => {
     try {
       const response = await postOrder();
@@ -127,15 +127,18 @@ const Cart = ({navigation}) => {
 
   // minus quantity item
   const decreaseQuantity = (id, option) => {
+    // Tìm vị trí của mục trong mảng cartItems
     const itemIndex = cartItems.findIndex(
       item => item?.id === id && item?.option?._id === option?._id,
     );
+
     if (itemIndex !== -1) {
       const updatedCartItems = [...cartItems];
       updatedCartItems.splice(itemIndex, 1);
       setCartItems(updatedCartItems);
     }
 
+    // Cập nhật UI để phản ánh số lượng đã giảm
     setCartItemUI(prevItems =>
       prevItems.map(item =>
         item.id === id &&
@@ -218,16 +221,11 @@ const Cart = ({navigation}) => {
             </Text>
           )}
         </View>
-        {/* <Button
-          title="Xóa"
-          onPress={() => handleDeleteItem(item.id, item.option)}
-          color="red"
-        /> */}
 
         <View
           style={{
             width: wp(20),
-         //    backgroundColor: 'yellow',
+            //    backgroundColor: 'yellow',
             height: '100%',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -251,11 +249,19 @@ const Cart = ({navigation}) => {
             }}>
             {/* quantity */}
             <View style={{flexDirection: 'row', gap: 10}}>
-              <TouchableOpacity
-                onPress={() => decreaseQuantity(item.id, item.option)}>
-                <Icon name="minussquareo" size={24} color="black" />
-              </TouchableOpacity>
+              {item.quantity > 1 ? (
+                <TouchableOpacity
+                  onPress={() => decreaseQuantity(item.id, item.option)}>
+                  <Icon name="minussquareo" size={24} color="black" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity>
+                  <Icon name="minussquareo" size={24} color="black" />
+                </TouchableOpacity>
+              )}
+
               <Text>{item.quantity}</Text>
+
               <TouchableOpacity
                 onPress={() => increaseQuantity(item.id, item.option)}>
                 <Icon name="plussquareo" size={24} color="black" />
