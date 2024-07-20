@@ -102,17 +102,17 @@ const Menu = ({navigation}) => {
     try {
       console.log(item.name, '<<<<<<<<<<<<<<<<<item');
 
-      const selectedOptionId = activeOptions[item._id];
-      if (!selectedOptionId) {
-        throw new Error('No option selected');
-      }
+      let selectedOptionId = activeOptions[item._id];
+      // if (!selectedOptionId) {
+      //   throw new Error('No option selected');
+      // }
 
-      const selectedOption = item.options?.find(
+      const selectedOption = item?.options?.find(
         option => option?._id === selectedOptionId,
       );
-      if (!selectedOption) {
-        throw new Error('Selected option not found');
-      }
+      // if (!selectedOption) {
+      //   throw new Error('Selected option not found');
+      // }
 
       // Tạo đối tượng mới chỉ với các trường cần thiết
       const cartItem = {
@@ -121,7 +121,7 @@ const Menu = ({navigation}) => {
         name: item.name,
         price: item.price,
         quantity: 1, // Set initial quantity to 1
-        option: selectedOption,
+        option: selectedOption ,
       };
 
       let cartItems = await AsyncStorage.getItem('cartItems');

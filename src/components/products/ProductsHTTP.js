@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
 import axios from 'axios';
+import { ToastAndroid } from 'react-native';
 
 // infor user profile
 export const infoProfile = async () => {
@@ -114,7 +115,6 @@ export const postOrder = async () => {
     const data = {
       items: items,
     };
-    console.log('---------------------', data);
     // Gửi yêu cầu POST lên API
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.post(
@@ -142,9 +142,7 @@ export const getOrderUser = async () => {
   } catch (err) {
     if (err.response) {
       console.log('API error:', err.response.data);
-      throw new Error(
-        err.response.message || 'Chưa đặt món',
-      );
+      throw new Error(err.response.message || 'Chưa đặt món');
     } else if (err.request) {
       console.log('No response from API:', err.request);
       throw new Error('Không có phản hồi từ máy chủ');
@@ -152,5 +150,23 @@ export const getOrderUser = async () => {
       console.log('Error setting up request:', err.message);
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
+  }
+};
+
+// DeleteOrder
+export const deleteOrder = async (tableId, itemId) => {
+  try {
+    if (!tableId || !itemId) {
+      throw new Error('Invalid tableId or itemId');
+    }
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.delete(`v1/tables/${tableId}/orders/${itemId}`);
+    return response; // Trả về phản hồi từ API nếu cần
+  } catch (error) {
+    if(error.response.data.message === "Time out to delete"){
+      ToastAndroid.show("Hết thời gian r thằng lồn", ToastAndroid.SHORT);
+    }
+    console.log('Error deleting order:', error.response.data);
+    throw error; // Đảm bảo lỗi được truyền ra ngoài
   }
 };

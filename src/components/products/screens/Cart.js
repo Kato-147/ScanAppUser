@@ -43,7 +43,6 @@ const Cart = ({navigation}) => {
       const response = await postOrder();
       if (response.status === 'success') {
         await AsyncStorage.removeItem('cartItems');
-        await AsyncStorage.removeItem('idTable');
         console.log('Cart items cleared');
         navigation.navigate('Oder');
       }

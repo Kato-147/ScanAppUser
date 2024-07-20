@@ -16,11 +16,12 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {getOrderUser} from '../ProductsHTTP';
+import {deleteOrder, getOrderUser} from '../ProductsHTTP';
 import {useIsFocused} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {RadioButton} from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const mergeOrderItems = items => {
   const mergedItems = [];
@@ -69,6 +70,7 @@ const Oder = ({navigation}) => {
   const [selectedMethod, setSelectedMethod] = useState('COD');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleted, setdeleted] = useState([])
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -81,7 +83,7 @@ const Oder = ({navigation}) => {
             const mergedItems = mergeOrderItems(response.data[0].items);
             setOderItems(mergedItems);
           } else {
-            console.error('Failed to fetch order data:', response.data);
+            console.log('Failed to fetch order data:', response.data);
           }
         } catch (error) {
           setError(error.message);
@@ -92,7 +94,7 @@ const Oder = ({navigation}) => {
       };
       loadOrderUser();
     }
-  }, [isFocused]);
+  }, [isFocused,deleted]);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -113,6 +115,27 @@ const Oder = ({navigation}) => {
       </LinearGradient>
     );
   }
+
+  const handleDeleteItems = async (itemId) => {
+    console.log(itemId);
+    try {
+      const tableId = await AsyncStorage.getItem('idTable');
+      if (!tableId) {
+        throw new Error('Table ID not found');
+      }
+      if (!itemId) {
+        throw new Error('Item ID is required');
+      }
+      const response = await deleteOrder(tableId, itemId);
+      setdeleted(response.data)
+      console.log('Order deleted successfully:------', response.data);
+    //  await AsyncStorage.removeItem('idTable');
+      return response;
+    } catch (error) {
+      console.log('Error handling delete items:', error);
+      // Có thể thông báo cho người dùng hoặc xử lý lỗi theo cách khác
+    }
+  };
 
   const handleHihihaha = () => {
     navigation.navigate('Hihihaha');
@@ -161,7 +184,8 @@ const Oder = ({navigation}) => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <View
+          <TouchableOpacity
+          onPress={()=>{handleDeleteItems(item._id)}}
             style={{
               marginTop: hp(1),
               backgroundColor: '#E8900C',
@@ -169,7 +193,7 @@ const Oder = ({navigation}) => {
               borderRadius: 99,
             }}>
             <Icon name="delete" size={wp(5)} color="#ffffff" />
-          </View>
+          </TouchableOpacity>
 
           <Text style={styles.quantity}>x {item.quantity}</Text>
         </View>
