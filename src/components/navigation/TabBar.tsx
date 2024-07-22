@@ -13,7 +13,6 @@ import Animated, { useAnimatedStyle, withTiming, useDerivedValue } from 'react-n
 import Svg, { Path } from 'react-native-svg'
 import Home from '../products/screens/Home'
 import Voucher from '../products/screens/Voucher'
-import Cart from '../products/screens/Cart'
 import Profile from '../products/screens/Profile'
 import Icon from 'react-native-vector-icons/AntDesign'
 import Oder from '../products/screens/Oder'
@@ -107,7 +106,7 @@ const PlaceholderScreen = () => {
     }
   
     const [layout, dispatch] = useReducer(reducer, [])
-    console.log(layout)
+  //  console.log(layout)
   
     const handleLayout = (event: LayoutChangeEvent, index: number) => {
       dispatch({ x: event.nativeEvent.layout.x, index })

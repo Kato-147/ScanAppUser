@@ -153,6 +153,34 @@ export const getOrderUser = async () => {
   }
 };
 
+// get Order User
+export const getOrderTable = async () => {
+  try {
+    const idTable = await AsyncStorage.getItem('idTable');
+    if (!idTable) {
+      throw new Error('ID Table không tồn tại');
+    }
+    const url = `v1/orders/get-order-by-tableId/${idTable}`; // Chèn idTable vào URL
+
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
+
+    // Trả về dữ liệu từ API
+    return response;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response.data);
+      throw new Error(err.response.data.message || 'Chưa đặt món table');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
 // DeleteOrder
 export const deleteOrder = async (tableId, itemId) => {
   try {
@@ -168,5 +196,53 @@ export const deleteOrder = async (tableId, itemId) => {
     }
     console.log('Error deleting order:', error.response.data);
     throw error; // Đảm bảo lỗi được truyền ra ngoài
+  }
+};
+
+export const paymentCodUser = async () => {
+  try {
+    const tableId = await AsyncStorage.getItem('idTable');
+    if (!tableId) {
+      throw new Error('Không tìm thấy ID bàn');
+    }
+    const url = `v1/payments/cashpayment/${tableId}?userId=true`;
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.post(url);
+    return res.data;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response.data);
+      throw new Error(err.response.data.message || 'Món chưa hoàn thành');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+export const paymentZaloUser = async () => {
+  try {
+    const tableId = await AsyncStorage.getItem('idTable');
+    if (!tableId) {
+      throw new Error('Không tìm thấy ID bàn');
+    }
+    const url = `v1/payments/zalopayment/${tableId}?userId=true`;
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.post(url);
+    return res;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response.data);
+      throw new Error(err.response.data.message || 'Món chưa hoàn thành');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
   }
 };
