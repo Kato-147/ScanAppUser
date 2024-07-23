@@ -13,7 +13,7 @@ import {
   ToastAndroid,
   NativeModules,
   NativeEventEmitter,
-  Alert
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState, useCallback} from 'react';
 import {
@@ -24,6 +24,7 @@ import {
   deleteOrder,
   getOrderTable,
   getOrderUser,
+  paymentCodTable,
   paymentCodUser,
   paymentZaloUser,
 } from '../ProductsHTTP';
@@ -109,17 +110,20 @@ const Oder = ({navigation}) => {
   }, [isFocused, loadOrderUser, deleted, orderType]);
 
   useEffect(() => {
-    const subscription = payZaloBridgeEmitter.addListener('EventPayZalo', data => {
-      if (data.return_code === 1) {
-        Alert.alert('Pay success!');
-        console.log('fádfádfdfádfadsfds');
-      } else {
-        Alert.alert('Pay error! ' + data.return_code);
-       console.log('====================================');
-       console.log('hihihihihi');
-       console.log('====================================');
-      }
-    });
+    const subscription = payZaloBridgeEmitter.addListener(
+      'EventPayZalo',
+      data => {
+        if (data.return_code === 1) {
+          Alert.alert('Pay success!');
+          console.log('fádfádfdfádfadsfds');
+        } else {
+          Alert.alert('Pay error! ' + data.return_code);
+          console.log('====================================');
+          console.log('hihihihihi');
+          console.log('====================================');
+        }
+      },
+    );
 
     // Hủy đăng ký sự kiện khi thành phần bị tháo rời
     return () => {
@@ -132,15 +136,16 @@ const Oder = ({navigation}) => {
       const response = await getOrderUser();
       // console.log('-----------', response.data[0]);
       if (response.success === 'success') {
-        const mergedItems = mergeOrderItems(response?.data[0]?.items);
+        const mergedItems = mergeOrderItems(response?.data);
         setOderItems(mergedItems);
-        settotalOrder(response?.data[0]?.amount);
+        settotalOrder(response?.totalAmount);
+        setError(null);
       } else {
         console.log('Failed to fetch orderUser data:', response?.data);
       }
     } catch (error) {
       setError(error.message);
-      console.log('===========', error);
+      console.log('=====loadOrderUser======', error);
     } finally {
       setLoading(false);
     }
@@ -153,7 +158,7 @@ const Oder = ({navigation}) => {
       if (response.success === 'success') {
         const mergedItems = mergeOrderItems(response?.data);
         setorderTables(mergedItems);
-        //  settotalTable(response.data[0].amount);
+        settotalTable(response.totalAmount);
       } else {
         console.log('Failed to fetch orderTable data:', response?.data);
       }
@@ -211,16 +216,19 @@ const Oder = ({navigation}) => {
 
   const handlePayment = () => {
     if (orderType === 'user' && selectedMethod === 'COD') {
-     handlePaymentCOD();
-    } if(orderType === 'user' && selectedMethod === 'Zalo'){
+      handlePaymentCOD();
+    }
+    if (orderType === 'user' && selectedMethod === 'Zalo') {
       handlePaymentZalo();
-    } if (orderType === 'table' && selectedMethod === 'COD'){
+    }
+    if (orderType === 'table' && selectedMethod === 'COD') {
       handlePaymentCodTable();
-    } if(orderType === 'table' && selectedMethod === 'Zalo'){
+    }
+    if (orderType === 'table' && selectedMethod === 'Zalo') {
       handlePaymentZaloTable();
     }
     // } else{
-    //   ToastAndroid.show('co loi xay ra!', ToastAndroid.SHORT); 
+    //   ToastAndroid.show('co loi xay ra!', ToastAndroid.SHORT);
     // }
   };
 
@@ -229,37 +237,57 @@ const Oder = ({navigation}) => {
     console.log('COD');
     try {
       await paymentCodUser();
-      alert('Thanh toán thành công!');
+      Alert.alert('Thanh toán thành công!');
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
-      alert(`Lỗi thanh toán: ${err.message}`);
+      Alert.alert(`Lỗi thanh toán: ${err.message}`);
     }
   };
-  const handlePaymentZalo = async() => {
+  const handlePaymentZalo = async () => {
     console.log('Zalo');
     try {
       const response = await paymentZaloUser();
-      if(response.return_code === 1){
-        const payOrder=()=> {
+      if (response.return_code === 1) {
+        const payOrder = () => {
           var payZP = NativeModules.PayZaloBridge;
           payZP.payOrder(response.order_token);
-        }
+        };
         payOrder();
       }
     } catch (error) {
       console.log('-------------', err);
-      alert(`Lỗi thanh toán: ${err.message}`);
+      Alert.alert(`Lỗi thanh toán: ${err.message}`);
     }
   };
 
-
-  const handlePaymentCodTable =  () => {
+  const handlePaymentCodTable = async() => {
     console.log('pay cod table');
+    try {
+      await paymentCodTable();
+      Alert.alert('Thanh toán thành công!');
+    } catch (err) {
+      // setError(err.message);
+      console.log('-------------', err);
+      Alert.alert(`Lỗi thanh toán: ${err.message}`);
+    }
   };
 
-  const handlePaymentZaloTable = () => {
+  const handlePaymentZaloTable = async() => {
     console.log(' pay Zalo table');
+    try {
+      const response = await paymentZaloUser();
+      if (response.return_code === 1) {
+        const payOrder = () => {
+          var payZP = NativeModules.PayZaloBridge;
+          payZP.payOrder(response.order_token);
+        };
+        payOrder();
+      }
+    } catch (error) {
+      console.log('-------------', error);
+      Alert.alert(`Lỗi thanh toán: ${error.message }`);
+    }
   };
 
   const renderOrderItem = ({item}) => {
@@ -273,9 +301,6 @@ const Oder = ({navigation}) => {
             padding: 14,
             justifyContent: 'center',
             alignItems: 'center',
-            // borderRadius: 10,
-            //marginRight: wp(2),
-            // backgroundColor: 'red',
           }}>
           <Image
             source={{uri: item.menuItemId.image_url}}
@@ -350,15 +375,11 @@ const Oder = ({navigation}) => {
               <TouchableOpacity
                 style={[
                   styles.containerHeaderText,
-                  {borderColor: orderType === 'user' ? 'red' : '#525252'},
+                  {borderColor: orderType === 'user' ? '#E8900C' : '#525252'},
                 ]}
                 onPress={() => setorderType('user')}>
                 <Text
-                  style={{
-                    fontSize: hp(3),
-                    fontWeight: '600',
-                    color: '#525252',
-                  }}>
+                  style={[styles.headerText,{color: orderType === 'user' ? '#E8900C' : '#525252'}]}>
                   Món của bạn
                 </Text>
               </TouchableOpacity>
@@ -366,17 +387,13 @@ const Oder = ({navigation}) => {
                 style={[
                   styles.containerHeaderText,
                   {
-                    borderColor: orderType === 'table' ? 'red' : '#525252',
+                    borderColor: orderType === 'table' ? '#E8900C' : '#525252',
                     alignItems: 'flex-end',
                   },
                 ]}
                 onPress={() => setorderType('table')}>
                 <Text
-                  style={{
-                    fontSize: hp(3),
-                    fontWeight: '600',
-                    color: '#525252',
-                  }}>
+                  style={[styles.headerText,{color: orderType === 'table' ? '#E8900C' : '#525252'}]}>
                   Món cả bàn
                 </Text>
               </TouchableOpacity>
@@ -384,14 +401,14 @@ const Oder = ({navigation}) => {
 
             {/* Order Item */}
 
-            <View style={{height: hp(40)}}>  
-                <FlatList
-                  data={orderType === 'user' ? oderItems : orderTables}
-                  keyExtractor={item => item._id.toString()}
-                  renderItem={renderOrderItem}
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={styles.menuList}
-                />
+            <View style={{height: hp(40)}}>
+              <FlatList
+                data={orderType === 'user' ? oderItems : orderTables}
+                keyExtractor={item => item._id.toString()}
+                renderItem={renderOrderItem}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.menuList}
+              />
             </View>
 
             {/* Voucher & payment method */}
@@ -490,7 +507,7 @@ const Oder = ({navigation}) => {
                 }}>
                 <Text style={styles.totalText}>Tổng tiền : </Text>
                 <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
-                  {checkPrice(totalOrder)} đ{' '}
+                  {checkPrice(orderType === 'user' ? totalOrder : totalTable)} đ{' '}
                 </Text>
               </View>
             </View>
@@ -535,6 +552,11 @@ const styles = StyleSheet.create({
     width: wp(45),
     borderBottomWidth: 1,
     borderColor: '#525252',
+  },
+  headerText:{
+    fontSize: hp(3),
+    fontWeight: '600',
+    color: '#525252',
   },
   menuList: {
     paddingBottom: 20,
@@ -599,19 +621,15 @@ const styles = StyleSheet.create({
     fontSize: hp(2),
   },
   voucherTextInput: {
-    //  backgroundColor: 'red',
     borderWidth: 1,
     borderColor: '#E8900C',
     height: hp(5),
     borderRadius: 8,
     width: hp(24),
-    // alignItems:'center',
-    //justifyContent:'center'
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    // marginTop: hp(1),
     color: '#525252',
   },
   optionContainer: {
@@ -662,7 +680,6 @@ const styles = StyleSheet.create({
     gap: hp(5),
   },
   errorText: {
-    // alignSelf:'center'
     fontSize: hp(2.2),
   },
   errorImage: {

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
 import axios from 'axios';
-import { ToastAndroid } from 'react-native';
+import {ToastAndroid} from 'react-native';
 
 // infor user profile
 export const infoProfile = async () => {
@@ -131,11 +131,14 @@ export const postOrder = async () => {
 // get Order User
 export const getOrderUser = async () => {
   try {
-    const url = `v1/orders/`; // Endpoint API
-    let token = await AsyncStorage.getItem('token');
+    const tableId = await AsyncStorage.getItem('idTable');
+    if (!tableId) {
+      throw new Error('ID Table không tồn tại');
+    }
+    const url = `v1/tables/${tableId}/orders?userId=true`; // Endpoint API
 
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.get(url, token); // GET request và gửi token user
+    const res = await axiosInstance.get(url); // GET request và gửi token user
 
     // Trả về dữ liệu từ API
     return res;
@@ -156,11 +159,11 @@ export const getOrderUser = async () => {
 // get Order User
 export const getOrderTable = async () => {
   try {
-    const idTable = await AsyncStorage.getItem('idTable');
-    if (!idTable) {
+    const tableId = await AsyncStorage.getItem('idTable');
+    if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const url = `v1/orders/get-order-by-tableId/${idTable}`; // Chèn idTable vào URL
+    const url = `v1/tables/${tableId}/orders`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
@@ -188,17 +191,23 @@ export const deleteOrder = async (tableId, itemId) => {
       throw new Error('Invalid tableId or itemId');
     }
     const axiosInstance = await AxiosInstance();
-    const response = await axiosInstance.delete(`v1/tables/${tableId}/orders/${itemId}`);
+    const response = await axiosInstance.delete(
+      `v1/tables/${tableId}/orders/items/${itemId}`,
+    );
     return response; // Trả về phản hồi từ API nếu cần
   } catch (error) {
-    if(error.response.data.message === "Time out to delete"){
-      ToastAndroid.show("Hết thời gian r thằng lồn", ToastAndroid.SHORT);
+    if (error.response.data.message === 'Time out to delete') {
+      ToastAndroid.show('Hết thời gian để hủy món', ToastAndroid.SHORT);
+    }
+    if (error.response.data.message === 'You cannot delete other people\'s item') {
+      ToastAndroid.show('Không thể hủy món của người khác', ToastAndroid.SHORT);
     }
     console.log('Error deleting order:', error.response.data);
     throw error; // Đảm bảo lỗi được truyền ra ngoài
   }
 };
 
+// Pay for user with cash
 export const paymentCodUser = async () => {
   try {
     const tableId = await AsyncStorage.getItem('idTable');
@@ -223,6 +232,7 @@ export const paymentCodUser = async () => {
   }
 };
 
+// Pay for user with ZaloPay
 export const paymentZaloUser = async () => {
   try {
     const tableId = await AsyncStorage.getItem('idTable');
@@ -230,6 +240,56 @@ export const paymentZaloUser = async () => {
       throw new Error('Không tìm thấy ID bàn');
     }
     const url = `v1/payments/zalopayment/${tableId}?userId=true`;
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.post(url);
+    return res;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response.data);
+      throw new Error(err.response.data.message || 'Món chưa hoàn thành');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+// Pay for table with cash
+export const paymentCodTable = async () => {
+  try {
+    const tableId = await AsyncStorage.getItem('idTable');
+    if (!tableId) {
+      throw new Error('Không tìm thấy ID bàn');
+    }
+    const url = `v1/payments/cashpayment/${tableId}`;
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.post(url);
+    return res.data;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response.data);
+      throw new Error(err.response.data.message || 'Món chưa hoàn thành');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+// Pay for table with ZaloPay
+export const paymentZaloTable = async () => {
+  try {
+    const tableId = await AsyncStorage.getItem('idTable');
+    if (!tableId) {
+      throw new Error('Không tìm thấy ID bàn');
+    }
+    const url = `v1/payments/zalopayment/${tableId}`;
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.post(url);
     return res;
