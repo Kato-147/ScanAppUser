@@ -7,9 +7,10 @@ import {
   TouchableWithoutFeedback,
   View,
   FlatList,
-  Image
+  Image,
+  ToastAndroid,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -17,38 +18,90 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
-import SearchBar from '../../fragment/SearchBar';
 import {SliderBox} from 'react-native-image-slider-box';
-
+import {useIsFocused} from '@react-navigation/native';
+import {getApiVoucher} from '../ProductsHTTP';
+import CopyIcon from 'react-native-vector-icons/MaterialIcons';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 const Voucher = ({navigation}) => {
-  const [value, setValue] = useState();
+  const isFocused = useIsFocused();
+  const [voucherItems, setvoucherItems] = useState([]);
+  const [copyCode, setcopyCode] = useState('');
 
   const handleMyVoucher = () => {
     navigation.navigate('MyVoucher');
-  }
+  };
 
-  const updateSearch = value => {
-    // setValue(value);
-    //do your search logic or anything
-    console.log(value);
+  const copyToClipboard = code => {
+    console.log('---------------', code);
+    setcopyCode(code);
+    Clipboard.setString(copyCode);
+    ToastAndroid.show('Đã sao chép', ToastAndroid.SHORT)
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      getVoucher();
+    }
+  }, [isFocused]);
+
+  const getVoucher = async () => {
+    try {
+      const response = await getApiVoucher();
+      if (response.status === 'success') {
+        setvoucherItems(response.data.promotions);
+      }
+      return response;
+    } catch (error) {
+      console.log('err>>', error);
+    }
   };
 
   const renderItem = ({item}) => {
-  //  const {_id, image, name, description} = item;
-    console.log(item.image, '<<<<<<<<<<<<<');
+    //  console.log(item.image, '<<<<<<<<<<<<<');
     return (
       <TouchableOpacity
-      style={{   }}
-      activeOpacity={1}
+        style={styles.itemContainer}
+        activeOpacity={1}
         onPress={() => {
-           console.log(item.id)
+          console.log(item.id);
           // navigation.navigate('Detail', { newsId: _id });
         }}>
+        {/* Image */}
         <View style={styles.itemFlatlist}>
-          <Image style={styles.imageVoucherItem} source={item.image} />
-         <Text>{item.name}</Text>
-          {/* <Text>{item.description}</Text> */}
+          <Image
+            style={styles.imageVoucherItem}
+            source={{uri: 'https://www.themealdb.com/images/meal-icon.png'}}
+          />
+        </View>
+
+        {/* in4 */}
+        <View style={styles.detailsContainer}>
+          {/* Name */}
+          <Text style={{fontSize: hp(2), fontWeight: 'bold'}} numberOfLines={2}>
+            {item.description}
+          </Text>
+          {/* Code & copyButton */}
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingEnd: wp(5),
+            }}>
+            <Text> Mã: {item.code}</Text>
+            <TouchableOpacity
+              onPress={() => copyToClipboard(item.code)}
+              style={{
+                backgroundColor: '#E8900C',
+                padding: wp(2),
+                borderRadius: 8,
+              }}>
+              <CopyIcon name="content-copy" size={wp(5)} color="#ffffff" />
+            </TouchableOpacity>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -60,11 +113,20 @@ const Voucher = ({navigation}) => {
         <LinearGradient
           colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
           style={styles.container}>
-
-          {/* Search bar */}
-          <View style={{width: wp(100), height: hp(6.2), justifyContent:'center', paddingHorizontal: wp(5)}}>
-            <Text style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>Voucher</Text>
+          {/* Header */}
+          <View
+            style={{
+              width: wp(100),
+              height: hp(6.2),
+              justifyContent: 'center',
+              paddingHorizontal: wp(5),
+            }}>
+            <Text
+              style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
+              Voucher
+            </Text>
           </View>
+
           {/* Baner */}
           <View
             style={{
@@ -94,7 +156,7 @@ const Voucher = ({navigation}) => {
 
           {/* See your voucher */}
           <TouchableOpacity
-          onPress={handleMyVoucher}
+            onPress={handleMyVoucher}
             activeOpacity={0.8}
             style={styles.seeVoucherContainer}>
             <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
@@ -108,34 +170,36 @@ const Voucher = ({navigation}) => {
           {/* Vouchers hot */}
 
           <View style={{height: hp(55)}}>
-            <View style={{flexDirection:'row', alignItems:'center', gap: 10, margin: 15}}>
-              <Icon2 name='fire-alt' size={24} color="#E8900C"/>
-            <Text
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 10,
+                margin: 15,
+              }}>
+              <Icon2 name="fire-alt" size={24} color="#E8900C" />
+              <Text
                 style={{
                   fontSize: hp(2.3),
                   fontWeight: '500',
                   color: 'black',
-                  marginTop: 5
+                  marginTop: 5,
                 }}>
                 Các Voucher hot
               </Text>
             </View>
-           
-           <View style={{height: hp(46.5)}}>
-           <FlatList
-                numColumns={2}
-                showsVerticalScrollIndicator={false}
-                style={{width: hp(45), alignSelf:'center'}}
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={(item, index) =>
-                  item.id ? item.id.toString() : index.toString()
-                }
-              />
-           </View>
-             
-            </View>
 
+            <View style={{height: hp(46.5)}}>
+              <FlatList
+                // numColumns={2}
+                showsVerticalScrollIndicator={false}
+                data={voucherItems}
+                renderItem={renderItem}
+                keyExtractor={item => item._id.toString()}
+                contentContainerStyle={styles.menuList}
+              />
+            </View>
+          </View>
         </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -185,18 +249,34 @@ const styles = StyleSheet.create({
     fontSize: hp(2),
   },
   imageVoucherItem: {
-    width: 50,
-    height: 50,
-    backgroundColor: 'red',
+    width: wp(25),
+    height: wp(25),
+    borderRadius: 10,
   },
   itemFlatlist: {
-    margin: 5,
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 10,
-   // alignSelf:'center',
-    width:hp(21),
-    
+    width: wp(30),
+    height: hp(12),
+    padding: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  itemContainer: {
+    width: wp(100),
+    height: hp(12),
+    marginVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  menuList: {
+    paddingBottom: 20,
+    marginTop: 5,
+  },
+  detailsContainer: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'space-around',
+    width: wp(50),
   },
 });
 
@@ -210,71 +290,3 @@ const images = [
   require('../../../images/iconQr.png'),
   require('../../../images/phoneVerify.png'),
 ];
-
-const data = [
-  {
-    id: '1',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 1',
-    description: 'Description for item 1',
-  },
-  {
-    id: '2',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 2',
-    description: 'Description for item 2',
-  },
-  {
-    id: '3',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '4',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '5',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '6',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '7',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '8',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 8',
-    description: 'Description for item 3',
-  },
-];
-

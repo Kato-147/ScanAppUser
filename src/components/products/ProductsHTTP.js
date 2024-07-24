@@ -306,3 +306,26 @@ export const paymentZaloTable = async () => {
     }
   }
 };
+
+// Get all available voucher
+export const getApiVoucher = async () => {
+  try {
+    const url = `v1/promotions`;
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
+    // Trả về dữ liệu từ API
+    return response;
+  } catch (error) {
+    if (error.response) {
+      console.log('API error:', error.response.data);
+      throw new Error(error.response.data.message || 'Lỗi get voucher');
+    } else if (error.request) {
+      console.log('No response from API:', error.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', error.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+
+}

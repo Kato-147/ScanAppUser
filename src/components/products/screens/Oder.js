@@ -109,32 +109,32 @@ const Oder = ({navigation}) => {
     }
   }, [isFocused, loadOrderUser, deleted, orderType]);
 
-  useEffect(() => {
-    const subscription = payZaloBridgeEmitter.addListener(
-      'EventPayZalo',
-      data => {
-        if (data.return_code === 1) {
-          Alert.alert('Pay success!');
-          console.log('fádfádfdfádfadsfds');
-        } else {
-          Alert.alert('Pay error! ' + data.return_code);
-          console.log('====================================');
-          console.log('hihihihihi');
-          console.log('====================================');
-        }
-      },
-    );
+  // useEffect(() => {
+  //   const subscription = payZaloBridgeEmitter.addListener('EventPayZalo',data => {
+  //     console.log('=========================r===========');
+  //     console.log(data,'chech data');
+  //     console.log('====================================');
+  //       if (data.return_code === 1) {
+  //         Alert.alert('Pay success!');
+  //         console.log('fádfádfdfádfadsfds');
+  //       } else {
+  //         Alert.alert('Pay error! ' + data.return_code);
+  //         console.log('====================================');
+  //         console.log('hihihihihi');
+  //         console.log('====================================');
+  //       }
+  //     },
+  //   );
 
-    // Hủy đăng ký sự kiện khi thành phần bị tháo rời
-    return () => {
-      subscription.remove();
-    };
-  }, []);
+  //   // Hủy đăng ký sự kiện khi thành phần bị tháo rời
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, []);
 
   const loadOrderUser = async () => {
     try {
       const response = await getOrderUser();
-      // console.log('-----------', response.data[0]);
       if (response.success === 'success') {
         const mergedItems = mergeOrderItems(response?.data);
         setOderItems(mergedItems);
@@ -154,7 +154,6 @@ const Oder = ({navigation}) => {
   const loadOrderTable = async () => {
     try {
       const response = await getOrderTable();
-      // console.log('-----------', response);
       if (response.success === 'success') {
         const mergedItems = mergeOrderItems(response?.data);
         setorderTables(mergedItems);
@@ -206,7 +205,7 @@ const Oder = ({navigation}) => {
         'Order deleted successfully:------',
         response.data.items.length,
       );
-      //  await AsyncStorage.removeItem('idTable');
+      
       return response;
     } catch (error) {
       console.log('Error handling delete items:', error);
@@ -238,18 +237,20 @@ const Oder = ({navigation}) => {
     try {
       await paymentCodUser();
       Alert.alert('Thanh toán thành công!');
+      await AsyncStorage.removeItem('idTable');
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
       Alert.alert(`Lỗi thanh toán: ${err.message}`);
     }
   };
+
   const handlePaymentZalo = async () => {
     console.log('Zalo');
     try {
       const response = await paymentZaloUser();
       if (response.return_code === 1) {
-        const payOrder = () => {
+        const payOrder = async() => {
           var payZP = NativeModules.PayZaloBridge;
           payZP.payOrder(response.order_token);
         };
@@ -266,6 +267,7 @@ const Oder = ({navigation}) => {
     try {
       await paymentCodTable();
       Alert.alert('Thanh toán thành công!');
+      await AsyncStorage.removeItem('idTable');
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
@@ -278,9 +280,10 @@ const Oder = ({navigation}) => {
     try {
       const response = await paymentZaloUser();
       if (response.return_code === 1) {
-        const payOrder = () => {
+        const payOrder = async() => {
           var payZP = NativeModules.PayZaloBridge;
           payZP.payOrder(response.order_token);
+          await AsyncStorage.removeItem('idTable');
         };
         payOrder();
       }
@@ -330,6 +333,7 @@ const Oder = ({navigation}) => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
+            
           <TouchableOpacity
             onPress={() => {
               handleDeleteItems(item._id);
