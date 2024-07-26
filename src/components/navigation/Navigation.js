@@ -13,13 +13,15 @@ import UpdateInfo from '../products/screens/UpdateInfo';
 import UpdatePassword from '../products/screens/UpdatePassword';
 import Cart from '../products/screens/Cart';
 import Hihihaha from '../users/screens/Hihihaha';
+import HistoryOrder from '../products/screens/HistoryOrder';
+import DetailHistoryOrder from '../products/screens/DetailHistoryOrder';
 
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
   return (
     
-      <Stack.Navigator initialRouteName='Splash' screenOptions={{headerShown: false}}>
+      <Stack.Navigator initialRouteName='HistoryOrder' screenOptions={{headerShown: false}}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="ScanQR" component={ScanQR} />
@@ -32,6 +34,8 @@ const Navigation = () => {
         <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
         <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
         <Stack.Screen name="Cart" component={Cart} />
+        <Stack.Screen name="HistoryOrder" component={HistoryOrder} />
+        <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
         <Stack.Screen name="Hihihaha" component={Hihihaha} />
       </Stack.Navigator>
  

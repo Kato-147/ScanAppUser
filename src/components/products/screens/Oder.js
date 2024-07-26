@@ -35,7 +35,7 @@ import {RadioButton} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const {PayZaloBridge} = NativeModules;
 
-const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
+// const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
 
 const mergeOrderItems = items => {
   // console.log(items);
@@ -108,29 +108,6 @@ const Oder = ({navigation}) => {
       orderType === 'user' ? loadOrderUser() : loadOrderTable();
     }
   }, [isFocused, loadOrderUser, deleted, orderType]);
-
-  // useEffect(() => {
-  //   const subscription = payZaloBridgeEmitter.addListener('EventPayZalo',data => {
-  //     console.log('=========================r===========');
-  //     console.log(data,'chech data');
-  //     console.log('====================================');
-  //       if (data.return_code === 1) {
-  //         Alert.alert('Pay success!');
-  //         console.log('fádfádfdfádfadsfds');
-  //       } else {
-  //         Alert.alert('Pay error! ' + data.return_code);
-  //         console.log('====================================');
-  //         console.log('hihihihihi');
-  //         console.log('====================================');
-  //       }
-  //     },
-  //   );
-
-  //   // Hủy đăng ký sự kiện khi thành phần bị tháo rời
-  //   return () => {
-  //     subscription.remove();
-  //   };
-  // }, []);
 
   const loadOrderUser = async () => {
     try {
@@ -328,12 +305,11 @@ const Oder = ({navigation}) => {
         <View
           style={{
             width: wp(20),
-            // backgroundColor: 'yellow',
             height: '100%',
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-            
+
           <TouchableOpacity
             onPress={() => {
               handleDeleteItems(item._id);
@@ -540,7 +516,6 @@ const styles = StyleSheet.create({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    // backgroundColor: 'white',
   },
   headerContainer: {
     width: wp(100),
@@ -551,7 +526,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   containerHeaderText: {
-    //backgroundColor:'red',
     height: hp(5),
     width: wp(45),
     borderBottomWidth: 1,
@@ -568,7 +542,6 @@ const styles = StyleSheet.create({
   },
   menuOrderItem: {
     width: '100%',
-    //  flex: 1,
     justifyContent: 'flex-start',
     paddingHorizontal: 15,
     marginVertical: 10,
@@ -586,16 +559,12 @@ const styles = StyleSheet.create({
     width: wp(25),
     height: wp(25),
     borderRadius: 10,
-    // resizeMode: 'contain',
   },
   detailsContainer: {
-    // flex: 1,
-    // justifyContent: 'center',
     flex: 1,
     height: '100%',
     justifyContent: 'space-around',
     width: wp(50),
-    // backgroundColor: '#EEEEEE',
   },
   name: {
     fontSize: hp(2.2),

@@ -165,8 +165,10 @@ const Profile = ({navigation}) => {
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionsetting}>
-          <Text style={styles.textOptionsetting}>Quản lý tài khoản/thẻ</Text>
+        <TouchableOpacity
+        onPress={()=>{navigation.navigate('HistoryOrder')}}
+        style={styles.optionsetting}>
+          <Text style={styles.textOptionsetting}>Lịch sử đơn hàng</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 
