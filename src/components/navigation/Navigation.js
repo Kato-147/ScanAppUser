@@ -15,13 +15,14 @@ import Cart from '../products/screens/Cart';
 import Hihihaha from '../users/screens/Hihihaha';
 import HistoryOrder from '../products/screens/HistoryOrder';
 import DetailHistoryOrder from '../products/screens/DetailHistoryOrder';
+import Socket from '../socket/screens/Socket';
 
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
   return (
     
-      <Stack.Navigator initialRouteName='HistoryOrder' screenOptions={{headerShown: false}}>
+      <Stack.Navigator initialRouteName='Socket' screenOptions={{headerShown: false}}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="ScanQR" component={ScanQR} />
@@ -37,6 +38,7 @@ const Navigation = () => {
         <Stack.Screen name="HistoryOrder" component={HistoryOrder} />
         <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
         <Stack.Screen name="Hihihaha" component={Hihihaha} />
+        <Stack.Screen name="Socket" component={Socket} />
       </Stack.Navigator>
  
   );
