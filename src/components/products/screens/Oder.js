@@ -37,7 +37,7 @@ const {PayZaloBridge} = NativeModules;
 
 // const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
 
-const mergeOrderItems = items => {
+export const mergeOrderItems = items => {
   // console.log(items);
   const mergedItems = [];
 

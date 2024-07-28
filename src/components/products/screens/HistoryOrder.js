@@ -13,10 +13,12 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
+import Icon2 from 'react-native-vector-icons/Ionicons';
 import {getHistoryOrder} from '../ProductsHTTP';
 
 const HistoryOrder = ({navigation}) => {
   const [items, setitems] = useState([]);
+ 
 
   //Back to Profile Screen
   const handleBack = () => {
@@ -42,18 +44,33 @@ const HistoryOrder = ({navigation}) => {
     }
   };
 
-  const handleDetail = (item) =>{
-    navigation.navigate('DetailHistoryOrder', { item })
-  }
+  const handleDetail = item => {
+    navigation.navigate('DetailHistoryOrder', {item});
+  };
 
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
-      activeOpacity={0}
-      onPress={()=> handleDetail(item)}
-      style={{height:hp(10), backgroundColor:'yellow', }}>
-        
-        <Text>Bạn đã thanh toán thành công hóa đơn {item.appTransactionId}</Text>
+        activeOpacity={0.5}
+        onPress={() => handleDetail(item)}
+        style={styles.itemContainer}>
+        <View style={styles.imageItem}>
+          <Icon2 name="checkmark-done" color="#E8900C" size={wp(10)} />
+        </View>
+        <View
+          style={{
+            height: '100%',
+            width: wp(75),
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Text style={styles.textItem}>
+            Bạn đã thanh toán thành công hóa đơn{' '}
+            <Text style={{fontWeight: '400', color: '#E8900C'}}>
+              {item.appTransactionId}
+            </Text>
+          </Text>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -76,12 +93,12 @@ const HistoryOrder = ({navigation}) => {
           <View />
         ) : (
           <FlatList
-          style={{backgroundColor:'red'}}
+            style={{}}
             data={items}
             keyExtractor={item => item._id.toString()}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
-               contentContainerStyle={styles.menuList}
+            contentContainerStyle={styles.menuList}
           />
         )}
       </View>
@@ -114,12 +131,32 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   headerText: {
-    fontSize: hp(2),
+    fontSize: hp(2.2),
     fontWeight: '500',
     color: '#E8900C',
   },
   menuList: {
     gap: 10,
-    marginTop: hp(2)
+    marginTop: hp(2),
+    // paddingHorizontal: wp(2)
+  },
+  itemContainer: {
+    height: hp(10),
+    // backgroundColor: 'yellow',
+    paddingHorizontal: wp(2),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderColor: '#E8E8E8',
+  },
+  imageItem: {
+    width: wp(21),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textItem: {
+    fontWeight: 'bold',
+    fontSize: hp(2.2),
   },
 });

@@ -17,7 +17,7 @@
 "@babel/compat-data@^7.20.5", "@babel/compat-data@^7.22.6", "@babel/compat-data@^7.24.7":
   version "7.24.7"
 
-"@babel/core@^7.11.6", "@babel/core@^7.12.3", "@babel/core@^7.13.16", "@babel/core@^7.20.0", "@babel/core@^7.23.9":
+"@babel/core@^7.0.0", "@babel/core@^7.0.0-0", "@babel/core@^7.0.0-0 || ^8.0.0-0 <8.0.0", "@babel/core@^7.11.0", "@babel/core@^7.11.6", "@babel/core@^7.12.0", "@babel/core@^7.12.3", "@babel/core@^7.13.0", "@babel/core@^7.13.16", "@babel/core@^7.20.0", "@babel/core@^7.23.9", "@babel/core@^7.4.0 || ^8.0.0-0 <8.0.0", "@babel/core@^7.8.0":
   version "7.24.7"
   dependencies:
     "@ampproject/remapping" "^2.2.0"
@@ -36,7 +36,7 @@
     json5 "^2.2.3"
     semver "^6.3.1"
 
-"@babel/eslint-parser@^7.20.0":
+"@babel/eslint-parser@^7.12.0", "@babel/eslint-parser@^7.20.0":
   version "7.24.7"
   dependencies:
     "@nicolo-ribaudo/eslint-scope-5-internals" "5.1.1-v1"
@@ -752,7 +752,7 @@
     "@babel/helper-create-regexp-features-plugin" "^7.24.7"
     "@babel/helper-plugin-utils" "^7.24.7"
 
-"@babel/preset-env@^7.20.0":
+"@babel/preset-env@^7.1.6", "@babel/preset-env@^7.20.0":
   version "7.24.7"
   dependencies:
     "@babel/compat-data" "^7.24.7"
@@ -915,6 +915,13 @@
   dependencies:
     deepmerge "^3.2.0"
     hoist-non-react-statics "^3.3.0"
+
+"@egjs/hammerjs@^2.0.17":
+  version "2.0.17"
+  resolved "https://registry.npmjs.org/@egjs/hammerjs/-/hammerjs-2.0.17.tgz"
+  integrity sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==
+  dependencies:
+    "@types/hammerjs" "^2.0.36"
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
   version "4.4.0"
@@ -1211,10 +1218,10 @@
   dependencies:
     merge-options "^3.0.4"
 
-"@react-native-clipboard/clipboard@^1.14.1":
-  version "1.14.1"
-  resolved "https://registry.npmjs.org/@react-native-clipboard/clipboard/-/clipboard-1.14.1.tgz"
-  integrity sha512-SM3el0A28SwoeJljVNhF217o0nI4E7RfalLmuRQcT1/7tGcxUjgFa3jyrEndYUct8/uxxK5EUNGUu1YEDqzxqw==
+"@react-native-clipboard/clipboard@^1.13.0":
+  version "1.13.0"
+  resolved "https://registry.npmjs.org/@react-native-clipboard/clipboard/-/clipboard-1.13.0.tgz"
+  integrity sha512-SKImS8uTnOKQVFyoCoSmgpMQtdy+oQzwhRmpQL38Ecf3MqsBxyjWTUf5PFPryB40BXShpDuRx4fP+v4yidvNsg==
 
 "@react-native-community/cli-clean@13.6.8":
   version "13.6.8"
@@ -1542,7 +1549,7 @@
     "@react-navigation/elements" "^1.3.30"
     warn-once "^0.1.0"
 
-"@react-navigation/native@^6.1.17":
+"@react-navigation/native@^6.0.0", "@react-navigation/native@^6.1.17":
   version "6.1.17"
   resolved "https://registry.npmjs.org/@react-navigation/native/-/native-6.1.17.tgz"
   integrity sha512-mer3OvfwWOHoUSMJyLa4vnBH3zpFmCwuzrBPlw7feXklurr/ZDiLjLxUScOot6jLRMz/67GyilEYMmP99LL0RQ==
@@ -1623,6 +1630,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/hammerjs@^2.0.36":
+  version "2.0.45"
+  resolved "https://registry.npmjs.org/@types/hammerjs/-/hammerjs-2.0.45.tgz"
+  integrity sha512-qkcUlZmX6c4J8q45taBKTL3p+LbITgyx7qhlPYOdOHZB7B31K0mXbP5YA7i7SgDeEGuI9MnumiKPEMrxg8j3KQ==
+
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   version "2.0.6"
 
@@ -1689,7 +1701,7 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin@^7.1.1":
+"@typescript-eslint/eslint-plugin@^5.0.0 || ^6.0.0 || ^7.0.0", "@typescript-eslint/eslint-plugin@^7.1.1":
   version "7.12.0"
   dependencies:
     "@eslint-community/regexpp" "^4.10.0"
@@ -1702,7 +1714,7 @@
     natural-compare "^1.4.0"
     ts-api-utils "^1.3.0"
 
-"@typescript-eslint/parser@^7.1.1":
+"@typescript-eslint/parser@^7.0.0", "@typescript-eslint/parser@^7.1.1":
   version "7.12.0"
   dependencies:
     "@typescript-eslint/scope-manager" "7.12.0"
@@ -1809,7 +1821,7 @@ accepts@^1.3.7, accepts@~1.3.5, accepts@~1.3.7:
 acorn-jsx@^5.3.2:
   version "5.3.2"
 
-acorn@^8.8.2, acorn@^8.9.0:
+"acorn@^6.0.0 || ^7.0.0 || ^8.0.0", acorn@^8.8.2, acorn@^8.9.0:
   version "8.11.3"
 
 ajv@^6.12.4:
@@ -2097,7 +2109,7 @@ braces@^3.0.3:
   dependencies:
     fill-range "^7.1.1"
 
-browserslist@^4.22.2, browserslist@^4.23.0:
+browserslist@^4.22.2, browserslist@^4.23.0, "browserslist@>= 4.21.0":
   version "4.23.0"
   dependencies:
     caniuse-lite "^1.0.30001587"
@@ -2583,7 +2595,7 @@ emoji-regex@^8.0.0:
 encodeurl@~1.0.2:
   version "1.0.2"
 
-encoding@^0.1.11:
+encoding@^0.1.0, encoding@^0.1.11:
   version "0.1.13"
   resolved "https://registry.npmjs.org/encoding/-/encoding-0.1.13.tgz"
   integrity sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==
@@ -2807,7 +2819,7 @@ eslint-visitor-keys@^2.1.0:
 eslint-visitor-keys@^3.3.0, eslint-visitor-keys@^3.4.1, eslint-visitor-keys@^3.4.3:
   version "3.4.3"
 
-eslint@^8.19.0:
+"eslint@^3 || ^4 || ^5 || ^6 || ^7 || ^8", "eslint@^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0", "eslint@^3.17.0 || ^4 || ^5 || ^6 || ^7 || ^8", "eslint@^6.0.0 || ^7.0.0 || ^8.0.0", "eslint@^6.0.0 || ^7.0.0 || >=8.0.0", "eslint@^7.0.0 || ^8.0.0", "eslint@^7.5.0 || ^8.0.0 || ^9.0.0", eslint@^8.1.0, eslint@^8.19.0, eslint@^8.56.0, eslint@>=4.19.1, eslint@>=7.0.0, eslint@>=7.28.0, eslint@>=8:
   version "8.57.0"
   dependencies:
     "@eslint-community/eslint-utils" "^4.2.0"
@@ -3703,7 +3715,7 @@ jest-resolve-dependencies@^29.7.0:
     jest-regex-util "^29.6.3"
     jest-snapshot "^29.7.0"
 
-jest-resolve@^29.7.0:
+jest-resolve@*, jest-resolve@^29.7.0:
   version "29.7.0"
   dependencies:
     chalk "^4.0.0"
@@ -3831,7 +3843,7 @@ jest-worker@^29.6.3, jest-worker@^29.7.0:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-jest@^29.6.3:
+jest@*, jest@^29.6.3:
   version "29.7.0"
   dependencies:
     "@jest/core" "^29.7.0"
@@ -4547,7 +4559,7 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@2.8.8:
+prettier@>=2, prettier@>=2.0.0, prettier@2.8.8:
   version "2.8.8"
 
 pretty-format@^26.5.2:
@@ -4680,7 +4692,7 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-native-camera@^4.2.1:
+react-native-camera@^4.2.1, react-native-camera@>=1.0.2:
   version "4.2.1"
   resolved "https://registry.npmjs.org/react-native-camera/-/react-native-camera-4.2.1.tgz"
   integrity sha512-+Vkql24PFYQfsPRznJCvPwJQfyzCnjlcww/iZ4Ej80bgivKjL9eU0IMQIXp4yi6XCrKi4voWXxIDPMupQZKeIQ==
@@ -4691,6 +4703,16 @@ react-native-fast-image@^8.6.3:
   version "8.6.3"
   resolved "https://registry.npmjs.org/react-native-fast-image/-/react-native-fast-image-8.6.3.tgz"
   integrity sha512-Sdw4ESidXCXOmQ9EcYguNY2swyoWmx53kym2zRsvi+VeFCHEdkO+WG1DK+6W81juot40bbfLNhkc63QnWtesNg==
+
+react-native-gesture-handler@^2.17.1:
+  version "2.17.1"
+  resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.17.1.tgz"
+  integrity sha512-pWfniN6NuVKUq40KACuD3NCMe+bWNQCpD3cmxL6aLSCTwPKYmf7l4Lp0/E/almpjvxhybJZtFLU0w4tmxnIKaA==
+  dependencies:
+    "@egjs/hammerjs" "^2.0.17"
+    hoist-non-react-statics "^3.3.0"
+    invariant "^2.2.4"
+    prop-types "^15.7.2"
 
 react-native-image-picker@^7.1.2:
   version "7.1.2"
@@ -4731,10 +4753,10 @@ react-native-qrcode-scanner@^1.5.5:
     prop-types "^15.5.10"
     react-native-permissions "^2.0.2"
 
-react-native-reanimated@^3.12.0:
-  version "3.12.0"
-  resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-3.12.0.tgz"
-  integrity sha512-Bwa4jKL/QttnV8pQYiX+1N5a6XgL8yZtMyH+7UbEaW7ZeNCv1Pxp2PmYu/bP3LafCkmS9Yj/hY2adYNKe58g9A==
+react-native-reanimated@^3.14.0:
+  version "3.14.0"
+  resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-3.14.0.tgz"
+  integrity sha512-TAxLtCfRyC/nOLeWoX/8MhdIF+Fi1e1NbLhIgEm5Kv9/gioAwSNaqLUYxjIClU1RaLwSTE8iaiHNVhTU4TS9DA==
   dependencies:
     "@babel/plugin-transform-arrow-functions" "^7.0.0-0"
     "@babel/plugin-transform-nullish-coalescing-operator" "^7.0.0-0"
@@ -4750,12 +4772,12 @@ react-native-responsive-screen@^1.4.2:
   resolved "https://registry.npmjs.org/react-native-responsive-screen/-/react-native-responsive-screen-1.4.2.tgz"
   integrity sha512-BLYz0UUpeohrib7jbz6wDmtBD5OmiuMRko4IT8kIF63taXPod/c5iZgmWnr5qOnK8hMuKiGMvsM3sC+eHX/lEQ==
 
-react-native-safe-area-context@^4.10.4:
+react-native-safe-area-context@*, react-native-safe-area-context@^4.10.4, "react-native-safe-area-context@>= 3.0.0":
   version "4.10.4"
   resolved "https://registry.npmjs.org/react-native-safe-area-context/-/react-native-safe-area-context-4.10.4.tgz"
   integrity sha512-rkpI8TALvWfTcCgsxWsVrlxycbCawjnkURocH0JqYT5jr4jZcOG9oAevgEL6EKiyhtGi/l73ZKWr55Im0eTTRg==
 
-react-native-screens@^3.31.1:
+react-native-screens@^3.31.1, "react-native-screens@>= 3.0.0":
   version "3.31.1"
   resolved "https://registry.npmjs.org/react-native-screens/-/react-native-screens-3.31.1.tgz"
   integrity sha512-8fRW362pfZ9y4rS8KY5P3DFScrmwo/vu1RrRMMx0PNHbeC9TLq0Kw1ubD83591yz64gLNHFLTVkTJmWeWCXKtQ==
@@ -4780,7 +4802,7 @@ react-native-svg@^15.3.0:
     css-select "^5.1.0"
     css-tree "^1.1.3"
 
-react-native-vector-icons@^10.1.0:
+react-native-vector-icons@*, react-native-vector-icons@^10.1.0:
   version "10.1.0"
   resolved "https://registry.npmjs.org/react-native-vector-icons/-/react-native-vector-icons-10.1.0.tgz"
   integrity sha512-fdQjCHIdoXmRoTZ5gvN1FmT4sGLQ2wmQiNZHKJQUYnE2tkIwjGnxNch+6Nd4lHAACvMWO7LOzBNot2u/zlOmkw==
@@ -4788,7 +4810,7 @@ react-native-vector-icons@^10.1.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native@0.74.2:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.35, react-native@>=0.57.0, react-native@>=0.60.0, react-native@0.74.2:
   version "0.74.2"
   dependencies:
     "@jest/create-cache-key-function" "^29.6.3"
@@ -4845,7 +4867,7 @@ react-test-renderer@18.2.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.23.0"
 
-react@18.2.0:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^17 || ^18", react@^18.2.0, react@>=15.0.0, react@>=16.0, react@>=16.3.0, react@>=16.8, react@>=16.8.6, react@>=17.0.0, react@18.2.0:
   version "18.2.0"
   dependencies:
     loose-envify "^1.1.0"
@@ -5450,7 +5472,7 @@ typed-array-length@^1.0.6:
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
 
-typescript@5.0.4:
+"typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta", typescript@>=4.2.0, typescript@5.0.4:
   version "5.0.4"
 
 ua-parser-js@^0.7.30:
