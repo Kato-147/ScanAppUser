@@ -21,7 +21,7 @@ const Stack = createNativeStackNavigator();
 const Navigation = () => {
   return (
     
-      <Stack.Navigator initialRouteName='HistoryOrder' screenOptions={{headerShown: false}}>
+      <Stack.Navigator initialRouteName='Splash' screenOptions={{headerShown: false}}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="ScanQR" component={ScanQR} />

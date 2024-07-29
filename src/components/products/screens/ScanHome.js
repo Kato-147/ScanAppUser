@@ -22,7 +22,7 @@ import {
 const ScanHome = ({navigation}) => {
   const [data, setData] = useState('scan something');
   const [scanning, setScanning] = useState(true); // Trạng thái để quản lý việc kích hoạt máy quét
-  console.log(data);
+  console.log();
 
   const handleMenu = async scannedData => {
     if (scannedData) {

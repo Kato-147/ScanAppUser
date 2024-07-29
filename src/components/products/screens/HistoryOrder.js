@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   StyleSheet,
@@ -18,6 +19,7 @@ import {getHistoryOrder} from '../ProductsHTTP';
 
 const HistoryOrder = ({navigation}) => {
   const [items, setitems] = useState([]);
+  const [loading, setLoading] = useState(true);
  
 
   //Back to Profile Screen
@@ -41,8 +43,17 @@ const HistoryOrder = ({navigation}) => {
     } catch (error) {
       setError(error.message);
       console.log('======OrderTable=====', error);
+    } finally{
+      setLoading(false);
     }
   };
+
+    //Loading
+    if (loading) {
+      return (<View style={[styles.container, {alignItems:'center', justifyContent:'center'}]}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>);
+    }
 
   const handleDetail = item => {
     navigation.navigate('DetailHistoryOrder', {item});
@@ -89,7 +100,8 @@ const HistoryOrder = ({navigation}) => {
       </View>
 
       <View>
-        {items.length === 0 ? (
+        
+        { items.length === 0 ? (
           <View />
         ) : (
           <FlatList

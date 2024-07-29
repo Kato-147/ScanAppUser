@@ -72,7 +72,7 @@ const DetailHistoryOrder = ({route, navigation}) => {
           <Text style={styles.price}>{checkPrice(item.price)} đ</Text>
 
           {/* Options */}
-          {item.options === '' || error ? (
+          {item.options === '' ? (
             <View />
           ) : (
             <Text style={styles.options}>{item.options}</Text>
@@ -104,17 +104,7 @@ const DetailHistoryOrder = ({route, navigation}) => {
       </View>
 
       {/* <Text>Người thanh toán: {item.userPay.fullName}</Text> */}
-      <TouchableOpacity
-        style={styles.infoContainer}
-        onPress={() => setStatus(true)}>
-        <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
-          <IconBill name="money-bill-wave" size={24} color="#E8900C" />
-          <Text style={{color: 'black', fontSize: hp(2)}}>
-            Chi tiết hóa đơn
-          </Text>
-        </View>
-        <Icon Icon name="right" size={24} color="#E8900C" />
-      </TouchableOpacity>
+     
 
       <View style={{height: hp(80)}}>
         <FlatList
@@ -125,6 +115,17 @@ const DetailHistoryOrder = ({route, navigation}) => {
           contentContainerStyle={{paddingBottom: 20, marginTop: 5}}
         />
       </View>
+      <View style={{width:wp(100), alignItems:'center', justifyContent:'center'}}>
+      <TouchableOpacity
+        style={styles.infoContainer}
+        onPress={() => setStatus(true)}>
+          <Text style={{color: 'white', fontSize: hp(2.2), fontWeight:'bold'}}>
+            Xem chi tiết hóa đơn
+          </Text>
+       
+      </TouchableOpacity>
+      </View>
+      
       {status && <BottomSheetHistoryOrder item={item} setStatus={setStatus} />}
     </LinearGradient>
   );
@@ -199,15 +200,17 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flexDirection: 'row',
-    //backgroundColor: 'red',
+    backgroundColor: '#E8900C',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 15,
     marginVertical: hp(3),
     height: hp(6),
-    //borderRadius: 10,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#E8900C',
+    width: wp(70),
+    justifyContent: 'center',
    
   },
   infoCard: {

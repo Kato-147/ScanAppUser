@@ -53,7 +53,7 @@ const BottomSheetHistoryOrder = ({setStatus, item}) => {
       <Pressable style={{width: '100%', height: '40%'}}>
         <Animated.View
           style={[styles.bottomSheet, {transform: [{translateY: slide}]}]}>
-          <Text style={{fontSize: 25, fontWeight: 'bold'}}>
+          <Text style={{fontSize: 25, fontWeight: 'bold', color: '#E8900C'}}>
             Thông tin hóa đơn
           </Text>
           <View style={styles.infoContainer}>
@@ -82,7 +82,7 @@ const BottomSheetHistoryOrder = ({setStatus, item}) => {
 
             <View style={styles.infoCard}>
               <Text style={styles.infoKeyText}>Phương thức thanh toán: </Text>
-              <Text style={styles.infoValueText}>{item.paymentMethod}</Text>
+              <Text style={styles.infoValueText}>{item.paymentMethod === 'Cash' ? 'Tiền mặt' : 'ZaloPay'}</Text>
             </View>
             <View style={styles.infoCard}>
               <Text style={styles.infoKeyText}>Tổng tiền: </Text>

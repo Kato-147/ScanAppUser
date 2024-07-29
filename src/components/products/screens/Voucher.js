@@ -9,6 +9,7 @@ import {
   FlatList,
   Image,
   ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -28,6 +29,7 @@ const Voucher = ({navigation}) => {
   const isFocused = useIsFocused();
   const [voucherItems, setvoucherItems] = useState([]);
   const [copyCode, setcopyCode] = useState('');
+  const [loading, setloading] = useState(true);
 
   const handleMyVoucher = () => {
     navigation.navigate('MyVoucher');
@@ -37,7 +39,7 @@ const Voucher = ({navigation}) => {
     console.log('---------------', code);
     setcopyCode(code);
     Clipboard.setString(copyCode);
-    ToastAndroid.show('Đã sao chép', ToastAndroid.SHORT)
+    ToastAndroid.show('Đã sao chép', ToastAndroid.SHORT);
   };
 
   useEffect(() => {
@@ -55,6 +57,8 @@ const Voucher = ({navigation}) => {
       return response;
     } catch (error) {
       console.log('err>>', error);
+    } finally {
+      setloading(false);
     }
   };
 
@@ -91,7 +95,7 @@ const Voucher = ({navigation}) => {
               justifyContent: 'space-between',
               paddingEnd: wp(5),
             }}>
-            <Text> Mã: {item.code}</Text>
+            <Text style={{width: wp(50)}}> Mã: {item.code}</Text>
             <TouchableOpacity
               onPress={() => copyToClipboard(item.code)}
               style={{
@@ -190,14 +194,26 @@ const Voucher = ({navigation}) => {
             </View>
 
             <View style={{height: hp(46.5)}}>
-              <FlatList
-                // numColumns={2}
-                showsVerticalScrollIndicator={false}
-                data={voucherItems}
-                renderItem={renderItem}
-                keyExtractor={item => item._id.toString()}
-                contentContainerStyle={styles.menuList}
-              />
+              {loading ? (
+                <View
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              ) : (
+                <FlatList
+                  // numColumns={2}
+                  showsVerticalScrollIndicator={false}
+                  data={voucherItems}
+                  renderItem={renderItem}
+                  keyExtractor={item => item._id.toString()}
+                  contentContainerStyle={styles.menuList}
+                />
+              )}
             </View>
           </View>
         </LinearGradient>
