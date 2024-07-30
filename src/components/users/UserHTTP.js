@@ -39,7 +39,7 @@ export const login = async (email, password) => {
     // Xử lý lỗi chi tiết
     if (err.response) {
       console.log('API error:', err.response);
-      throw new Error(err.response.message || 'Đăng ký thất bại');
+      throw new Error(err.response.data.message || 'Đăng ký thất bại');
     } else if (err.request) {
       console.log('No response from API:', err.request);
       throw new Error('Không có phản hồi từ máy chủ');
@@ -126,3 +126,25 @@ export const updatePassword = async (currentPassword, newPassword) => {
   }
 };
 
+// re Send Otp code
+export const reSendOtp = async (email) => {
+  try {
+    const url = 'v1/users/resend-verification';
+    const body = {email};
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.post(url, body);
+    return res;
+  } catch (err) {
+    // Xử lý lỗi chi tiết
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.data.message || 'gửi Otp thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};

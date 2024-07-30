@@ -20,11 +20,11 @@ import {
 } from 'react-native-responsive-screen';
 
 const Login = ({navigation}) => {
-  const [email, setEmail] = useState('oroki147@gmail.com');
-  const [password, setPassword] = useState('Tt123456');
+  // const [email, setEmail] = useState('oroki147@gmail.com');
+  // const [password, setPassword] = useState('Tt123456');
 
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('')
 
   const handleRegister = () => {
     navigation.navigate('Register');
@@ -52,7 +52,7 @@ const Login = ({navigation}) => {
         console.log('======Login===========', response);
 
         setTimeout(() => {
-          navigation.navigate('tab');
+          navigation.replace('tab');
         }, 500);
       }
       if (response.status === 'fail') {
@@ -95,6 +95,11 @@ const Login = ({navigation}) => {
             placeholder={'Mật khẩu'}
             onChangeText={setPassword}
           />
+          <TouchableOpacity
+          activeOpacity={0.5}
+          style={{alignSelf:'flex-end'}}>
+          <Text style={{color:'white', alignSelf:'flex-end', margin:5}}>Quên mật khẩu ?</Text>
+          </TouchableOpacity>
 
           {/* button login */}
           <View style={{marginTop: 40}}>
@@ -121,7 +126,7 @@ const Login = ({navigation}) => {
               flex: 1,
               alignItems: 'center',
               justifyContent: 'flex-end',
-              marginBottom: 20,
+              marginBottom: hp(2),
             }}>
             <Text style={{textAlign: 'center'}}>
               Bằng việc đăng nhập, bạn đồng ý tuân thủ {'\n'} Điều khoản và điều

@@ -13,7 +13,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import Icon2 from 'react-native-vector-icons/Ionicons';
 import CustomInput from '../../fragment/CustomInput';
 import {register} from '../UserHTTP';
-import axios from 'axios';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const Register = ({navigation}) => {
   // const [fullName, setFullName] = useState('hihihaha');
@@ -25,7 +28,7 @@ const Register = ({navigation}) => {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    navigation.navigate('Login');
+    navigation.goBack('Login');
   };
 
   const handleRegister = async () => {
@@ -35,13 +38,13 @@ const Register = ({navigation}) => {
       return;
     }
     try {
-      // Gọi hàm register
+      // Call register function form http
       const response = await register(fullName, email, password);
       console.log(response, 'response from register');
 
-      // Xử lý phản hồi thành công
+      //Send email to OtpLogin screen when register is successful
       if (response.status === 'success') {
-        ToastAndroid.show(response.message, ToastAndroid.SHORT);
+        ToastAndroid.show(response.message.message === 'User created successfully!' ? 'Đăng ký thành công' : null, ToastAndroid.SHORT);
         setTimeout(() => {
           navigation.navigate('OtpLogin', {email});
         }, 500);
@@ -50,7 +53,7 @@ const Register = ({navigation}) => {
         console.log(response.message);
       }
     } catch (error) {
-      // Xử lý lỗi và hiển thị thông báo lỗi
+      // Handle error and show error message
       console.error('Error in handleRegister:', error.message);
       ToastAndroid.show(error.message, ToastAndroid.SHORT);
     }
@@ -60,7 +63,7 @@ const Register = ({navigation}) => {
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <LinearGradient
-          colors={['#CE8025', '#FFB266', '#E0E0E0']}
+          colors={['#C55402', '#CE8025', '#CE8025', '#EEEEEE']}
           style={styles.container}>
           {/* header */}
           <View>
@@ -93,12 +96,32 @@ const Register = ({navigation}) => {
               onChangeText={setPassword}
             />
           </View>
+          <TouchableOpacity
+          onPress={() => navigation.navigate('OtpLogin', email)}
+          activeOpacity={0.5}
+          style={{alignSelf:'flex-end'}}>
+          <Text style={{color:'white', alignSelf:'flex-end', margin:5}}>Xác minh mã Otp</Text>
+          </TouchableOpacity>
 
           {/* button login */}
           <View style={{marginTop: 40}}>
             <TouchableOpacity onPress={handleRegister} style={styles.btnLogin}>
               <Text style={styles.textLogin}>Xác nhận</Text>
             </TouchableOpacity>
+          </View>
+
+           {/* Nói linh tinh */}
+           <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              marginBottom: hp(2),
+            }}>
+            <Text style={{textAlign: 'center'}}>
+              Bằng việc đăng nhập, bạn đồng ý tuân thủ {'\n'} Điều khoản và điều
+              kiện {'\n'} & Chính sách bảo mật của chúng tôi
+            </Text>
           </View>
         </LinearGradient>
       </TouchableWithoutFeedback>

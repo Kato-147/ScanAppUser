@@ -15,6 +15,7 @@ import Cart from '../products/screens/Cart';
 import Hihihaha from '../users/screens/Hihihaha';
 import HistoryOrder from '../products/screens/HistoryOrder';
 import DetailHistoryOrder from '../products/screens/DetailHistoryOrder';
+import OtpAgain from '../users/screens/OtpAgain';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,7 @@ const Navigation = () => {
         <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="HistoryOrder" component={HistoryOrder} />
         <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
+        <Stack.Screen name="OtpAgain" component={OtpAgain} />
         <Stack.Screen name="Hihihaha" component={Hihihaha} />
       </Stack.Navigator>
  
