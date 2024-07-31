@@ -12,7 +12,6 @@ import Splash from '../users/screens/Splash';
 import UpdateInfo from '../products/screens/UpdateInfo';
 import UpdatePassword from '../products/screens/UpdatePassword';
 import Cart from '../products/screens/Cart';
-import Hihihaha from '../users/screens/Hihihaha';
 import HistoryOrder from '../products/screens/HistoryOrder';
 import DetailHistoryOrder from '../products/screens/DetailHistoryOrder';
 import OtpAgain from '../users/screens/OtpAgain';
@@ -38,7 +37,6 @@ const Navigation = () => {
         <Stack.Screen name="HistoryOrder" component={HistoryOrder} />
         <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
         <Stack.Screen name="OtpAgain" component={OtpAgain} />
-        <Stack.Screen name="Hihihaha" component={Hihihaha} />
       </Stack.Navigator>
  
   );

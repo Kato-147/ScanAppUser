@@ -24,16 +24,6 @@ const OtpLogin = ({navigation}) => {
   const {email} = route.params;
   const [emailOtp, setemailOtp] = useState(email);
 
-  console.log('====================================');
-  console.log(emailOtp);
-  console.log('====================================');
-
-  useEffect(() => {
-    console.log('Cặc');
-    if (emailOtp === undefined) {
-      console.log('Lồn');
-    }
-  }, []);
 
   const handleBack = () => {
     console.log('Back');
@@ -43,7 +33,7 @@ const OtpLogin = ({navigation}) => {
   const handleOtpSubmit = async () => {
     console.log('send otp');
     try {
-      const response = await verifyOtp(emailOtp, verificationCode); // Gửi email cùng với OTP
+      const response = await verifyOtp(emailOtp, verificationCode); // Send email and verify code
       if (response.status === 'success') {
         ToastAndroid.show('Xác nhận Otp thành công', ToastAndroid.SHORT);
         // Alert.alert('Thành công', 'Xác nhận OTP thành công!');
