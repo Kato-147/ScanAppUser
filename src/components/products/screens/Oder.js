@@ -101,14 +101,17 @@ const Oder = ({navigation}) => {
   const [orderType, setorderType] = useState('user');
   const isFocused = useIsFocused();
   const [totalAmout, settotalAmout] = useState(totalOrder);
+  const [promotionCode, setpromotionCode] = useState('');
+ // console.log('ádfádfsấdf', totalAmout);
   //orderType === 'user' ? totalOrder : totalTable
 
   useEffect(() => {
     if (isFocused) {
-      loadOrderUser() ;
-      loadOrderTable();
+      loadOrderUser();
+      loadOrderTable(promotionCode);
+      console.log('cặc');
     }
-  }, [isFocused, loadOrderUser, deleted, orderType, loadOrderTable]);
+  }, [isFocused, loadOrderUser, deleted, orderType, loadOrderTable, handleApplyVoucher]);
 
   const loadOrderUser = async () => {
     try {
@@ -129,13 +132,15 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const loadOrderTable = async () => {
+  const loadOrderTable = async promotionCode => {
+
     try {
-      const response = await getOrderTable();
+      const response = await getOrderTable(promotionCode);
+      console.log(response);
       if (response.success === 'success') {
+        settotalTable(response.totalAmount);
         const mergedItems = mergeOrderItems(response?.data);
         setorderTables(mergedItems);
-        settotalTable(response.totalAmount);
       } else {
         console.log('Failed to fetch orderTable data:', response?.data);
       }
@@ -281,6 +286,18 @@ const Oder = ({navigation}) => {
     }
   };
 
+  const handleApplyVoucher = async(promotionCode) => {
+
+    console.log('====================================');
+    console.log('Áp con cặt', promotionCode);
+    console.log('====================================');
+    try {
+       loadOrderTable(promotionCode)
+    } catch (error) {
+      console.log('handle Apply Voucher', error);
+    }
+  };
+
   const renderOrderItem = ({item}) => {
     return (
       <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
@@ -418,7 +435,10 @@ const Oder = ({navigation}) => {
                 styles.containerHeaderText,
                 {borderColor: orderType === 'user' ? '#E8900C' : '#525252'},
               ]}
-              onPress={() => {setorderType('user'); settotalAmout(totalOrder)}}>
+              onPress={() => {
+                setorderType('user');
+                settotalAmout(totalOrder);
+              }}>
               <Text
                 style={[
                   styles.headerText,
@@ -435,7 +455,10 @@ const Oder = ({navigation}) => {
                   alignItems: 'flex-end',
                 },
               ]}
-              onPress={() => {setorderType('table'); settotalAmout(totalTable)}}>
+              onPress={() => {
+                setorderType('table');
+                settotalAmout(totalTable);
+              }}>
               <Text
                 style={[
                   styles.headerText,
@@ -454,23 +477,33 @@ const Oder = ({navigation}) => {
           <View style={{height: hp(35)}}>
             <View>
               {/* Voucher */}
-              <View style={ styles.voucherContainer}>
+              <View style={styles.voucherContainer}>
                 <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: 10,
                   }}>
-                  <Icon name="tagso" size={24} color={totalAmout === 0 ? '#a0a0a0' : '#E8900C'} />
+                  <Icon
+                    name="tagso"
+                    size={24}
+                    color={totalAmout === 0 ? '#a0a0a0' : '#E8900C'}
+                  />
 
                   <TextInput
                     // value={query}
                     placeholder="Nhập mã giảm giá"
-                    style={totalAmout === 0 ? [styles.voucherTextInput, {borderColor:'#a0a0a0'}] : styles.voucherTextInput}
+                    style={
+                      totalAmout === 0
+                        ? [styles.voucherTextInput, {borderColor: '#a0a0a0'}]
+                        : styles.voucherTextInput
+                    }
+                    onChangeText={setpromotionCode}
                   />
                 </View>
 
                 <TouchableOpacity
+                  onPress={()=>handleApplyVoucher(promotionCode)}
                   style={{
                     backgroundColor: totalAmout === 0 ? '#a0a0a0' : '#E8900C',
                     padding: hp(1.2),
@@ -549,8 +582,14 @@ const Oder = ({navigation}) => {
 
           <View style={{height: hp(10)}}>
             <TouchableOpacity
-              onPress={()=>totalAmout === 0 ? console.log('có cái đb') : handlePayment()}
-              style={ totalAmout === 0 ? [styles.orderButton, {backgroundColor:'#a0a0a0a0'}] : styles.orderButton}>
+              onPress={() =>
+                totalAmout === 0 ? console.log('có cái đb') : handlePayment()
+              }
+              style={
+                totalAmout === 0
+                  ? [styles.orderButton, {backgroundColor: '#a0a0a0a0'}]
+                  : styles.orderButton
+              }>
               <Text style={styles.orderButtonText}>Thanh toán</Text>
             </TouchableOpacity>
           </View>

@@ -77,7 +77,7 @@ export const getTables = async tableId => {
     const url = `v1/tables/${tableId}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request không cần body
-    // console.log(res.data,'=========API Table=============');
+     console.log(res.data,'=========API Table=============');
     return res.data; // Trả về dữ liệu từ API
   } catch (err) {
     if (err?.response) {
@@ -156,13 +156,15 @@ export const getOrderUser = async () => {
 };
 
 // get Order User
-export const getOrderTable = async () => {
+export const getOrderTable = async (promotionCode) => {
   try {
     const tableId = await AsyncStorage.getItem('idTable');
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const url = `v1/tables/${tableId}/orders`; // Chèn idTable vào URL
+    const body = promotionCode
+    console.log( 'Code send to sever', body);
+    const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
@@ -309,7 +311,7 @@ export const paymentZaloTable = async () => {
 // Get all available voucher
 export const getApiVoucher = async () => {
   try {
-    const url = `v1/promotions`;
+    const url = `v1/promotions?isActive=true`;
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
     // Trả về dữ liệu từ API
@@ -350,3 +352,5 @@ export const getHistoryOrder = async() =>{
     }
   }
 }
+
+//

@@ -182,8 +182,10 @@ const Profile = ({navigation}) => {
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionsetting}>
-          <Text style={styles.textOptionsetting}>Cài đặt chung</Text>
+        <TouchableOpacity
+        onPress={()=>{navigation.navigate('Help')}}
+        style={styles.optionsetting}>
+          <Text style={styles.textOptionsetting}>Hỗ trợ</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
       </View>

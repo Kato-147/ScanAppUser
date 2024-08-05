@@ -6,10 +6,10 @@ import {
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-const MyVoucher = ({navigation}) => {
-  const handleVoucher = () => {
-    navigation.navigate('Voucher');
-    console.log('back to voucher');
+const Help = ({navigation}) => {
+  const handleBack = () => {
+    navigation.goBack();
+    console.log('back');
   };
 
   return (
@@ -18,7 +18,7 @@ const MyVoucher = ({navigation}) => {
       <View style={styles.headerContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={handleVoucher}
+          onPress={handleBack}
           hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
           <Icon name="left" color="#E8900C" style={{fontSize: hp(2.4)}} />
         </TouchableOpacity>
@@ -29,7 +29,7 @@ const MyVoucher = ({navigation}) => {
   );
 };
 
-export default MyVoucher;
+export default Help;
 
 const styles = StyleSheet.create({
   container: {
