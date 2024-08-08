@@ -1,6 +1,6 @@
 import {io} from 'socket.io-client';
 
-const SOCKET_URL = '';
+const SOCKET_URL = 'http://10.0.2.2:8000/';
 
 class WSSerive {
   inittializeSocket = async () => {
@@ -8,7 +8,7 @@ class WSSerive {
       this.socket = io(SOCKET_URL, {
         transports: ['websocket'],
       });
-      console.log('inittializing socket ...', this.socket);
+      console.log('inittializing socket ...');
 
       this.socket.on('connect', data => {
         console.log('===== socket connected =====');
@@ -18,7 +18,7 @@ class WSSerive {
         console.log('===== socket disconnected =====');
       });
 
-      this.socket.on('erro', data => {
+      this.socket.on('error', data => {
         console.log('socket error ', data);
       });
     } catch (error) {
@@ -32,6 +32,10 @@ class WSSerive {
 
   on(even, cb) {
     this.socket.on(even, cb);
+  }
+
+  off(event, cb) {
+    this.socket.off(event, cb);
   }
 
   removeListener(listenerName) {

@@ -11,27 +11,35 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import socketServices from '../utils/socketService';
+import {requestUserPermission} from '../utils/notificationService';
 
 const Socket = () => {
-  const [messge, setmessge] = useState('');
-  const [data, setdata] = useState([]);
+  const [message, setMessage] = useState({tableNumber: 1, voucher: ''});
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     socketServices.inittializeSocket();
+    requestUserPermission();
   }, []);
 
   useEffect(() => {
-    socketServices.on('received_message', msg => {
+    const handlePaymentNotification = msg => {
       console.log('message received in reactApp', msg);
-      let cloneArry = [...data];
-      setdata(cloneArry.concat(msg));
-    });
-  }, [data]);
+      setData(prevData => [...prevData, msg]);
+    };
+
+    socketServices.on('noti_client_payment', handlePaymentNotification);
+
+    return () => {
+      socketServices.off('noti_client_payment', handlePaymentNotification); // Cleanup the listener on unmount
+    };
+  }, []);
+
 
   const sendMessage = () => {
-    if (!!messge) {
-      socketServices.emit('send_message', messge);
-      setmessge('');
+    if (!!message) {
+      socketServices.emit('noti_client_payment', message);
+      setMessage({tableNumber: 1, voucher: ''});
       return;
     }
     Alert.alert('Plese enter your message');
@@ -50,21 +58,21 @@ const Socket = () => {
               paddingHorizontal: 20,
             }}>
             <TextInput
-              value={messge}
+              value={message}
               style={styles.inputStyle}
-              placeholder="Enter your messge...."
-              onChangeText={text => setdata(text)}
+              placeholder="Enter your message...."
+              onChangeText={text => setMessage(text)}
             />
-            <Button onPress={sendMessage} title="cặc" />
+            <Button onPress={sendMessage} title="Send" />
           </View>
 
-          {data.map((val, i) => {
+          {/* data.map((val, i) => {
             return (
               <View>
                 <Text style={{fontWeight: 'bold', marginTop: 10}}>{val}</Text>
               </View>
             );
-          })}
+          }) */}
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
