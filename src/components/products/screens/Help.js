@@ -16,15 +16,12 @@ const Help = ({navigation}) => {
     <View>
       {/* Header */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={handleBack}
-          hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
-          <Icon name="left" color="#E8900C" style={{fontSize: hp(2.4)}} />
-        </TouchableOpacity>
+            <TouchableOpacity onPress={handleBack}>
+              <Icon name="arrowleft" size={24} color="#E8900C" />
+            </TouchableOpacity>
 
-        <Text style={styles.textHeader}>Voucher</Text>
-      </View>
+            <Text style={styles.headerText}>HỖ TRỢ </Text>
+          </View>
     </View>
   );
 };
@@ -39,7 +36,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   headerContainer: {
-    height: hp(7),
+    height: hp(8),
+    width: wp(100),
     backgroundColor: 'white',
     alignItems: 'center',
     flexDirection: 'row',
@@ -48,12 +46,12 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.25,
     elevation: 3,
-    gap: 25,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
+    gap: 20,
   },
-  textHeader: {
-    fontSize: hp(2.4),
-    color: '#E8900C',
+  headerText: {
+    fontSize: hp(2),
     fontWeight: '500',
+    color: '#E8900C',
   },
 });

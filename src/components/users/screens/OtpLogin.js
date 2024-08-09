@@ -32,30 +32,41 @@ const OtpLogin = ({navigation}) => {
 
   const handleOtpSubmit = async () => {
     console.log('send otp');
+    if (emailOtp === '' || verificationCode === '') {
+      ToastAndroid.show('Vui lòng điền đầy đủ thông tin', ToastAndroid.SHORT);
+      return;
+    }
     try {
       const response = await verifyOtp(emailOtp, verificationCode); // Send email and verify code
-      if (response.status === 'success') {
+      if (response?.status === 'success') {
         ToastAndroid.show('Xác nhận Otp thành công', ToastAndroid.SHORT);
         // Alert.alert('Thành công', 'Xác nhận OTP thành công!');
         // Điều hướng đến trang khác sau khi xác minh thành công
         navigation.popToTop('Login'); // Chuyển đến màn hình login sau khi xác minh otp thành công
-      } else {
-        Alert.alert('Lỗi', 'Mã OTP không hợp lệ, vui lòng thử lại.');
+      }  else {
+       // Alert.alert('Lỗi', 'Mã OTP không hợp lệ, vui lòng thử lại.');
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Đã xảy ra lỗi khi xác minh OTP.');
+       Alert.alert('Lỗi', 'Mã OTP không hợp lệ') ;
+      
       console.log(error);
     }
   };
 
   const sendOtpAgain = async (emailOtp) => {
+    console.log('reSendOtp');
+    if (emailOtp === '' ) {
+      ToastAndroid.show('Vui lòng điền đầy đủ thông tin', ToastAndroid.SHORT);
+      return;
+    }
     try {
       const res = await reSendOtp(emailOtp);
       ToastAndroid.show('Vui lòng kiểm tra email', ToastAndroid.SHORT);
       console.log('response from sendOtpAgain ', res);
       return res;
     } catch (error) {
-      console.log(error);
+     // Alert.alert(error)
+      console.log(error.data.message);
     }
   };
 

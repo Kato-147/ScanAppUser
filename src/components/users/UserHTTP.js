@@ -1,5 +1,6 @@
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
+import { Alert } from 'react-native';
 
 // Login 
 export const login = async (email, password) => {
@@ -51,7 +52,7 @@ export const login = async (email, password) => {
 };
 
 
-// Send Otp code
+// Verify otp code 
 export const verifyOtp = async (email, verificationCode) => {
   try {
     const url = 'v1/users/verify';
@@ -63,7 +64,11 @@ export const verifyOtp = async (email, verificationCode) => {
     // Xử lý lỗi chi tiết
     if (err.response) {
       console.log('API error:', err.response);
-      throw new Error(err.response.message || 'xác thực thất bại');
+      if(err.response.data.message === "User not found!"){
+        Alert.alert('Lỗi','Không tìm thấy người dùng')
+      }
+     // console.log('Erro', err.response);
+      //throw new Error(err.response.message || 'xác thực thất bại');
     } else if (err.request) {
       console.log('No response from API:', err.request);
       throw new Error('Không có phản hồi từ máy chủ');

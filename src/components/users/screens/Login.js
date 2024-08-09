@@ -20,11 +20,11 @@ import {
 } from 'react-native-responsive-screen';
 
 const Login = ({navigation}) => {
-  // const [email, setEmail] = useState('oroki147@gmail.com');
-  // const [password, setPassword] = useState('Tt123456');
+  const [email, setEmail] = useState('oroki147@gmail.com');
+  const [password, setPassword] = useState('Tt123456');
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('')
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('')
 
   const handleRegister = () => {
     navigation.navigate('Register');

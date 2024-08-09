@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ToastAndroid,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
@@ -44,7 +45,7 @@ const Register = ({navigation}) => {
 
       //Send email to OtpLogin screen when register is successful
       if (response.status === 'success') {
-        ToastAndroid.show(response.message.message === 'User created successfully!' ? 'Đăng ký thành công' : null, ToastAndroid.SHORT);
+        ToastAndroid.show( 'Đăng ký thành công' , ToastAndroid.SHORT);
         setTimeout(() => {
           navigation.navigate('OtpLogin', {email});
         }, 500);
@@ -54,8 +55,9 @@ const Register = ({navigation}) => {
       }
     } catch (error) {
       // Handle error and show error message
-      console.error('Error in handleRegister:', error.message);
-      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+      console.log('Error in handleRegister:', error.message);
+      Alert.alert(error.message)
+     // ToastAndroid.show(error.message, ToastAndroid.SHORT);
     }
   };
 

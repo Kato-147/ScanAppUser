@@ -109,7 +109,6 @@ const Oder = ({navigation}) => {
     if (isFocused) {
       loadOrderUser();
       loadOrderTable(promotionCode);
-      console.log('cặc');
     }
   }, [isFocused, loadOrderUser, deleted, orderType, loadOrderTable, handleApplyVoucher]);
 
@@ -289,9 +288,10 @@ const Oder = ({navigation}) => {
   const handleApplyVoucher = async(promotionCode) => {
 
     console.log('====================================');
-    console.log('Áp con cặt', promotionCode);
+    console.log('Khoong co ma', promotionCode);
     console.log('====================================');
     try {
+      
        loadOrderTable(promotionCode)
     } catch (error) {
       console.log('handle Apply Voucher', error);
