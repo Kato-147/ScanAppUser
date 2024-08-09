@@ -29,7 +29,7 @@ const getFCMToken = async () => {
 // Cấu hình notification khi app ở foreground
 const displayNotification = (title, body) => {
   PushNotification.localNotification({
-    title: title,
+    title: title,  //
     message: body,
   });
 };
