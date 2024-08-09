@@ -3,15 +3,15 @@ import AxiosInstance from '../../helper/AxiosInstance';
 import { Alert } from 'react-native';
 
 // Login 
-export const login = async (email, password) => {
-  console.log(email, password);
+export const login = async (email, password, fcmToken) => {
+  console.log(email, password,'-----fcmToken---------',fcmToken);
   try {
     const url = 'v1/users/login';
-    const body = {email, password};
+    const body = {email, password,fcmToken};
     const axiosInstance = await AxiosInstance(); // Đợi instance
     const res = await axiosInstance.post(url, body);
-
     return res;
+    ;
     
   } catch (err) {
     if (err.response) {

@@ -80,7 +80,7 @@ const Profile = ({navigation}) => {
       // Chuyển sang màn hình chính
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Login' }],
+        routes: [{ name: 'Splash' }],
       });
       
       const token = await AsyncStorage.getItem('token');

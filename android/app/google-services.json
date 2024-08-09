@@ -1,0 +1,29 @@
+{
+    "project_info": {
+      "project_number": "695201942791",
+      "project_id": "ngonrestaurant-4415f",
+      "storage_bucket": "ngonrestaurant-4415f.appspot.com"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:695201942791:android:5f836e540a5c32800d89a2",
+          "android_client_info": {
+            "package_name": "com.scanqrapp"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyBd6arVUrDNNTg4VQjmfcK5j2QBYUBMWkU"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }

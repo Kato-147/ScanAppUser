@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   ToastAndroid,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import CustomInput from '../../fragment/CustomInput';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import LinearGradient from 'react-native-linear-gradient';
@@ -22,9 +22,27 @@ import {
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('oroki147@gmail.com');
   const [password, setPassword] = useState('Tt123456');
-
-  // const [email, setEmail] = useState('');
+   // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('')
+  const [fcmToken, setfcmToken] = useState('')
+
+  console.log('--------fcm  Token in login---------',fcmToken);
+  
+  // get fcmToken from AsynStorage
+  useMemo(()=>{
+    const retrieveFCMToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('fcmToken');
+        if (token !== null) {
+          setfcmToken(token);
+        }
+      } catch (error) {
+        console.log(error);
+        ToastAndroid.show('Có lỗi xảy ra, vui lòng khỏi động lại ứng dụng', ToastAndroid.SHORT);
+      }
+    };
+    retrieveFCMToken();
+  },[])
 
   const handleRegister = () => {
     navigation.navigate('Register');
@@ -44,7 +62,7 @@ const Login = ({navigation}) => {
 
     try {
       // Gọi hàm login
-      const response = await login(email, password);
+      const response = await login(email, password, fcmToken);
 
       // Xử lý phản hồi thành công
       if (response.status === 'success') {

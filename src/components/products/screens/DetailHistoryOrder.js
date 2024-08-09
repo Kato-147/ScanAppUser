@@ -37,6 +37,8 @@ const DetailHistoryOrder = ({route, navigation}) => {
   const [historyItems, sethistoryItems] = useState([]);
   const [status, setStatus] = useState(false);
 
+  
+
   //Back to HistoryOrder Screen
   const handleBack = () => {
     console.log('>>>>>> Click Back Button');
