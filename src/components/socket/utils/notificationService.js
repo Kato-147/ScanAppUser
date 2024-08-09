@@ -15,6 +15,7 @@ export async function requestUserPermission() {
     }
   }
 }
+//
 
 const getFCMToken = async () => {
   try {
