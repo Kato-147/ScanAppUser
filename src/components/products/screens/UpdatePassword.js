@@ -69,52 +69,56 @@ const UpdatePassword = ({navigation}) => {
             <Text style={styles.headerText}>THAY ĐỔI MẬT KHẨU </Text>
           </View>
 
-<View style={{justifyContent:'space-between', height: hp(90) }}>
- {/* Body */}
- <View style={{paddingHorizontal:wp(10), gap: hp(5), marginTop: hp(10)}}>
-            {/* Input Text */}
-            <CustomInput
-              containerStyle={{}}
-              placeholder={'Mật khẩu cũ'}
-              onChangeText={setCurrentPassword}
-              secureTextEntry
-            />
+          <View style={{justifyContent: 'space-between', height: hp(90)}}>
+            {/* Body */}
+            <View
+              style={{
+                paddingHorizontal: wp(10),
+                gap: hp(5),
+                marginTop: hp(10),
+              }}>
+              {/* Input Text */}
+              <CustomInput
+                containerStyle={{}}
+                placeholder={'Mật khẩu cũ'}
+                onChangeText={setCurrentPassword}
+                secureTextEntry
+              />
 
-            <CustomInput
-              containerStyle={{}}
-              placeholder={'Mật khẩu mới'}
-              onChangeText={setNewPassword1}
-              error={passwordError}
-              secureTextEntry
-            />
+              <CustomInput
+                containerStyle={{}}
+                placeholder={'Mật khẩu mới'}
+                onChangeText={setNewPassword1}
+                error={passwordError}
+                secureTextEntry
+              />
 
-            <CustomInput
-              containerStyle={{}}
-              placeholder={'Nhập lại mật khẩu mới'}
-              error={passwordError}
-              secureTextEntry
-              onChangeText={setNewPassword}
-            />
+              <CustomInput
+                containerStyle={{}}
+                placeholder={'Nhập lại mật khẩu mới'}
+                error={passwordError}
+                secureTextEntry
+                onChangeText={setNewPassword}
+              />
+            </View>
+
+            {/* Button Ok */}
+            <TouchableOpacity
+              style={{
+                alignItems: 'center',
+                height: hp(6),
+                backgroundColor: '#E8900C',
+                borderRadius: 8,
+                justifyContent: 'center',
+                margin: wp(10),
+              }}
+              onPress={handleUpdate}>
+              <Text
+                style={{fontSize: hp(2), fontWeight: '500', color: 'white'}}>
+                Xác nhận
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          {/* Button Ok */}
-          <TouchableOpacity
-            style={{
-              alignItems: 'center',
-              height: hp(6),
-              backgroundColor: '#E8900C',
-              borderRadius: 8,
-              justifyContent: 'center',
-              margin: wp(10),
-            }}
-            onPress={handleUpdate}>
-            <Text style={{fontSize: hp(2), fontWeight: '500', color: 'white'}}>
-              Xác nhận
-            </Text>
-          </TouchableOpacity>
-
-</View>
-
         </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

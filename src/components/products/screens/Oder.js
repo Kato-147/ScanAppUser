@@ -262,7 +262,7 @@ const Oder = ({navigation}) => {
       await AsyncStorage.removeItem('idTable');
     } catch (err) {
       // setError(err.message);
-      console.log('-------------', err);
+      console.log('------error-------', err);
       Alert.alert(`Lỗi thanh toán: ${err.message}`);
     }
   };
@@ -288,7 +288,7 @@ const Oder = ({navigation}) => {
   const handleApplyVoucher = async(promotionCode) => {
 
     console.log('====================================');
-    console.log('Khoong co ma', promotionCode);
+    console.log('Handle ApplyVoucher', promotionCode);
     console.log('====================================');
     try {
       

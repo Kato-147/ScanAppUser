@@ -31,10 +31,6 @@ const Voucher = ({navigation}) => {
   const [copyCode, setcopyCode] = useState('');
   const [loading, setloading] = useState(true);
 
-  const handleMyVoucher = () => {
-    navigation.navigate('MyVoucher');
-  };
-
   const copyToClipboard = code => {
     console.log('---------------', code);
     setcopyCode(code);
@@ -137,10 +133,10 @@ const Voucher = ({navigation}) => {
               marginVertical: hp(2.6),
               paddingHorizontal: 15,
               flexDirection: 'row',
-              gap:10,
-              alignItems:'center',
+              gap: 10,
+              alignItems: 'center',
             }}>
-              <Icon2 name="fire-alt" size={24} color="#E8900C" />
+            <Icon2 name="fire-alt" size={24} color="#E8900C" />
             <Text
               style={{
                 fontSize: hp(2.3),
@@ -157,7 +153,7 @@ const Voucher = ({navigation}) => {
             style={{
               width: wp(100),
               height: hp(20),
-            //  backgroundColor: 'yellow',
+              //  backgroundColor: 'yellow',
               alignSelf: 'center',
               justifyContent: 'center',
               marginBottom: 20,
@@ -178,19 +174,6 @@ const Voucher = ({navigation}) => {
               imageLoadingColor="#2196F3"
             />
           </View>
-
-          {/* See your voucher */}
-          {/* <TouchableOpacity
-            onPress={handleMyVoucher}
-            activeOpacity={0.8}
-            style={styles.seeVoucherContainer}>
-            <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
-              <Icon name="tagso" size={24} color="#E8900C" />
-              <Text style={styles.voucherText}>Xem ưu đãi của bạn</Text>
-            </View>
-
-            <Icon Icon name="right" size={24} color="#E8900C" />
-          </TouchableOpacity> */}
 
           {/* Vouchers hot */}
 
@@ -225,6 +208,22 @@ const Voucher = ({navigation}) => {
                   }}>
                   <ActivityIndicator size="large" color="#0000ff" />
                 </View>
+              ) : voucherItems.length === 0 ? (
+                <View
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                     <Image
+              style={styles.errorImage}
+              source={{
+                uri: 'https://cdn-icons-png.flaticon.com/256/3405/3405177.png',
+              }}
+            />
+            <Text style={styles.errorText}>Hiện không có voucher</Text>
+                  </View>
               ) : (
                 <FlatList
                   // numColumns={2}
@@ -262,10 +261,10 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   imageStyle: {
-   // borderRadius: 15,
+    // borderRadius: 15,
     width: '100%',
     height: '100%',
-   // marginTop: 5,
+    // marginTop: 5,
   },
   seeVoucherContainer: {
     flexDirection: 'row',
@@ -314,6 +313,13 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'space-around',
     width: wp(50),
+  },
+  errorText: {
+    fontSize: hp(2.2),
+  },
+  errorImage: {
+    width: hp(10),
+    height: hp(10),
   },
 });
 

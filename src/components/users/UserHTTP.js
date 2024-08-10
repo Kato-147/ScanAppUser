@@ -1,13 +1,16 @@
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
 import { Alert } from 'react-native';
+import axios from 'axios';
 
 // Login 
-export const login = async (email, password, fcmToken) => {
-  console.log(email, password,'-----fcmToken---------',fcmToken);
+export const login = async (email, password, FCMToken) => {
+ // console.log(email, password,'-----FCMToken---------',FCMToken);
   try {
     const url = 'v1/users/login';
-    const body = {email, password,fcmToken};
+    const body = {email, password,FCMToken};
+    console.log('----------body---------',body);
+    
     const axiosInstance = await AxiosInstance(); // Đợi instance
     const res = await axiosInstance.post(url, body);
     return res;
@@ -153,3 +156,14 @@ export const reSendOtp = async (email) => {
     }
   }
 };
+
+//get News
+export const getNewsApi = async() =>{
+  try {
+    const response = await axios.get('https://api.spaceflightnewsapi.net/v4/articles/?limit=10&offset=10');
+  //  console.log('Articles:', response.data); // Xử lý dữ liệu hoặc trả về dữ liệu
+    return response;
+  } catch (error) {
+    console.error('Error fetching articles:', error);
+  }
+}

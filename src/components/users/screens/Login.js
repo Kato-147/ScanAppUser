@@ -24,7 +24,7 @@ const Login = ({navigation}) => {
   const [password, setPassword] = useState('Tt123456');
    // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('')
-  const [fcmToken, setfcmToken] = useState('')
+  const [fcmToken, setfcmToken] = useState([]);
 
   console.log('--------fcm  Token in login---------',fcmToken);
   

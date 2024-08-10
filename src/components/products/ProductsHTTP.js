@@ -163,7 +163,7 @@ export const getOrderTable = async (promotionCode) => {
       throw new Error('ID Table không tồn tại');
     }
     const body = promotionCode
-    console.log( 'Code send to sever', body);
+    console.log( 'body getOrder resquest to sever', body);
     const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
