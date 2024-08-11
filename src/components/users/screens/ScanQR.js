@@ -10,13 +10,13 @@ import {
 } from 'react-native-responsive-screen';
 const ScanQR = ({navigation}) => {
   const [data, setData] = useState('scan something');
+  const [scanning, setScanning] = useState(true); // Trạng thái để quản lý việc kích hoạt máy quét
 
   const handleMenu = async scannedData => {
     if (scannedData) {
       // Lưu dữ liệu vào AsyncStorage nếu cần
-      await AsyncStorage.setItem('idTableHome', scannedData);
       // Điều hướng đến màn hình Menu
-    //  navigation.replace('Menu');
+      navigation.replace('MenuNoLogin', scannedData);
     }
   };
 

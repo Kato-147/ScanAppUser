@@ -15,6 +15,7 @@ import HistoryOrder from '../products/screens/HistoryOrder';
 import DetailHistoryOrder from '../products/screens/DetailHistoryOrder';
 import Help from '../products/screens/Help';
 import DetailNews from '../products/screens/DetailNews';
+import MenuNoLogin from '../users/screens/MenuNoLogin';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ const Navigation = () => {
         <Stack.Screen name="HistoryOrder" component={HistoryOrder} />
         <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
         <Stack.Screen name="DetailNews" component={DetailNews} />
+        <Stack.Screen name="MenuNoLogin" component={MenuNoLogin} />
       </Stack.Navigator>
  
   );

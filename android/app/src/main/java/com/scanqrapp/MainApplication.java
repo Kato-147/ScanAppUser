@@ -19,6 +19,7 @@ import java.util.List;
 import vn.zalopay.sdk.Environment;
 import vn.zalopay.sdk.ZaloPaySDK;
 
+
 public class MainApplication extends Application implements ReactApplication {
 
     private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
@@ -33,6 +34,7 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new PayZaloBridge());
             return packages;
         }
+
 
         @Override
         protected String getJSMainModuleName() {

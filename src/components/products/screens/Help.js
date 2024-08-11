@@ -5,6 +5,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
+//import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 
 const Help = ({navigation}) => {
   const handleBack = () => {
@@ -16,12 +17,26 @@ const Help = ({navigation}) => {
     <View>
       {/* Header */}
       <View style={styles.headerContainer}>
-            <TouchableOpacity onPress={handleBack}>
-              <Icon name="arrowleft" size={24} color="#E8900C" />
-            </TouchableOpacity>
+        <TouchableOpacity onPress={handleBack}>
+          <Icon name="arrowleft" size={24} color="#E8900C" />
+        </TouchableOpacity>
 
-            <Text style={styles.headerText}>HỖ TRỢ </Text>
-          </View>
+        <Text style={styles.headerText}>HỖ TRỢ </Text>
+
+        {/* Map */}
+        {/* <View style={styles.mapContainer}>
+        <MapView
+          provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+          style={styles.map}
+          region={{
+            latitude: 37.78825,
+            longitude: -122.4324,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.0121,
+          }}></MapView>
+        </View> */}
+       
+      </View>
     </View>
   );
 };
@@ -53,5 +68,15 @@ const styles = StyleSheet.create({
     fontSize: hp(2),
     fontWeight: '500',
     color: '#E8900C',
+  },
+  mapContainer: {
+    ...StyleSheet.absoluteFillObject,
+    height: 400,
+    width: 400,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
   },
 });
