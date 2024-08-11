@@ -8,7 +8,7 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {
   widthPercentageToDP as wp,
@@ -20,6 +20,7 @@ import {getMenuItem} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
 import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
+import {checkPrice} from './Oder';
 
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -28,12 +29,13 @@ const Menu = ({navigation}) => {
   const [activeCategory, setActiveCategory] = useState('');
   const [table, setTable] = useState('');
   const [activeOptions, setActiveOptions] = useState({});
+  const [quantityCard, setquantityCard] = useState([]);
   const isFocused = useIsFocused();
 
   // Back to home function
   const handleHome = () => {
     console.log('back');
-    navigation.navigate('Home');
+    navigation.goBack();
   };
 
   // Go to Cart Screen
@@ -42,65 +44,91 @@ const Menu = ({navigation}) => {
     navigation.navigate('Cart');
   };
 
-  // useEffect(() => {
-  //   const unsubcrise = navigation.addListener('focus', () => {});
-  //   return unsubcrise;
-  // }, [navigation]);
+  const fetchQuantity = useCallback(async () => {
+    try {
+      const quantity = await AsyncStorage.getItem('cartItems');
+      if (quantity) {
+        setquantityCard(JSON.parse(quantity).length);
+      } else {
+        setquantityCard(0);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchQuantity();
+    }
+  }, [isFocused, fetchQuantity]);
 
   // Get idTable from AsyncStorage
   useEffect(() => {
-    const idTable = async () => {
-      try {
-        const idTable = await AsyncStorage.getItem('idTable');
-        console.log('ID Table từ AsyncStorage', idTable);
-        const table = await getTables(idTable);
-        //  console.log('===table==', table);
-        setTable(table);
-      } catch (error) {
-        console.error('Table error', error);
-      }
-    };
     idTable();
-  }, []);
-
-  // Get data Categories from API
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-        if (data.length > 0) {
-          setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
-          loadMenuItems(data[0]._id); // Lấy món ăn cho danh mục đầu tiên
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadCategories();
   }, []);
 
+  const idTable = async () => {
+    try {
+      const idTable = await AsyncStorage.getItem('idTable');
+      console.log('ID Table từ AsyncStorage', idTable);
+      const table = await getTables(idTable);
+      //  console.log('===table==', table);
+      setTable(table);
+    } catch (error) {
+      console.error('Table error', error);
+    }
+  };
+
+  // Get data Categories from API
+  const loadCategories = async () => {
+    try {
+      const data = await getCategories();
+      setCategories(data);
+      if (data.length > 0) {
+        setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
+        loadMenuItems(data[0]._id); // Lấy món ăn cho danh mục đầu tiên
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Add menuItem to Cart
-  const handleAddToCart = async (item, selectedOptionId) => {
+  const handleAddToCart = async item => {
     try {
       console.log(item.name, '<<<<<<<<<<<<<<<<<item');
 
+      let selectedOptionId = activeOptions[item._id];
+      // if (!selectedOptionId) {
+      //   throw new Error('No option selected');
+      // }
+
+      const selectedOption = item?.options?.find(
+        option => option?._id === selectedOptionId,
+      );
+      // if (!selectedOption) {
+      //   throw new Error('Selected option not found');
+      // }
+
       // Tạo đối tượng mới chỉ với các trường cần thiết
       const cartItem = {
-        image: item?.image_url,
-        id: item?._id,
-        name: item?.name,
-        quantity: 0,
-        option: item?.options?.find(option => option?._id === selectedOptionId),
+        image: item.image_url,
+        id: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: 1, // Set initial quantity to 1
+        option: selectedOption ,
       };
 
       let cartItems = await AsyncStorage.getItem('cartItems');
       cartItems = cartItems ? JSON.parse(cartItems) : [];
-      cartItems.push({...cartItem, quantity: 1});
+      cartItems.push(cartItem);
       await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+      fetchQuantity();
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }
@@ -111,14 +139,52 @@ const Menu = ({navigation}) => {
     try {
       const items = await getMenuItem(categoryId);
       setMenuItems(items);
-      //  console.log(items[0]);
+
+      // Đặt tùy chọn đầu tiên của mỗi mục làm tùy chọn mặc định
+      const initialOptions = {};
+      items.forEach(item => {
+        if (item.options && item.options.length > 0) {
+          initialOptions[item._id] = item.options[0]._id;
+        }
+      });
+      setActiveOptions(initialOptions);
     } catch (error) {
       console.error(error);
     }
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <LinearGradient
+        style={{width: wp(100), height: hp(100)}}
+        colors={['white', 'white', 'white', '#F6F6F6']}>
+        {/* Header h10 */}
+        <View style={styles.headerContainer}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 20,
+            }}>
+            <TouchableOpacity onPress={handleHome} style={{}}>
+              <Icon style={styles.backIcon} name="left" />
+            </TouchableOpacity>
+            <Text
+              style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
+              Đang tải ...
+            </Text>
+          </View>
+        </View>
+        <View
+          style={{
+            height: hp(90),
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color="blue" />
+        </View>
+      </LinearGradient>
+    );
   }
 
   // Function handle change Categories
@@ -151,45 +217,88 @@ const Menu = ({navigation}) => {
   };
 
   const handleChangeOption = (menuItemId, optionId) => {
-    setActiveOptions({...activeOptions, [menuItemId]: optionId});
-  };
-
-  const handcheck = id => {
-    console.log(id, 'ID ITem');
+    setActiveOptions(prevOptions => ({...prevOptions, [menuItemId]: optionId}));
+    console.log('options', optionId);
   };
 
   // Function render item for flatlist MenuItem
   const renderMenuItem = ({item}) => {
-    const activeOption = activeOptions[item._id];
-
-    const isActive = item.options._id === activeOption;
-    const activeButtonStyle = {
-      borderColor: isActive ? '#E8900C' : '#757575',
-    };
-    const activeTextStyle = {
-      color: isActive ? '#E8900C' : '#757575',
-    };
-
     return (
-      <TouchableOpacity onPress={() => handcheck(item._id)}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => {
+          console.log(item.name);
+        }}>
         <View style={styles.menuItem}>
-          <Image
-            source={{
-              // If value of Image in API not null, show image : show Image URL
-              uri: item.image_url
-                ? item.image_url
-                : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-            }}
-            style={styles.menuItemImage}
-          />
+          {/* Image */}
+          <View
+            style={{
+              width: wp(30),
+              height: hp(13),
+              padding: 14,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              source={{
+                // If value of Image in API not null, show image : show Image URL
+                uri: item.image_url
+                  ? item.image_url
+                  : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+              }}
+              style={styles.menuItemImage}
+            />
+          </View>
 
           <View style={styles.menuItemInfo}>
-            <Text
-              style={styles.menuItemName}
-              numberOfLines={1}
-              ellipsizeMode="tail">
+            {/* Name */}
+            <Text style={styles.menuItemName} numberOfLines={1}>
               {item.name}
             </Text>
+
+            {item.options.length > 0 ? (
+              <ScrollView
+                horizontal
+                style={{
+                  width: '100%',
+                  height: hp(5),                 
+                }}>
+                {item.options.map(option => {
+                  const isActive = activeOptions[item._id] === option._id;
+
+                  const activeTextOptions = {
+                    color: isActive ? '#E8900C' : '#757575',
+                  };
+
+                  return (
+                    <TouchableOpacity
+                    style={{alignSelf:'center'}}
+                      key={option._id}
+                      onPress={() => handleChangeOption(item._id, option._id)}>
+                      <View
+                        style={[
+                          {
+                            marginRight: wp(3),
+                            borderWidth: 1,
+                            borderRadius: 5,
+                            paddingHorizontal:wp(1)
+                          },
+                          activeOptions[item._id] === option._id
+                            ? {borderColor: '#E8900C'}
+                            : {borderColor: '#757575'},
+                        ]}>
+                        <Text style={[{}, activeTextOptions]}>
+                          {option.name}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            ) : (
+              null
+            )}
+            {/* Price */}
             <View
               style={{
                 flexDirection: 'row',
@@ -198,11 +307,12 @@ const Menu = ({navigation}) => {
                 //  backgroundColor: 'blue',
                 alignItems: 'center',
               }}>
-              <Text style={styles.menuItemPrice}>{item.price} VND</Text>
+              <Text style={styles.menuItemPrice}>
+                {checkPrice(item.price)} đ
+              </Text>
 
               {/* Button Add ItemMenu */}
-              <TouchableOpacity
-                onPress={() => handleAddToCart(item, activeOption)}>
+              <TouchableOpacity onPress={() => handleAddToCart(item)}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -228,80 +338,79 @@ const Menu = ({navigation}) => {
             </View>
           </View>
         </View>
-
-        <View style={{height: 1, width: hp(100), backgroundColor: '#C0C0C0'}} />
-
-        {item.options.length > 0 ? (
-          <ScrollView
-            horizontal
-            style={{width: hp(100), height: hp(5), paddingHorizontal: wp(2)}}>
-            {item.options.map(option => (
-              <TouchableOpacity
-                onPress={() => handleChangeOption(item._id, option._id)}>
-                <View
-                  key={option._id}
-                  style={[
-                    {marginRight: wp(3), borderWidth: 1, borderRadius: 10},
-                    activeOption === option._id
-                      ? {borderColor: 'blue'}
-                      : {borderColor: 'red'},
-                  ]}>
-                  <Text style={[{}, activeTextStyle]}>{option.name}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        ) : (
-          <View></View>
-        )}
       </TouchableOpacity>
     );
   };
 
-  // Tính tổng giá tiền bằng reduce
-
-  // const totalPrice = selectedItems.reduce(
-  //   (total, item) => total + item.price,
-  //   0,
-  // );
-
   return (
     <View style={styles.container}>
       {table?.status === 'open' ? (
-        <LinearGradient colors={['#ffff', '#ffff', '#F6F6F6', '#F6F6F6']}>
-          {/* Header */}
+        <LinearGradient colors={['white', 'white', 'white', '#F6F6F6']}>
+          {/* Header h10 */}
           <View style={styles.headerContainer}>
-            <TouchableOpacity onPress={handleHome}>
-              <Icon style={styles.backIcon} name="left" />
-            </TouchableOpacity>
-            <Text
-              style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
-              Bàn {table?.tableNumber}
-            </Text>
-          </View>
-
-          {/* Body */}
-
-          {/* Menu */}
-          <View>
-            <Text style={styles.textMenu}>Menu</Text>
-            {/* categories */}
-            <View>
-              {categories.length > 0 && (
-                <FlatList
-                  horizontal
-                  data={categories}
-                  keyExtractor={item => item._id.toString()}
-                  renderItem={renderItem}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.contentContainer}
-                  style={styles.flatList}
-                />
-              )}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 20,
+                //  backgroundColor: 'red',
+              }}>
+              <TouchableOpacity onPress={handleHome} style={{}}>
+                <Icon style={styles.backIcon} name="left" />
+              </TouchableOpacity>
+              <Text
+                style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
+                Bàn {table?.tableNumber}
+              </Text>
             </View>
 
-            <View style={{height: '70%'}}>
-              {/* Menu Item */}
+            <TouchableOpacity onPress={handleCart} style={{marginRight: wp(3)}}>
+              <View
+                style={{
+                  width: hp(2.2),
+                  height: hp(2.2),
+                  backgroundColor: '#E8900C',
+                  borderRadius: 40,
+                  top: hp(-0.8),
+                  right: wp(-2.2),
+                  position: 'absolute',
+                  zIndex: 1,
+                }}>
+                <Text
+                  style={{
+                    alignSelf: 'center',
+                    color: 'white',
+                    fontSize: hp(1.6),
+                  }}>
+                  {quantityCard}
+                </Text>
+              </View>
+              <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Menu */}
+          <View style={{height: hp(90)}}>
+            <View style={{height: hp(12)}}>
+              <Text style={styles.textMenu}>Menu</Text>
+              {/* categories */}
+              <View>
+                {categories.length > 0 && (
+                  <FlatList
+                    horizontal
+                    data={categories}
+                    keyExtractor={item => item._id.toString()}
+                    renderItem={renderItem}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.contentContainer}
+                    style={styles.flatList}
+                  />
+                )}
+              </View>
+            </View>
+
+            {/* Menu Item */}
+            <View style={{height: hp(78)}}>
               {menuItems.length > 0 ? (
                 <FlatList
                   data={menuItems}
@@ -314,56 +423,6 @@ const Menu = ({navigation}) => {
                 <Loading style={{marginTop: 100, fontSize: 100}} />
               )}
             </View>
-
-            {/* Cart */}
-            <TouchableOpacity
-              style={styles.paymentContainer}
-              onPress={handleCart}>
-              <View
-                style={{flexDirection: 'row', gap: 10, alignItems: 'center'}}>
-                <View style={{}}>
-                  <View
-                    style={{
-                      width: hp(2.2),
-                      height: hp(2.2),
-                      backgroundColor: '#E8900C',
-                      borderRadius: 40,
-                      top: hp(-0.8),
-                      right: wp(-2.2),
-                      position: 'absolute',
-                      zIndex: 1,
-                    }}>
-                    <Text
-                      style={{
-                        alignSelf: 'center',
-                        color: 'white',
-                        fontSize: hp(1.6),
-                      }}>
-                      {/* {selectedItems.length} */}0
-                    </Text>
-                  </View>
-                  <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
-                </View>
-
-                <View style={styles.lineVertical} />
-                <View>
-                  <Text style={{fontSize: hp(1.7)}}>Tổng tiền :</Text>
-                  <Text
-                    style={{
-                      fontSize: hp(2.3),
-                      fontWeight: '500',
-                      color: 'black',
-                    }}>
-                    cc đ
-                  </Text>
-                </View>
-              </View>
-
-              {/* pay button */}
-              <View style={styles.payButtonContainer}>
-                <Text style={styles.payButtonText}>GIỎ HÀNG</Text>
-              </View>
-            </TouchableOpacity>
           </View>
         </LinearGradient>
       ) : (
@@ -378,7 +437,7 @@ const Menu = ({navigation}) => {
 
 export default Menu;
 
-const styles = StyleSheet.create({
+ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
@@ -413,27 +472,29 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   menuItem: {
-    width: '100%',
-    //  flex: 1,
+    width: wp(100),
+    // backgroundColor:'red',
     justifyContent: 'flex-start',
     paddingHorizontal: 15,
     marginVertical: 10,
     flexDirection: 'row',
-    // backgroundColor: 'red',
+    height: hp(13),
   },
   menuItemImage: {
-    width: wp(20),
-    height: hp(10),
+    width: wp(25),
+    height: wp(25),
     borderRadius: 10,
     marginRight: 10,
   },
   menuItemInfo: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
+    //backgroundColor:'red'
   },
   menuItemName: {
-    fontSize: hp(2),
-    fontWeight: '500',
+    color: 'black',
+    fontSize: hp(2.2),
+    fontWeight: 'bold',
   },
   menuItemPrice: {
     fontSize: hp(2),
@@ -450,44 +511,17 @@ const styles = StyleSheet.create({
     fontSize: hp(2),
   },
   headerContainer: {
-    width: '100%',
+    width: wp(100),
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 20,
-    margin: 20,
+    height: hp(10),
+    justifyContent: 'space-between',
+    paddingHorizontal: wp(5),
   },
   textMenu: {
     fontSize: hp(2.5),
     fontWeight: '400',
     color: '#525252',
     marginStart: 20,
-  },
-  paymentContainer: {
-    width: wp(100),
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: hp(10),
-    paddingHorizontal: wp(5),
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.3,
-    elevation: 5,
-  },
-  payButtonContainer: {
-    backgroundColor: '#E8900C',
-    borderRadius: 5,
-    padding: 10,
-  },
-  lineVertical: {
-    width: 1, // Chiều rộng của đường thẳng
-    height: hp(5), // Chiều cao của đường thẳng
-    backgroundColor: '#C0C0C0', // Màu của đường thẳng
-  },
-  payButtonText: {
-    fontSize: hp(1.8),
-    fontWeight: '500',
-    color: 'white',
   },
 });

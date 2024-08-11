@@ -1,16 +1,20 @@
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
+import { Alert } from 'react-native';
+import axios from 'axios';
 
 // Login 
-export const login = async (email, password) => {
-  console.log(email, password);
+export const login = async (email, password, FCMToken) => {
+ // console.log(email, password,'-----FCMToken---------',FCMToken);
   try {
     const url = 'v1/users/login';
-    const body = {email, password};
+    const body = {email, password,FCMToken};
+    console.log('----------body---------',body);
+    
     const axiosInstance = await AxiosInstance(); // Đợi instance
     const res = await axiosInstance.post(url, body);
-
     return res;
+    ;
     
   } catch (err) {
     if (err.response) {
@@ -39,7 +43,7 @@ export const login = async (email, password) => {
     // Xử lý lỗi chi tiết
     if (err.response) {
       console.log('API error:', err.response);
-      throw new Error(err.response.message || 'Đăng ký thất bại');
+      throw new Error(err.response.data.message || 'Đăng ký thất bại');
     } else if (err.request) {
       console.log('No response from API:', err.request);
       throw new Error('Không có phản hồi từ máy chủ');
@@ -51,7 +55,7 @@ export const login = async (email, password) => {
 };
 
 
-// Send Otp code
+// Verify otp code 
 export const verifyOtp = async (email, verificationCode) => {
   try {
     const url = 'v1/users/verify';
@@ -63,7 +67,11 @@ export const verifyOtp = async (email, verificationCode) => {
     // Xử lý lỗi chi tiết
     if (err.response) {
       console.log('API error:', err.response);
-      throw new Error(err.response.message || 'xác thực thất bại');
+      if(err.response.data.message === "User not found!"){
+        Alert.alert('Lỗi','Không tìm thấy người dùng')
+      }
+     // console.log('Erro', err.response);
+      //throw new Error(err.response.message || 'xác thực thất bại');
     } else if (err.request) {
       console.log('No response from API:', err.request);
       throw new Error('Không có phản hồi từ máy chủ');
@@ -126,3 +134,36 @@ export const updatePassword = async (currentPassword, newPassword) => {
   }
 };
 
+// re Send Otp code
+export const reSendOtp = async (email) => {
+  try {
+    const url = 'v1/users/resend-verification';
+    const body = {email};
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.post(url, body);
+    return res;
+  } catch (err) {
+    // Xử lý lỗi chi tiết
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.data.message || 'gửi Otp thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+//get News
+export const getNewsApi = async() =>{
+  try {
+    const response = await axios.get('https://api.spaceflightnewsapi.net/v4/articles/?limit=10&offset=10');
+  //  console.log('Articles:', response.data); // Xử lý dữ liệu hoặc trả về dữ liệu
+    return response;
+  } catch (error) {
+    console.error('Error fetching articles:', error);
+  }
+}

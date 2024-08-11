@@ -21,28 +21,28 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
 import {postOrder} from '../ProductsHTTP';
+import LinearGradient from 'react-native-linear-gradient';
+import {checkPrice} from '../screens/Oder';
+
+export const cutStr = (string, maxLength = 30) =>
+  string.length > maxLength ? `${string.slice(0, maxLength)}...` : string;
 
 const Cart = ({navigation}) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartItemUI, setCartItemUI] = useState([]);
-  // console.log(cartItemUI, '---------------CartItemUI');
+  //  console.log(cartItemUI, '---------------CartItemUI');
 
-  //console.log(cartItems, 'cardddddddddddddddddddddddd');
   const handleMenu = () => {
     console.log('Back to menu');
-    navigation.navigate('Menu');
+    navigation.goBack();
   };
 
-  const cutStr = string => {
-    return string.length > 30 ? string.slice(0, 30) + '...' : string;
-  };
-
+  // Post MenuItems to API
   const handlePlaceOrder = async () => {
     try {
       const response = await postOrder();
       if (response.status === 'success') {
         await AsyncStorage.removeItem('cartItems');
-        await AsyncStorage.removeItem('idTable');
         console.log('Cart items cleared');
         navigation.navigate('Oder');
       }
@@ -93,18 +93,6 @@ const Cart = ({navigation}) => {
     fetchCartItems(); // Gọi hàm fetchCartItems khi component mount
   }, []);
 
-  //   useEffect(()=>{
-  // const fetchCartItemUI = async()=>{
-  //   try {
-  //     setCartItemUI(cartItems);
-  //     mergeCartItems(cartItemUI);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-  // fetchCartItemUI();
-  //   },[])
-
   // Cập nhật AsyncStorage khi cartItems thay đổi
   useEffect(() => {
     const updateStorage = async () => {
@@ -138,15 +126,18 @@ const Cart = ({navigation}) => {
 
   // minus quantity item
   const decreaseQuantity = (id, option) => {
+    // Tìm vị trí của mục trong mảng cartItems
     const itemIndex = cartItems.findIndex(
       item => item?.id === id && item?.option?._id === option?._id,
     );
+
     if (itemIndex !== -1) {
       const updatedCartItems = [...cartItems];
       updatedCartItems.splice(itemIndex, 1);
       setCartItems(updatedCartItems);
     }
 
+    // Cập nhật UI để phản ánh số lượng đã giảm
     setCartItemUI(prevItems =>
       prevItems.map(item =>
         item.id === id &&
@@ -173,20 +164,22 @@ const Cart = ({navigation}) => {
   };
 
   const renderItem = ({item}) => {
-    // console.log('Item when render .....: ',item.name, item.quantity);
-    //   console.log(item);
-
-    // Hợp nhất các mục trùng lặp và cập nhật state
-    //   setCartItems(mergeCartItems(item));
-
     return (
       <TouchableOpacity
-        style={{width: hp(90)}}
+        style={styles.itemFlatlist}
         activeOpacity={1}
         onPress={() => {
-          console.log('id', item._id, item?.name);
+          console.log('id', item.id, item.name);
         }}>
-        <View style={styles.itemFlatlist}>
+        {/* Image */}
+        <View
+          style={{
+            width: wp(30),
+            height: hp(12),
+            padding: 14,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
           <Image
             source={{
               // If API have value of image, show image from API. If image != value, show image URL
@@ -196,47 +189,84 @@ const Cart = ({navigation}) => {
             }}
             style={styles.imageVoucherItem}
           />
+        </View>
 
-          {/* text info */}
-          <View style={{justifyContent: 'space-between'}}>
-            {/* name */}
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="head"
-              style={{color: 'black', fontSize: hp(2)}}>
-              {cutStr(item?.name)}
+        {/* text info */}
+        <View
+          style={{
+            flex: 1,
+            height: '100%',
+            justifyContent: 'space-around',
+            width: wp(50),
+          }}>
+          {/* name */}
+          <Text
+            numberOfLines={1}
+            // ellipsizeMode="head"
+            style={{color: 'black', fontSize: hp(2.2), fontWeight: 'bold'}}>
+            {cutStr(item.name)}
+          </Text>
+
+          <Text style={{fontSize: hp(2), color: '#888'}}>
+            {checkPrice(item.price)} đ
+          </Text>
+
+          {/* Options */}
+          {item?.option?.name === null ? (
+            <View />
+          ) : (
+            <Text style={{fontSize: 14, color: '#555'}}>
+              {item?.option?.name}
             </Text>
+          )}
+        </View>
 
-            <Text>{item?.option?.name}</Text>
+        <View
+          style={{
+            width: wp(20),
+            //    backgroundColor: 'yellow',
+            height: '100%',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+          <TouchableOpacity
+            onPress={() => handleDeleteItem(item.id, item.option)}
+            style={{
+              marginTop: hp(1),
+              backgroundColor: '#E8900C',
+              padding: wp(2),
+              borderRadius: 99,
+            }}>
+            <Icon name="delete" size={wp(5)} color="#ffffff" />
+          </TouchableOpacity>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: hp(30),
-              }}>
-              {/* price */}
-              <Text>{item.price}</Text>
-
-              {/* quantity */}
-              <View style={{flexDirection: 'row', display: 'flex', gap: 10}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              width: hp(16),
+            }}>
+            {/* quantity */}
+            <View style={{flexDirection: 'row', gap: 10}}>
+              {item.quantity > 1 ? (
                 <TouchableOpacity
                   onPress={() => decreaseQuantity(item.id, item.option)}>
                   <Icon name="minussquareo" size={24} color="black" />
                 </TouchableOpacity>
-                <Text>{item.quantity}</Text>
-                <TouchableOpacity
-                  onPress={() => increaseQuantity(item.id, item.option)}>
-                  <Icon name="plussquareo" size={24} color="black" />
+              ) : (
+                <TouchableOpacity>
+                  <Icon name="minussquareo" size={24} color="black" />
                 </TouchableOpacity>
-              </View>
+              )}
+
+              <Text>{item.quantity}</Text>
+
+              <TouchableOpacity
+                onPress={() => increaseQuantity(item.id, item.option)}>
+                <Icon name="plussquareo" size={24} color="black" />
+              </TouchableOpacity>
             </View>
           </View>
-          <Button
-            title="Xóa"
-            onPress={() => handleDeleteItem(item.id, item.option)}
-            color="red"
-          />
         </View>
       </TouchableOpacity>
     );
@@ -252,68 +282,39 @@ const Cart = ({navigation}) => {
               style={{fontSize: hp(2.2), fontWeight: '500', color: '#E8900C'}}>
               GIỎ HÀNG
             </Text>
-
-            {/* Total money */}
-            {/* <View
-              style={{
-             
-                height: '100%',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                marginRight: 10,
-                width: hp(10),
-              }}>
-              <Text>Tổng tiền</Text>
-              <Text
-                style={{
-                  fontSize: hp(2.2),
-                  fontWeight: '500',
-                  color: '#E8900C',
-                }}>
-                đ 13.000
-              </Text>
-            </View> */}
-
           </View>
 
           {/* Body */}
 
-          {/* Voucher */}
-          {/* <View style={styles.voucherContainer}>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-              <Icon name="tagso" size={24} color="#E8900C" />
-
-             
-              <TextInput
-                // value={query}
-                placeholder="Nhập mã giảm giá"
-                style={styles.voucherTextInput}
-              />
-            </View>
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#E8900C',
-                padding: hp(1.2),
-                borderRadius: 8,
-              }}>
-              <Text style={{color: 'white', fontSize: hp(2)}}>Áp dụng</Text>
-            </TouchableOpacity>
-          </View> */}
-
           {/* menu */}
-          <View style={{height: hp(82), width: '100%'}}>
-            <FlatList
-              // numColumns={1}
-              showsVerticalScrollIndicator={false}
-              style={{width: '100%'}}
-              data={cartItemUI}
-              renderItem={renderItem}
-              keyExtractor={(item, index) =>
-                `${item.id}-${item.option}-${index}`
-              }
-            />
-          </View>
+          {cartItemUI.length > 0 ? (
+            <LinearGradient
+              colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
+              style={{height: hp(82), width: '100%'}}>
+              <FlatList
+                // numColumns={1}
+                showsVerticalScrollIndicator={false}
+                style={{width: '100%'}}
+                data={cartItemUI}
+                renderItem={renderItem}
+                keyExtractor={(item, index) =>
+                  `${item.id}-${item.option}-${index}`
+                }
+              />
+            </LinearGradient>
+          ) : (
+            <LinearGradient
+              colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
+              style={styles.errorContainer}>
+              <Image
+                style={styles.errorImage}
+                source={{
+                  uri: 'https://i.pinimg.com/564x/55/96/49/559649030e6667d7f8d50fc15afbbd20.jpg',
+                }}
+              />
+              <Text style={styles.errorText}>Chưa có món trong giỏ hàng</Text>
+            </LinearGradient>
+          )}
 
           {/* Cart */}
           <View
@@ -327,11 +328,25 @@ const Cart = ({navigation}) => {
             </TouchableOpacity>
 
             {/* pay button */}
-            <TouchableOpacity
-              onPress={handlePlaceOrder}
-              style={styles.payButtonContainer}>
-              <Text style={styles.payButtonText}>ĐẶT MÓN</Text>
-            </TouchableOpacity>
+            {cartItemUI.length > 0 ? (
+              <TouchableOpacity
+                onPress={handlePlaceOrder}
+                style={styles.payButtonContainer}>
+                <Text style={styles.payButtonText}>ĐẶT MÓN</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  console.log('co cai db');
+                }}
+                style={{
+                  backgroundColor: '#a0a0a0a0',
+                  borderRadius: 5,
+                  padding: 10,
+                }}>
+                <Text style={styles.payButtonText}>ĐẶT MÓN</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -376,43 +391,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   imageVoucherItem: {
-    width: hp(8.5),
-    height: hp(8.5),
-    marginHorizontal: 15,
+    width: wp(25),
+    height: wp(25),
+    borderRadius: 10,
     // backgroundColor: 'red',
   },
   itemFlatlist: {
-    backgroundColor: 'white',
+    width: wp(100),
+    height: hp(12),
+    marginVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
-    display: 'flex',
+    justifyContent: 'space-between',
   },
-  // voucherContainer: {
-  //   flexDirection: 'row',
-  //   backgroundColor: 'white',
-  //   alignItems: 'center',
-  //   justifyContent: 'space-between',
-  //   paddingHorizontal: 15,
-  //   //  marginBottom: 10,
-  //   marginVertical: 20,
-  //   height: hp(8),
-  // },
-  // iconVoucher: {},
-  // voucherText: {
-  //   color: 'black',
-  //   fontSize: hp(2),
-  // },
-  // voucherTextInput: {
-  //   //  backgroundColor: 'red',
-  //   borderWidth: 1,
-  //   borderColor: '#E8900C',
-  //   height: hp(5),
-  //   borderRadius: 8,
-  //   width: hp(24),
-  //   // alignItems:'center',
-  //   //justifyContent:'center'
-  // },
-
   paymentContainer: {
     width: wp(100),
     backgroundColor: 'white',
@@ -435,5 +426,22 @@ const styles = StyleSheet.create({
     fontSize: hp(1.8),
     fontWeight: '500',
     color: 'white',
+  },
+  errorContainer: {
+    width: '100%',
+    height: hp(82),
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: hp(5),
+  },
+  errorText: {
+    // alignSelf:'center'
+    fontSize: hp(2.2),
+  },
+  errorImage: {
+    width: hp(10),
+    height: hp(10),
   },
 });

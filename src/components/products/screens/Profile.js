@@ -25,12 +25,18 @@ const Profile = ({navigation}) => {
   const [error, setError] = useState(null);
   const isFocused = useIsFocused();
 
+  const [log, setlog] = useState('')
+
+  
+
   useEffect(() => {
     if (isFocused) {
       const fetchProfileInfo = async () => {
         try {
           const data = await infoProfile();
           setUserInfo(data);
+          setlog(data.data.user.email)
+          console.log( 'userInfo -->>>>>>>>>>',log);
         } catch (err) {
           setError(err.message);
           ToastAndroid.show(err.message, ToastAndroid.SHORT);
@@ -44,7 +50,17 @@ const Profile = ({navigation}) => {
 
   //Loading
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View
+        style={{
+          width: '100%',
+          height: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
   if (error) {
@@ -57,15 +73,18 @@ const Profile = ({navigation}) => {
 
   const handleLogout = async () => {
     console.log('click log out');
-    console.log(userInfo, 'userInfo -->>>>>>>>>>');
-
     try {
       // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
       await AsyncStorage.clear();
 
       // Chuyển sang màn hình chính
-      navigation.navigate('Login');
-
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Splash' }],
+      });
+      
+      const token = await AsyncStorage.getItem('token');
+      console.log("asyncStorage------------", token);
       console.log('Logged out and navigated to Login screen.');
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);
@@ -84,7 +103,7 @@ const Profile = ({navigation}) => {
 
   return (
     <LinearGradient
-      colors={['#C96913', '#FFB266', '#EEEEEE', '#EEEEEE']}
+      colors={['#C96913', '#FFB266', '#F6F6F6', '#F6F6F6']}
       style={{width: '100%', height: '100%', padding: 24}}>
       {/* Info */}
       <View
@@ -156,13 +175,17 @@ const Profile = ({navigation}) => {
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionsetting}>
-          <Text style={styles.textOptionsetting}>Quản lý tài khoản/thẻ</Text>
+        <TouchableOpacity
+        onPress={()=>{navigation.navigate('HistoryOrder')}}
+        style={styles.optionsetting}>
+          <Text style={styles.textOptionsetting}>Lịch sử đơn hàng</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionsetting}>
-          <Text style={styles.textOptionsetting}>Cài đặt chung</Text>
+        <TouchableOpacity
+        onPress={()=>{navigation.navigate('Help')}}
+        style={styles.optionsetting}>
+          <Text style={styles.textOptionsetting}>Hỗ trợ</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
       </View>

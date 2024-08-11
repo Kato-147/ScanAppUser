@@ -1,60 +1,84 @@
-import { StyleSheet, Text, View, TouchableOpacity, Linking, Alert } from 'react-native'
-import React,{useState, useEffect} from 'react'
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Linking,
+  Alert,
+} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import { RNCamera } from 'react-native-camera';
+import {RNCamera} from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/AntDesign';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 // id ban 1 : 666c5a75c55050edf1b3168e
-// id ban 3 : 
+// id ban 3 :
 
 const ScanHome = ({navigation}) => {
-  const [data, setData] = useState('scan something')
+  const [data, setData] = useState('scan something');
   const [scanning, setScanning] = useState(true); // Trạng thái để quản lý việc kích hoạt máy quét
-  console.log(data);
-  
+  console.log();
 
-  const handleMenu = async (scannedData) => {
+  const handleMenu = async scannedData => {
     if (scannedData) {
       // Lưu dữ liệu vào AsyncStorage nếu cần
       await AsyncStorage.setItem('idTable', scannedData);
       // Điều hướng đến màn hình Menu
-      navigation.navigate('Menu');
+      navigation.replace('Menu');
     }
   };
 
-  
-  const handleScan = ({ data: scannedData }) => {
+  const handleBack = () => {
+    console.log('back to Home');
+    navigation.goBack();
+  };
+
+  const handleScan = ({data: scannedData}) => {
     setData(scannedData);
     setScanning(false); // Dừng máy quét sau khi quét lần đầu
   };
 
   return (
-
     <QRCodeScanner
-    onRead={({ data: scannedData }) => {
-      setData(scannedData); // Cập nhật state với dữ liệu đã quét
-      handleMenu(scannedData); // Gọi hàm handleMenu khi có dữ liệu hợp lệ
-    }}
-    fadeIn={true}
-    reactivate={true}
-    reactivateTimeout={100}
-    showMarker={true}
-    topContent={
-      <View>
-        <Text>{data}</Text>
-      </View>
-    }
-    bottomContent={
-      <TouchableOpacity onPress={() => handleMenu('666c5a75c55050edf1b3168e')}>
-        <Text> Menu</Text>
-      </TouchableOpacity>
-    }
-  />
-  )
-}
+      onRead={({data: scannedData}) => {
+        setData(scannedData); // Cập nhật state với dữ liệu đã quét
+        handleMenu(scannedData); // Gọi hàm handleMenu khi có dữ liệu hợp lệ
+      }}
+      fadeIn={true}
+      reactivate={true}
+      reactivateTimeout={100}
+      showMarker={true}
+      // topp
+      topContent={
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', display: 'flex', width: wp(100), paddingHorizontal: wp(10)}}>
+          <TouchableOpacity onPress={handleBack}>
+            <Icon style={styles.backIcon} name="left" />
+          </TouchableOpacity>
+          <Text>{data}</Text>
+          <View></View>
+        </View>
+      }
+      // Bottom
+      bottomContent={
+        <TouchableOpacity
+          onPress={() => handleMenu('666c5a75c55050edf1b3168e')}>
+          <Text> Menu</Text>
+        </TouchableOpacity>
+      }
+    />
+  );
+};
 
-export default ScanHome
+export default ScanHome;
 
 const styles = StyleSheet.create({
-
-})
+  backIcon: {
+    fontSize: hp(3),
+    color: 'black',
+  },
+});

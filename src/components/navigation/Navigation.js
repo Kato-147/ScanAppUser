@@ -6,12 +6,16 @@ import ScanQR from '../users/screens/ScanQR';
 import OtpLogin from '../users/screens/OtpLogin';
 import TabBar from './TabBar';
 import ScanHome from '../products/screens/ScanHome';
-import MyVoucher from '../products/screens/MyVoucher';
 import Menu from '../products/screens/Menu';
 import Splash from '../users/screens/Splash';
 import UpdateInfo from '../products/screens/UpdateInfo';
 import UpdatePassword from '../products/screens/UpdatePassword';
 import Cart from '../products/screens/Cart';
+import HistoryOrder from '../products/screens/HistoryOrder';
+import DetailHistoryOrder from '../products/screens/DetailHistoryOrder';
+import Help from '../products/screens/Help';
+import DetailNews from '../products/screens/DetailNews';
+import MenuNoLogin from '../users/screens/MenuNoLogin';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,12 +29,16 @@ const Navigation = () => {
         <Stack.Screen name="OtpLogin" component={OtpLogin} />
         <Stack.Screen name="tab" component={TabBar} />
         <Stack.Screen name="ScanHome" component={ScanHome} />
-        <Stack.Screen name="MyVoucher" component={MyVoucher} />
+        <Stack.Screen name="Help" component={Help} />
         <Stack.Screen name="Menu" component={Menu} />
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
         <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
         <Stack.Screen name="Cart" component={Cart} />
+        <Stack.Screen name="HistoryOrder" component={HistoryOrder} />
+        <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
+        <Stack.Screen name="DetailNews" component={DetailNews} />
+        <Stack.Screen name="MenuNoLogin" component={MenuNoLogin} />
       </Stack.Navigator>
  
   );

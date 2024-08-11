@@ -21,6 +21,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import CustomInput from '../../fragment/CustomInput';
 import {updateUser} from '../../users/UserHTTP';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import LinearGradient from 'react-native-linear-gradient';
 
 const UpdateInfo = ({navigation}) => {
   const [fullName, setFullName] = useState('');
@@ -89,13 +90,15 @@ const UpdateInfo = ({navigation}) => {
   //Back to Profile Screen
   const handleBack = () => {
     console.log('>>>>>> Click Back Button');
-    navigation.navigate('Profile');
+    navigation.goBack();
   };
 
   return (
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
+        <LinearGradient
+          colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
+          style={styles.container}>
           {/* Header */}
           <View style={styles.headerContainer}>
             <TouchableOpacity onPress={handleBack}>
@@ -105,133 +108,136 @@ const UpdateInfo = ({navigation}) => {
             <Text style={styles.headerText}>CẬP NHẬT THÔNG TIN </Text>
           </View>
 
-          {/* Body */}
-          <View style={{paddingHorizontal: wp(4), marginTop: hp(3)}}>
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={showModal}
-              onRequestClose={() => setshowModal(false)}>
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                    }}>
-                    <View style={{width: 25}}></View>
-                    <View
-                      style={{justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={[styles.text2, {padding: 4}]}>
-                        Thêm hình ảnh
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      style={{width: 20, margin: 5}}
-                      onPress={() => setshowModal(false)}>
-                      {/* <MaterialCommunityIcons name='close' size={20} /> */}
-                    </TouchableOpacity>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      width: '80%',
-                    }}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        openCamera();
-                      }}>
-                      <View style={{alignItems: 'center'}}>
-                        {/* <MaterialCommunityIcons
+          <View style={{justifyContent:'space-between', height: hp(90)}} >
+            {/* Body */}
+            <View style={{paddingHorizontal: wp(4), marginTop: hp(3)}}>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showModal}
+                onRequestClose={() => setshowModal(false)}>
+                <TouchableWithoutFeedback onPress={() => setshowModal(false)}>
+                  <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          width: '100%',
+                        }}>
+                        <View style={{width: 25}}></View>
+                        <View
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text style={[styles.text2, {padding: 4}]}>
+                            Thêm hình ảnh
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          style={{width: 20, margin: 5}}
+                          onPress={() => setshowModal(false)}>
+                          {/* <MaterialCommunityIcons name='close' size={20} /> */}
+                        </TouchableOpacity>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          width: '80%',
+                        }}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            openCamera();
+                          }}>
+                          <View style={{alignItems: 'center'}}>
+                            {/* <MaterialCommunityIcons
                           name="camera"
                           color="black"
                           size={40}
                         /> */}
-                        <Text style={styles.text1}>Chụp từ camera</Text>
-                      </View>
-                    </TouchableOpacity>
-                    <Text>hoặc</Text>
-                    <TouchableOpacity
-                      onPress={() => {
-                        openLibrary();
-                      }}>
-                      <View style={{alignItems: 'center'}}>
-                        {/* <MaterialCommunityIcons
+                            <Text style={styles.text1}>Chụp từ camera</Text>
+                          </View>
+                        </TouchableOpacity>
+                        <Text>hoặc</Text>
+                        <TouchableOpacity
+                          onPress={() => {
+                            openLibrary();
+                          }}>
+                          <View style={{alignItems: 'center'}}>
+                            {/* <MaterialCommunityIcons
                           name="image-area"
                           color="black"
                           size={40}
                         /> */}
-                        <Text style={styles.text1}>Lấy từ thư viện</Text>
+                            <Text style={styles.text1}>Lấy từ thư viện</Text>
+                          </View>
+                        </TouchableOpacity>
                       </View>
-                    </TouchableOpacity>
+
+                      <View></View>
+                    </View>
                   </View>
+                </TouchableWithoutFeedback>
+              </Modal>
 
-                  <View></View>
+              {image != '' ? (
+                <View style={styles.addedImageContainer}>
+                  <Image style={styles.addImage} source={{uri: image}}></Image>
+                  <TouchableOpacity
+                    style={styles.icEdit1Container}
+                    onPress={() => setshowModal(true)}>
+                    <Text>Edit</Text>
+                  </TouchableOpacity>
                 </View>
-              </View>
-            </Modal>
-
-            {image != '' ? (
-              <View style={styles.addedImageContainer}>
-                <Image style={styles.addImage} source={{uri: image}}></Image>
+              ) : (
                 <TouchableOpacity
-                  style={styles.icEdit1Container}
-                  onPress={() => setshowModal(true)}>
-                  {/* <Image source={require('../../media/icEdit.png')}></Image> */}
-                  <Text>Edit</Text>
+                  onPress={() => setshowModal(true)}
+                  style={styles.addImageContainer}>
+                  <TouchableOpacity style={{alignItems: 'center'}}>
+                    <Text>+</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.text1}>Thay đổi Avatar</Text>
                 </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={styles.addImageContainer}>
-                <TouchableOpacity
-                  style={{alignItems: 'center'}}
-                  onPress={() => setshowModal(true)}>
-                  {/* <Image source={require('../../media/icPlus.png')}></Image> */}
-                  <Text>+</Text>
-                </TouchableOpacity>
-                <Text style={styles.text1}>Add Cover Photo</Text>
-              </View>
-            )}
+              )}
 
-            {/* Input Text */}
-            <CustomInput
-              containerStyle={{marginTop: 100}}
-              placeholder={'Tên'}
-              onChangeText={setFullName}
-            />
-          </View>
-          {/* Button Confirm change info */}
-          <View
-            style={{
-              //
-              justifyContent: 'flex-end',
-              marginBottom: 20,
-              width: '100%',
-            }}>
-            <TouchableOpacity onPress={handleUpdate}>
-              <View
-                style={{
-                  alignItems: 'center',
-                  height: hp(6),
-                  backgroundColor: '#E8900C',
-                  borderRadius: 8,
-                  justifyContent: 'center',
-                }}>
-                <Text
+              {/* Input Text */}
+              <CustomInput
+                containerStyle={{marginTop: 100}}
+                placeholder={'Tên'}
+                onChangeText={setFullName}
+              />
+            </View>
+            {/* Button Confirm change info */}
+            <View
+              style={{
+                width: '100%',
+                padding: wp(10)
+              }}>
+              <TouchableOpacity onPress={handleUpdate}>
+                <View
                   style={{
-                    fontSize: hp(2),
-                    fontWeight: '500',
-                    color: 'white',
+                    alignItems: 'center',
+                    height: hp(6),
+                    backgroundColor: '#E8900C',
+                    borderRadius: 8,
+                    justifyContent: 'center',
                   }}>
-                  Cập nhật
-                </Text>
-              </View>
-            </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontSize: hp(2),
+                      fontWeight: '500',
+                      color: 'white',
+                    }}>
+                    Cập nhật
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
@@ -245,11 +251,11 @@ const styles = StyleSheet.create({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     // backgroundColor: 'white',
   },
   headerContainer: {
-    height: hp(7),
+    height: hp(8),
     width: wp(100),
     backgroundColor: 'white',
     alignItems: 'center',
