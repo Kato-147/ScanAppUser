@@ -5,7 +5,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
-//import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 
 const Help = ({navigation}) => {
   const handleBack = () => {
@@ -24,18 +24,29 @@ const Help = ({navigation}) => {
         <Text style={styles.headerText}>HỖ TRỢ </Text>
 
         {/* Map */}
-        {/* <View style={styles.mapContainer}>
-        <MapView
-          provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-          style={styles.map}
-          region={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.015,
-            longitudeDelta: 0.0121,
-          }}></MapView>
-        </View> */}
-       
+        <View style={styles.mapContainer}>
+          <MapView
+            // provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+            style={styles.map}
+            initialRegion={{
+              latitude: 37.78825,
+              longitude: -122.4324,
+              latitudeDelta: 0.015,
+              longitudeDelta: 0.0121,
+            }}>
+            <Marker
+             // key={index}
+              coordinate={{
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.015,
+                longitudeDelta: 0.0121,
+              }}
+              title={'con cac'}
+             // description={marker.description}
+            />
+          </MapView>
+        </View>
       </View>
     </View>
   );
@@ -74,9 +85,11 @@ const styles = StyleSheet.create({
     height: 400,
     width: 400,
     justifyContent: 'flex-end',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   map: {
+    height: 200,
+    width: 200,
     ...StyleSheet.absoluteFillObject,
   },
 });
