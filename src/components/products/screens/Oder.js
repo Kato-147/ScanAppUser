@@ -15,7 +15,7 @@ import {
   NativeEventEmitter,
   Alert,
 } from 'react-native';
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -96,29 +96,39 @@ const Oder = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleted, setdeleted] = useState([]);
-  const [totalOrder, settotalOrder] = useState(0);
-  const [totalTable, settotalTable] = useState(0);
+  const [totalOrder, settotalOrder] = useState(totalOrder);
+  const [totalTable, settotalTable] = useState(totalTable);
   const [orderType, setorderType] = useState('user');
   const isFocused = useIsFocused();
-  const [totalAmout, settotalAmout] = useState(totalOrder);
   const [promotionCode, setpromotionCode] = useState('');
- // console.log('ádfádfsấdf', totalAmout);
-  //orderType === 'user' ? totalOrder : totalTable
+
+
+
+
 
   useEffect(() => {
     if (isFocused) {
+     // fix();
       loadOrderUser();
       loadOrderTable(promotionCode);
     }
-  }, [isFocused, loadOrderUser, deleted, orderType, loadOrderTable, handleApplyVoucher]);
+  }, [
+    isFocused,
+    loadOrderUser,
+    deleted,
+   orderType,
+    loadOrderTable,
+    handleApplyVoucher,
+  ]);
 
   const loadOrderUser = async () => {
     try {
       const response = await getOrderUser();
+      
       if (response.success === 'success') {
         const mergedItems = mergeOrderItems(response?.data);
         setOderItems(mergedItems);
-        settotalOrder(response?.totalAmount);
+        settotalOrder(response.totalAmount);
         setError(null);
       } else {
         console.log('Failed to fetch orderUser data:', response?.data);
@@ -132,10 +142,9 @@ const Oder = ({navigation}) => {
   };
 
   const loadOrderTable = async promotionCode => {
-
     try {
       const response = await getOrderTable(promotionCode);
-      console.log(response);
+     // console.log(response);
       if (response.success === 'success') {
         settotalTable(response.totalAmount);
         const mergedItems = mergeOrderItems(response?.data);
@@ -149,6 +158,15 @@ const Oder = ({navigation}) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onclickUser = async () => {
+    setorderType('user');
+   
+  };
+  const onclickTable = () => {
+    setorderType('table');
+    
   };
 
   if (loading) {
@@ -285,14 +303,12 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handleApplyVoucher = async(promotionCode) => {
-
+  const handleApplyVoucher = async promotionCode => {
     console.log('====================================');
     console.log('Handle ApplyVoucher', promotionCode);
     console.log('====================================');
     try {
-      
-       loadOrderTable(promotionCode)
+      loadOrderTable(promotionCode);
     } catch (error) {
       console.log('handle Apply Voucher', error);
     }
@@ -356,7 +372,11 @@ const Oder = ({navigation}) => {
     );
   };
 
-  //const totalPrice = calculateTotalPrice(oderItems);
+
+function totalMoney (){
+return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
+}
+
 
   const handleFlatlist = () => {
     if (orderType === 'user') {
@@ -379,15 +399,15 @@ const Oder = ({navigation}) => {
           </View>
         );
       } else {
-        return (
+        return  (
           <FlatList
-            data={oderItems}
-            keyExtractor={item => item._id.toString()}
-            renderItem={renderOrderItem}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.menuList}
-          />
-        );
+          data={oderItems}
+          keyExtractor={item => item._id.toString()}
+          renderItem={renderOrderItem}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.menuList}
+        />
+        )
       }
     } else {
       if (orderTables.length === 0) {
@@ -436,8 +456,7 @@ const Oder = ({navigation}) => {
                 {borderColor: orderType === 'user' ? '#E8900C' : '#525252'},
               ]}
               onPress={() => {
-                setorderType('user');
-                settotalAmout(totalOrder);
+                onclickUser();
               }}>
               <Text
                 style={[
@@ -456,8 +475,7 @@ const Oder = ({navigation}) => {
                 },
               ]}
               onPress={() => {
-                setorderType('table');
-                settotalAmout(totalTable);
+                onclickTable();
               }}>
               <Text
                 style={[
@@ -487,14 +505,14 @@ const Oder = ({navigation}) => {
                   <Icon
                     name="tagso"
                     size={24}
-                    color={totalAmout === 0 ? '#a0a0a0' : '#E8900C'}
+                    color={totalMoney() == 0 ? '#a0a0a0' : '#E8900C'}
                   />
 
                   <TextInput
                     // value={query}
                     placeholder="Nhập mã giảm giá"
                     style={
-                      totalAmout === 0
+                      totalMoney() == 0
                         ? [styles.voucherTextInput, {borderColor: '#a0a0a0'}]
                         : styles.voucherTextInput
                     }
@@ -503,9 +521,9 @@ const Oder = ({navigation}) => {
                 </View>
 
                 <TouchableOpacity
-                  onPress={()=>handleApplyVoucher(promotionCode)}
+                  onPress={() => handleApplyVoucher(promotionCode)}
                   style={{
-                    backgroundColor: totalAmout === 0 ? '#a0a0a0' : '#E8900C',
+                    backgroundColor: totalMoney() == 0 ? '#a0a0a0' : '#E8900C',
                     padding: hp(1.2),
                     borderRadius: 8,
                   }}>
@@ -573,7 +591,7 @@ const Oder = ({navigation}) => {
               }}>
               <Text style={styles.totalText}>Tổng tiền : </Text>
               <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
-                {checkPrice(totalAmout)} đ{' '}
+                { totalMoney()} đ{' '}
               </Text>
             </View>
           </View>
@@ -583,10 +601,10 @@ const Oder = ({navigation}) => {
           <View style={{height: hp(10)}}>
             <TouchableOpacity
               onPress={() =>
-                totalAmout === 0 ? console.log('có cái đb') : handlePayment()
+                totalMoney() == 0 ? console.log('có cái đb') : handlePayment()
               }
               style={
-                totalAmout === 0
+                totalMoney() == 0
                   ? [styles.orderButton, {backgroundColor: '#a0a0a0a0'}]
                   : styles.orderButton
               }>
