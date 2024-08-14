@@ -48,7 +48,7 @@ const DetailNews = ({route, navigation}) => {
       >
         {/* Body */}
         <View style={styles.bodyContainer}>
-          <Image style={styles.image} source={{uri: itemNews.item.image_url}} />
+          <Image style={styles.image} source={{uri: itemNews.item.image_url[0]}} />
 
           {/* info */}
           <View style={{ paddingHorizontal: wp(3)}}>
@@ -57,7 +57,7 @@ const DetailNews = ({route, navigation}) => {
             </Text>
 
             <Text style={styles.time}>
-              Thời gian đăng bài : {formatDate(itemNews.item.published_at)}
+              Thời gian đăng bài : {formatDate(itemNews.item.createdAt)}
             </Text>
 
             <Text style={styles.description}>{itemNews.item.summary}</Text>

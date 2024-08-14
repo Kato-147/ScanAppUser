@@ -98,12 +98,9 @@ const Oder = ({navigation}) => {
   const [deleted, setdeleted] = useState([]);
   const [totalOrder, settotalOrder] = useState(totalOrder);
   const [totalTable, settotalTable] = useState(totalTable);
-  const [orderType, setorderType] = useState('user');
+  const [orderType, setorderType] = useState('user'); //table
   const isFocused = useIsFocused();
   const [promotionCode, setpromotionCode] = useState('');
-
-
-
 
 
   useEffect(() => {
@@ -121,6 +118,7 @@ const Oder = ({navigation}) => {
     handleApplyVoucher,
   ]);
 
+  // gọi api load order theo user
   const loadOrderUser = async () => {
     try {
       const response = await getOrderUser();
@@ -141,6 +139,7 @@ const Oder = ({navigation}) => {
     }
   };
 
+  // gọi api load order bàn
   const loadOrderTable = async promotionCode => {
     try {
       const response = await getOrderTable(promotionCode);
@@ -199,6 +198,7 @@ const Oder = ({navigation}) => {
   //   );
   // }
 
+  // Hủy món
   const handleDeleteItems = async itemId => {
     console.log(itemId);
     try {
@@ -223,15 +223,16 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handlePayment = () => {
+// Hàm xử lý khi người dùng nhấn nút thanh toán
+  const handlePayment = (promotionCode) => {
     if (orderType === 'user' && selectedMethod === 'COD') {
-      handlePaymentCOD();
+      handlePaymentCOD(promotionCode);
     }
     if (orderType === 'user' && selectedMethod === 'Zalo') {
       handlePaymentZalo();
     }
     if (orderType === 'table' && selectedMethod === 'COD') {
-      handlePaymentCodTable();
+      handlePaymentCodTable(promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'Zalo') {
       handlePaymentZaloTable();
@@ -241,13 +242,13 @@ const Oder = ({navigation}) => {
     // }
   };
 
-  // Hàm để xử lý thanh toán COD khi người dùng nhấn nút
-  const handlePaymentCOD = async () => {
+  // Hàm xử lý thanh toán tiền mặt
+  const handlePaymentCOD = async (promotionCode) => {
     console.log('COD');
     try {
-      await paymentCodUser();
-      Alert.alert('Thanh toán thành công!');
-      await AsyncStorage.removeItem('idTable');
+      await paymentCodUser(promotionCode);
+      Alert.alert('Chờ phục vụ xác nhận ... ', 'Vui lòng chờ phục vụ xác nhận thanh toán !');
+     
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
@@ -255,6 +256,7 @@ const Oder = ({navigation}) => {
     }
   };
 
+  // Hàm xử lý thanh toán zalo
   const handlePaymentZalo = async () => {
     console.log('Zalo');
     try {
@@ -272,12 +274,12 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handlePaymentCodTable = async () => {
+  // Hàm xử lý thanh toán tiền mặt theo bàn
+  const handlePaymentCodTable = async (promotionCode) => {
     console.log('pay cod table');
     try {
-      await paymentCodTable();
-      Alert.alert('Thanh toán thành công!');
-      await AsyncStorage.removeItem('idTable');
+      await paymentCodTable(promotionCode);
+      Alert.alert('Chờ phục vụ xác nhận ... ', 'Vui lòng chờ phục vụ xác nhận thanh toán !');
     } catch (err) {
       // setError(err.message);
       console.log('------error-------', err);
@@ -285,6 +287,7 @@ const Oder = ({navigation}) => {
     }
   };
 
+// Hàm xử lý thanh toán zalo theo bàn
   const handlePaymentZaloTable = async () => {
     console.log(' pay Zalo table');
     try {
@@ -303,6 +306,7 @@ const Oder = ({navigation}) => {
     }
   };
 
+  //Hàm xử lý khi người dùng nhấn nút apply Voucher
   const handleApplyVoucher = async promotionCode => {
     console.log('====================================');
     console.log('Handle ApplyVoucher', promotionCode);
@@ -314,6 +318,7 @@ const Oder = ({navigation}) => {
     }
   };
 
+// Hàm hiển thị item món ăn
   const renderOrderItem = ({item}) => {
     return (
       <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
@@ -372,12 +377,12 @@ const Oder = ({navigation}) => {
     );
   };
 
-
+// Hàm tính tổng tiền
 function totalMoney (){
 return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
 }
 
-
+//Hàm hiển thị flatlist
   const handleFlatlist = () => {
     if (orderType === 'user') {
       if (oderItems.length === 0) {
@@ -601,7 +606,7 @@ return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
           <View style={{height: hp(10)}}>
             <TouchableOpacity
               onPress={() =>
-                totalMoney() == 0 ? console.log('có cái đb') : handlePayment()
+                totalMoney() == 0 ? console.log('Không thanh toán vì không có giá tiền') : handlePayment(promotionCode)
               }
               style={
                 totalMoney() == 0

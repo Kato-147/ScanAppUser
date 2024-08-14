@@ -1,21 +1,19 @@
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
-import { Alert } from 'react-native';
+import {Alert} from 'react-native';
 import axios from 'axios';
 
-// Login 
+// Login
 export const login = async (email, password, FCMToken) => {
- // console.log(email, password,'-----FCMToken---------',FCMToken);
+  // console.log(email, password,'-----FCMToken---------',FCMToken);
   try {
     const url = 'v1/users/login';
-    const body = {email, password,FCMToken};
-    console.log('----------body---------',body);
-    
+    const body = {email, password, FCMToken};
+    console.log('----------body---------', body);
+
     const axiosInstance = await AxiosInstance(); // Đợi instance
     const res = await axiosInstance.post(url, body);
     return res;
-    ;
-    
   } catch (err) {
     if (err.response) {
       console.log('API error:', err.response);
@@ -31,7 +29,7 @@ export const login = async (email, password, FCMToken) => {
 };
 
 // Register
- export const register = async (fullName, email, password) => {
+export const register = async (fullName, email, password) => {
   console.log(fullName, email, password);
   try {
     const url = 'v1/users/register'; // Đường dẫn endpoint
@@ -54,8 +52,7 @@ export const login = async (email, password, FCMToken) => {
   }
 };
 
-
-// Verify otp code 
+// Verify otp code
 export const verifyOtp = async (email, verificationCode) => {
   try {
     const url = 'v1/users/verify';
@@ -67,10 +64,10 @@ export const verifyOtp = async (email, verificationCode) => {
     // Xử lý lỗi chi tiết
     if (err.response) {
       console.log('API error:', err.response);
-      if(err.response.data.message === "User not found!"){
-        Alert.alert('Lỗi','Không tìm thấy người dùng')
+      if (err.response.data.message === 'User not found!') {
+        Alert.alert('Lỗi', 'Không tìm thấy người dùng');
       }
-     // console.log('Erro', err.response);
+      // console.log('Erro', err.response);
       //throw new Error(err.response.message || 'xác thực thất bại');
     } else if (err.request) {
       console.log('No response from API:', err.request);
@@ -83,21 +80,22 @@ export const verifyOtp = async (email, verificationCode) => {
 };
 
 //Update Info User
-export const updateUser = async (formData) => {
-  console.log('>>>>truyền dô ảnh và tên',formData);
+export const updateUser = async formData => {
+  console.log('>>>>truyền dô ảnh và tên', formData);
   try {
     const url = 'v1/users/update-me'; // Đường dẫn endpoint
-   // const body = {formData}; // Dữ liệu gửi đi
+    // const body = {formData}; // Dữ liệu gửi đi
     const axiosInstance = await AxiosInstance('multipart/form-data'); // Đợi instance
     const res = await axiosInstance.patch(url, formData); // Gửi yêu cầu
     return res; // Trả về dữ liệu phản hồi
-    
   } catch (err) {
     // Xử lý lỗi chi tiết
     if (err.response) {
       if (err.response) {
         console.error('API error:', err.response.data);
-        throw new Error(err.response.data.message || 'Cập nhật thông tin người dùng thất bại');
+        throw new Error(
+          err.response.data.message || 'Cập nhật thông tin người dùng thất bại',
+        );
       } else if (err.request) {
         console.error('No response from API:', err.request);
         throw new Error('Không có phản hồi từ máy chủ');
@@ -109,7 +107,7 @@ export const updateUser = async (formData) => {
   }
 };
 
-// updatePassword 
+// updatePassword
 export const updatePassword = async (currentPassword, newPassword) => {
   console.log(currentPassword, newPassword);
   try {
@@ -119,7 +117,6 @@ export const updatePassword = async (currentPassword, newPassword) => {
     const res = await axiosInstance.patch(url, body);
 
     return res;
-    
   } catch (err) {
     if (err.response) {
       console.log('API error:', err.response);
@@ -135,7 +132,7 @@ export const updatePassword = async (currentPassword, newPassword) => {
 };
 
 // re Send Otp code
-export const reSendOtp = async (email) => {
+export const reSendOtp = async email => {
   try {
     const url = 'v1/users/resend-verification';
     const body = {email};
@@ -158,12 +155,24 @@ export const reSendOtp = async (email) => {
 };
 
 //get News
-export const getNewsApi = async() =>{
+export const getInfoApi = async () => {
   try {
-    const response = await axios.get('https://api.spaceflightnewsapi.net/v4/articles/?limit=10&offset=10');
-  //  console.log('Articles:', response.data); // Xử lý dữ liệu hoặc trả về dữ liệu
-    return response;
-  } catch (error) {
-    console.error('Error fetching articles:', error);
+    const url = 'v1/events';
+    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const res = await axiosInstance.get(url);
+    return res;
+  } catch (err) {
+    // Xử lý lỗi chi tiết
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.data.message || 'gọi thông báo thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
   }
-}
+};
+
