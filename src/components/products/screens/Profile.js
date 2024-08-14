@@ -50,7 +50,17 @@ const Profile = ({navigation}) => {
 
   //Loading
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View
+        style={{
+          width: '100%',
+          height: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
   if (error) {
@@ -70,7 +80,7 @@ const Profile = ({navigation}) => {
       // Chuyển sang màn hình chính
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Login' }],
+        routes: [{ name: 'Splash' }],
       });
       
       const token = await AsyncStorage.getItem('token');
@@ -172,8 +182,10 @@ const Profile = ({navigation}) => {
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionsetting}>
-          <Text style={styles.textOptionsetting}>Cài đặt chung</Text>
+        <TouchableOpacity
+        onPress={()=>{navigation.navigate('Help')}}
+        style={styles.optionsetting}>
+          <Text style={styles.textOptionsetting}>Hỗ trợ</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
       </View>

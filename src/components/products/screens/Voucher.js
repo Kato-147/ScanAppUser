@@ -9,6 +9,7 @@ import {
   FlatList,
   Image,
   ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -28,16 +29,13 @@ const Voucher = ({navigation}) => {
   const isFocused = useIsFocused();
   const [voucherItems, setvoucherItems] = useState([]);
   const [copyCode, setcopyCode] = useState('');
-
-  const handleMyVoucher = () => {
-    navigation.navigate('MyVoucher');
-  };
+  const [loading, setloading] = useState(true);
 
   const copyToClipboard = code => {
     console.log('---------------', code);
     setcopyCode(code);
     Clipboard.setString(copyCode);
-    ToastAndroid.show('Đã sao chép', ToastAndroid.SHORT)
+    ToastAndroid.show('Đã sao chép', ToastAndroid.SHORT);
   };
 
   useEffect(() => {
@@ -55,6 +53,8 @@ const Voucher = ({navigation}) => {
       return response;
     } catch (error) {
       console.log('err>>', error);
+    } finally {
+      setloading(false);
     }
   };
 
@@ -91,7 +91,7 @@ const Voucher = ({navigation}) => {
               justifyContent: 'space-between',
               paddingEnd: wp(5),
             }}>
-            <Text> Mã: {item.code}</Text>
+            <Text style={{width: wp(50)}}> Mã: {item.code}</Text>
             <TouchableOpacity
               onPress={() => copyToClipboard(item.code)}
               style={{
@@ -127,15 +127,36 @@ const Voucher = ({navigation}) => {
             </Text>
           </View>
 
+          <View
+            style={{
+              height: hp(6.5),
+              marginVertical: hp(2.6),
+              paddingHorizontal: 15,
+              flexDirection: 'row',
+              gap: 10,
+              alignItems: 'center',
+            }}>
+            <Icon2 name="fire-alt" size={24} color="#E8900C" />
+            <Text
+              style={{
+                fontSize: hp(2.3),
+                fontWeight: '500',
+                color: 'black',
+                marginTop: 5,
+              }}>
+              Săn Voucher hay, quà liền tay
+            </Text>
+          </View>
+
           {/* Baner */}
           <View
             style={{
-              width: '80%',
-              height: hp(15),
-              backgroundColor: 'yellow',
+              width: wp(100),
+              height: hp(20),
+              //  backgroundColor: 'yellow',
               alignSelf: 'center',
               justifyContent: 'center',
-              marginVertical: 20,
+              marginBottom: 20,
             }}>
             <SliderBox
               images={images}
@@ -153,19 +174,6 @@ const Voucher = ({navigation}) => {
               imageLoadingColor="#2196F3"
             />
           </View>
-
-          {/* See your voucher */}
-          <TouchableOpacity
-            onPress={handleMyVoucher}
-            activeOpacity={0.8}
-            style={styles.seeVoucherContainer}>
-            <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
-              <Icon name="tagso" size={24} color="#E8900C" />
-              <Text style={styles.voucherText}>Xem ưu đãi của bạn</Text>
-            </View>
-
-            <Icon Icon name="right" size={24} color="#E8900C" />
-          </TouchableOpacity>
 
           {/* Vouchers hot */}
 
@@ -189,15 +197,43 @@ const Voucher = ({navigation}) => {
               </Text>
             </View>
 
-            <View style={{height: hp(46.5)}}>
-              <FlatList
-                // numColumns={2}
-                showsVerticalScrollIndicator={false}
-                data={voucherItems}
-                renderItem={renderItem}
-                keyExtractor={item => item._id.toString()}
-                contentContainerStyle={styles.menuList}
-              />
+            <View style={{height: hp(45)}}>
+              {loading ? (
+                <View
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              ) : voucherItems.length === 0 ? (
+                <View
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                     <Image
+              style={styles.errorImage}
+              source={{
+                uri: 'https://cdn-icons-png.flaticon.com/256/3405/3405177.png',
+              }}
+            />
+            <Text style={styles.errorText}>Hiện không có voucher</Text>
+                  </View>
+              ) : (
+                <FlatList
+                  // numColumns={2}
+                  showsVerticalScrollIndicator={false}
+                  data={voucherItems}
+                  renderItem={renderItem}
+                  keyExtractor={item => item._id.toString()}
+                  contentContainerStyle={styles.menuList}
+                />
+              )}
             </View>
           </View>
         </LinearGradient>
@@ -225,10 +261,10 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   imageStyle: {
-    borderRadius: 15,
-    width: 50,
-    height: 50,
-    marginTop: 5,
+    // borderRadius: 15,
+    width: '100%',
+    height: '100%',
+    // marginTop: 5,
   },
   seeVoucherContainer: {
     flexDirection: 'row',
@@ -278,15 +314,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: wp(50),
   },
+  errorText: {
+    fontSize: hp(2.2),
+  },
+  errorImage: {
+    width: hp(10),
+    height: hp(10),
+  },
 });
 
 const images = [
-  require('../../../images/iconQr.png'),
-  require('../../../images/phoneVerify.png'),
-  require('../../../images/iconQr.png'),
-  require('../../../images/phoneVerify.png'),
-  require('../../../images/iconQr.png'),
-  require('../../../images/phoneVerify.png'),
-  require('../../../images/iconQr.png'),
-  require('../../../images/phoneVerify.png'),
+  {
+    uri: 'https://cdn.create.vista.com/downloads/a872c327-e398-4e0c-95b7-9fb77fd0464a_1024.jpeg',
+  },
+  {
+    uri: 'https://cdn.create.vista.com/downloads/2f091ea2-b749-4aa4-904f-55739768f749_1024.jpeg',
+  },
+  {
+    uri: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/restaurant-food-voucher-template-design-3f760e8c846b211d1f48bbbdc1364386_screen.jpg?ts=1588142046',
+  },
+  {
+    uri: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/orange-food-gift-voucher-design-template-ea779e971972b66be32009352e52d1ba_screen.jpg?ts=1589184242',
+  },
+  {
+    uri: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/red-food-gift-card-voucher-design-template-97e81f812b13d305d852edc6d17b86e1_screen.jpg?ts=1657194809',
+  },
 ];

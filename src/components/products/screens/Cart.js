@@ -24,6 +24,9 @@ import {postOrder} from '../ProductsHTTP';
 import LinearGradient from 'react-native-linear-gradient';
 import {checkPrice} from '../screens/Oder';
 
+export const cutStr = (string, maxLength = 30) =>
+  string.length > maxLength ? `${string.slice(0, maxLength)}...` : string;
+
 const Cart = ({navigation}) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartItemUI, setCartItemUI] = useState([]);
@@ -33,9 +36,6 @@ const Cart = ({navigation}) => {
     console.log('Back to menu');
     navigation.goBack();
   };
-
-  const cutStr = (string, maxLength = 30) =>
-    string.length > maxLength ? `${string.slice(0, maxLength)}...` : string;
 
   // Post MenuItems to API
   const handlePlaceOrder = async () => {

@@ -437,7 +437,7 @@ const Menu = ({navigation}) => {
 
 export default Menu;
 
-const styles = StyleSheet.create({
+ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',

@@ -15,7 +15,7 @@ import {
   NativeEventEmitter,
   Alert,
 } from 'react-native';
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -37,7 +37,7 @@ const {PayZaloBridge} = NativeModules;
 
 // const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
 
-const mergeOrderItems = items => {
+export const mergeOrderItems = items => {
   // console.log(items);
   const mergedItems = [];
 
@@ -96,26 +96,37 @@ const Oder = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleted, setdeleted] = useState([]);
-  const [totalOrder, settotalOrder] = useState(0);
-  const [totalTable, settotalTable] = useState(0);
-  const [orderType, setorderType] = useState('user');
+  const [totalOrder, settotalOrder] = useState(totalOrder);
+  const [totalTable, settotalTable] = useState(totalTable);
+  const [orderType, setorderType] = useState('user'); //table
   const isFocused = useIsFocused();
+  const [promotionCode, setpromotionCode] = useState('');
 
-  console.log('error: ', error);
 
   useEffect(() => {
     if (isFocused) {
-      orderType === 'user' ? loadOrderUser() : loadOrderTable();
+     // fix();
+      loadOrderUser();
+      loadOrderTable(promotionCode);
     }
-  }, [isFocused, loadOrderUser, deleted, orderType]);
+  }, [
+    isFocused,
+    loadOrderUser,
+    deleted,
+   orderType,
+    loadOrderTable,
+    handleApplyVoucher,
+  ]);
 
+  // gọi api load order theo user
   const loadOrderUser = async () => {
     try {
       const response = await getOrderUser();
+      
       if (response.success === 'success') {
         const mergedItems = mergeOrderItems(response?.data);
         setOderItems(mergedItems);
-        settotalOrder(response?.totalAmount);
+        settotalOrder(response.totalAmount);
         setError(null);
       } else {
         console.log('Failed to fetch orderUser data:', response?.data);
@@ -128,13 +139,15 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const loadOrderTable = async () => {
+  // gọi api load order bàn
+  const loadOrderTable = async promotionCode => {
     try {
-      const response = await getOrderTable();
+      const response = await getOrderTable(promotionCode);
+     // console.log(response);
       if (response.success === 'success') {
+        settotalTable(response.totalAmount);
         const mergedItems = mergeOrderItems(response?.data);
         setorderTables(mergedItems);
-        settotalTable(response.totalAmount);
       } else {
         console.log('Failed to fetch orderTable data:', response?.data);
       }
@@ -146,26 +159,46 @@ const Oder = ({navigation}) => {
     }
   };
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
+  const onclickUser = async () => {
+    setorderType('user');
+   
+  };
+  const onclickTable = () => {
+    setorderType('table');
+    
+  };
 
-  if (error) {
+  if (loading) {
     return (
-      <LinearGradient
-        colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
-        style={styles.errorContainer}>
-        <Image
-          style={styles.errorImage}
-          source={{
-            uri: 'https://i.pinimg.com/564x/55/96/49/559649030e6667d7f8d50fc15afbbd20.jpg',
-          }}
-        />
-        <Text style={styles.errorText}>Bạn chưa đặt món nào cả</Text>
-      </LinearGradient>
+      <View
+        style={{
+          width: '100%',
+          height: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
     );
   }
 
+  // if (error) {
+  //   return (
+  //     <LinearGradient
+  //       colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
+  //       style={styles.errorContainer}>
+  //       <Image
+  //         style={styles.errorImage}
+  //         source={{
+  //           uri: 'https://i.pinimg.com/564x/55/96/49/559649030e6667d7f8d50fc15afbbd20.jpg',
+  //         }}
+  //       />
+  //       <Text style={styles.errorText}>Bạn chưa đặt món nào cả</Text>
+  //     </LinearGradient>
+  //   );
+  // }
+
+  // Hủy món
   const handleDeleteItems = async itemId => {
     console.log(itemId);
     try {
@@ -182,7 +215,7 @@ const Oder = ({navigation}) => {
         'Order deleted successfully:------',
         response.data.items.length,
       );
-      
+
       return response;
     } catch (error) {
       console.log('Error handling delete items:', error);
@@ -190,15 +223,16 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handlePayment = () => {
+// Hàm xử lý khi người dùng nhấn nút thanh toán
+  const handlePayment = (promotionCode) => {
     if (orderType === 'user' && selectedMethod === 'COD') {
-      handlePaymentCOD();
+      handlePaymentCOD(promotionCode);
     }
     if (orderType === 'user' && selectedMethod === 'Zalo') {
       handlePaymentZalo();
     }
     if (orderType === 'table' && selectedMethod === 'COD') {
-      handlePaymentCodTable();
+      handlePaymentCodTable(promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'Zalo') {
       handlePaymentZaloTable();
@@ -208,13 +242,13 @@ const Oder = ({navigation}) => {
     // }
   };
 
-  // Hàm để xử lý thanh toán COD khi người dùng nhấn nút
-  const handlePaymentCOD = async () => {
+  // Hàm xử lý thanh toán tiền mặt
+  const handlePaymentCOD = async (promotionCode) => {
     console.log('COD');
     try {
-      await paymentCodUser();
-      Alert.alert('Thanh toán thành công!');
-      await AsyncStorage.removeItem('idTable');
+      await paymentCodUser(promotionCode);
+      Alert.alert('Chờ phục vụ xác nhận ... ', 'Vui lòng chờ phục vụ xác nhận thanh toán !');
+     
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
@@ -222,12 +256,13 @@ const Oder = ({navigation}) => {
     }
   };
 
+  // Hàm xử lý thanh toán zalo
   const handlePaymentZalo = async () => {
     console.log('Zalo');
     try {
       const response = await paymentZaloUser();
       if (response.return_code === 1) {
-        const payOrder = async() => {
+        const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
           payZP.payOrder(response.order_token);
         };
@@ -239,25 +274,26 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handlePaymentCodTable = async() => {
+  // Hàm xử lý thanh toán tiền mặt theo bàn
+  const handlePaymentCodTable = async (promotionCode) => {
     console.log('pay cod table');
     try {
-      await paymentCodTable();
-      Alert.alert('Thanh toán thành công!');
-      await AsyncStorage.removeItem('idTable');
+      await paymentCodTable(promotionCode);
+      Alert.alert('Chờ phục vụ xác nhận ... ', 'Vui lòng chờ phục vụ xác nhận thanh toán !');
     } catch (err) {
       // setError(err.message);
-      console.log('-------------', err);
+      console.log('------error-------', err);
       Alert.alert(`Lỗi thanh toán: ${err.message}`);
     }
   };
 
-  const handlePaymentZaloTable = async() => {
+// Hàm xử lý thanh toán zalo theo bàn
+  const handlePaymentZaloTable = async () => {
     console.log(' pay Zalo table');
     try {
       const response = await paymentZaloUser();
       if (response.return_code === 1) {
-        const payOrder = async() => {
+        const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
           payZP.payOrder(response.order_token);
           await AsyncStorage.removeItem('idTable');
@@ -266,10 +302,23 @@ const Oder = ({navigation}) => {
       }
     } catch (error) {
       console.log('-------------', error);
-      Alert.alert(`Lỗi thanh toán: ${error.message }`);
+      Alert.alert(`Lỗi thanh toán: ${error.message}`);
     }
   };
 
+  //Hàm xử lý khi người dùng nhấn nút apply Voucher
+  const handleApplyVoucher = async promotionCode => {
+    console.log('====================================');
+    console.log('Handle ApplyVoucher', promotionCode);
+    console.log('====================================');
+    try {
+      loadOrderTable(promotionCode);
+    } catch (error) {
+      console.log('handle Apply Voucher', error);
+    }
+  };
+
+// Hàm hiển thị item món ăn
   const renderOrderItem = ({item}) => {
     return (
       <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
@@ -309,7 +358,6 @@ const Oder = ({navigation}) => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-
           <TouchableOpacity
             onPress={() => {
               handleDeleteItems(item._id);
@@ -329,15 +377,23 @@ const Oder = ({navigation}) => {
     );
   };
 
-  //const totalPrice = calculateTotalPrice(oderItems);
+// Hàm tính tổng tiền
+function totalMoney (){
+return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
+}
 
-  return (
-    <KeyboardAvoidingView>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        {oderItems.length === 0 ? (
-          <LinearGradient
-            colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
-            style={styles.errorContainer}>
+//Hàm hiển thị flatlist
+  const handleFlatlist = () => {
+    if (orderType === 'user') {
+      if (oderItems.length === 0) {
+        return (
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
             <Image
               style={styles.errorImage}
               source={{
@@ -345,164 +401,222 @@ const Oder = ({navigation}) => {
               }}
             />
             <Text style={styles.errorText}>Bạn chưa đặt món nào cả</Text>
-          </LinearGradient>
-        ) : (
-          <LinearGradient
-            colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
-            style={styles.container}>
-            {/* Header */}
-            <View style={styles.headerContainer}>
-              <TouchableOpacity
+          </View>
+        );
+      } else {
+        return  (
+          <FlatList
+          data={oderItems}
+          keyExtractor={item => item._id.toString()}
+          renderItem={renderOrderItem}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.menuList}
+        />
+        )
+      }
+    } else {
+      if (orderTables.length === 0) {
+        return (
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Image
+              style={styles.errorImage}
+              source={{
+                uri: 'https://i.pinimg.com/564x/55/96/49/559649030e6667d7f8d50fc15afbbd20.jpg',
+              }}
+            />
+            <Text style={styles.errorText}>Bạn chưa đặt món nào cả</Text>
+          </View>
+        );
+      } else {
+        return (
+          <FlatList
+            data={orderTables}
+            keyExtractor={item => item._id.toString()}
+            renderItem={renderOrderItem}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.menuList}
+          />
+        );
+      }
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <LinearGradient
+          colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
+          style={styles.container}>
+          {/* Header */}
+          <View style={styles.headerContainer}>
+            <TouchableOpacity
+              style={[
+                styles.containerHeaderText,
+                {borderColor: orderType === 'user' ? '#E8900C' : '#525252'},
+              ]}
+              onPress={() => {
+                onclickUser();
+              }}>
+              <Text
                 style={[
-                  styles.containerHeaderText,
-                  {borderColor: orderType === 'user' ? '#E8900C' : '#525252'},
-                ]}
-                onPress={() => setorderType('user')}>
-                <Text
-                  style={[styles.headerText,{color: orderType === 'user' ? '#E8900C' : '#525252'}]}>
-                  Món của bạn
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+                  styles.headerText,
+                  {color: orderType === 'user' ? '#E8900C' : '#525252'},
+                ]}>
+                Món của bạn
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.containerHeaderText,
+                {
+                  borderColor: orderType === 'table' ? '#E8900C' : '#525252',
+                  alignItems: 'flex-end',
+                },
+              ]}
+              onPress={() => {
+                onclickTable();
+              }}>
+              <Text
                 style={[
-                  styles.containerHeaderText,
-                  {
-                    borderColor: orderType === 'table' ? '#E8900C' : '#525252',
-                    alignItems: 'flex-end',
-                  },
-                ]}
-                onPress={() => setorderType('table')}>
-                <Text
-                  style={[styles.headerText,{color: orderType === 'table' ? '#E8900C' : '#525252'}]}>
-                  Món cả bàn
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  styles.headerText,
+                  {color: orderType === 'table' ? '#E8900C' : '#525252'},
+                ]}>
+                Món cả bàn
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-            {/* Order Item */}
+          {/* Order Item */}
 
-            <View style={{height: hp(40)}}>
-              <FlatList
-                data={orderType === 'user' ? oderItems : orderTables}
-                keyExtractor={item => item._id.toString()}
-                renderItem={renderOrderItem}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.menuList}
-              />
-            </View>
+          <View style={{height: hp(40)}}>{handleFlatlist()}</View>
 
-            {/* Voucher & payment method */}
-            <View style={{height: hp(35)}}>
-              <View>
-                {/* Voucher */}
-                <View style={styles.voucherContainer}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 10,
-                    }}>
-                    <Icon name="tagso" size={24} color="#E8900C" />
+          {/* Voucher & payment method */}
+          <View style={{height: hp(35)}}>
+            <View>
+              {/* Voucher */}
+              <View style={styles.voucherContainer}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}>
+                  <Icon
+                    name="tagso"
+                    size={24}
+                    color={totalMoney() == 0 ? '#a0a0a0' : '#E8900C'}
+                  />
 
-                    <TextInput
-                      // value={query}
-                      placeholder="Nhập mã giảm giá"
-                      style={styles.voucherTextInput}
+                  <TextInput
+                    // value={query}
+                    placeholder="Nhập mã giảm giá"
+                    style={
+                      totalMoney() == 0
+                        ? [styles.voucherTextInput, {borderColor: '#a0a0a0'}]
+                        : styles.voucherTextInput
+                    }
+                    onChangeText={setpromotionCode}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => handleApplyVoucher(promotionCode)}
+                  style={{
+                    backgroundColor: totalMoney() == 0 ? '#a0a0a0' : '#E8900C',
+                    padding: hp(1.2),
+                    borderRadius: 8,
+                  }}>
+                  <Text style={{color: 'white', fontSize: hp(2)}}>Áp dụng</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Payment method */}
+              <View style={{paddingHorizontal: 10}}>
+                <Text style={styles.title}>Phương thức thanh toán</Text>
+
+                <TouchableOpacity
+                  activeOpacity={1}
+                  style={styles.optionContainer}
+                  onPress={() => setSelectedMethod('COD')}>
+                  <View style={styles.optionContent}>
+                    <Image
+                      source={{
+                        uri: 'https://e7.pngegg.com/pngimages/199/428/png-clipart-paper-computer-icons-money-banknote-united-states-dollar-banknote-rectangle-sign.png',
+                      }}
+                      style={styles.logo}
                     />
+                    <Text style={styles.optionText}>Thanh toán tiền mặt</Text>
+                  </View>
+                  <RadioButton
+                    value="COD"
+                    status={selectedMethod === 'COD' ? 'checked' : 'unchecked'}
+                    onPress={() => setSelectedMethod('COD')}
+                    color="#E8900C"
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={1}
+                  style={styles.optionContainer}
+                  onPress={() => setSelectedMethod('Zalo')}>
+                  <View style={styles.optionContent}>
+                    <Image
+                      source={{
+                        uri: 'https://www.plusweb.vn/uploads/public/2021/06/03/1622682588188_zalopay.png',
+                      }}
+                      style={styles.logo}
+                    />
+                    <Text style={styles.optionText}>Ví điện tử ZaloPay</Text>
                   </View>
 
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: '#E8900C',
-                      padding: hp(1.2),
-                      borderRadius: 8,
-                    }}>
-                    <Text style={{color: 'white', fontSize: hp(2)}}>
-                      Áp dụng
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Payment method */}
-                <View style={{paddingHorizontal: 10}}>
-                  <Text style={styles.title}>Phương thức thanh toán</Text>
-
-                  <TouchableOpacity
-                    activeOpacity={1}
-                    style={styles.optionContainer}
-                    onPress={() => setSelectedMethod('COD')}>
-                    <View style={styles.optionContent}>
-                      <Image
-                        source={{
-                          uri: 'https://e7.pngegg.com/pngimages/199/428/png-clipart-paper-computer-icons-money-banknote-united-states-dollar-banknote-rectangle-sign.png',
-                        }}
-                        style={styles.logo}
-                      />
-                      <Text style={styles.optionText}>Thanh toán tiền mặt</Text>
-                    </View>
-                    <RadioButton
-                      value="COD"
-                      status={
-                        selectedMethod === 'COD' ? 'checked' : 'unchecked'
-                      }
-                      onPress={() => setSelectedMethod('COD')}
-                      color="#E8900C"
-                    />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    activeOpacity={1}
-                    style={styles.optionContainer}
-                    onPress={() => setSelectedMethod('Zalo')}>
-                    <View style={styles.optionContent}>
-                      <Image
-                        source={{
-                          uri: 'https://www.plusweb.vn/uploads/public/2021/06/03/1622682588188_zalopay.png',
-                        }}
-                        style={styles.logo}
-                      />
-                      <Text style={styles.optionText}>Ví điện tử ZaloPay</Text>
-                    </View>
-
-                    <RadioButton
-                      value="Zalo"
-                      status={
-                        selectedMethod === 'Zalo' ? 'checked' : 'unchecked'
-                      }
-                      onPress={() => setSelectedMethod('Zalo')}
-                      color="#E8900C"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              {/* Total Price */}
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  padding: wp(6),
-                  width: wp(100),
-                }}>
-                <Text style={styles.totalText}>Tổng tiền : </Text>
-                <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
-                  {checkPrice(orderType === 'user' ? totalOrder : totalTable)} đ{' '}
-                </Text>
+                  <RadioButton
+                    value="Zalo"
+                    status={selectedMethod === 'Zalo' ? 'checked' : 'unchecked'}
+                    onPress={() => setSelectedMethod('Zalo')}
+                    color="#E8900C"
+                  />
+                </TouchableOpacity>
               </View>
             </View>
 
-            {/* Button Order */}
+            {/* Total Price */}
 
-            <View style={{height: hp(10)}}>
-              <TouchableOpacity
-                onPress={handlePayment}
-                style={styles.orderButton}>
-                <Text style={styles.orderButtonText}>Thanh toán</Text>
-              </TouchableOpacity>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: wp(6),
+                width: wp(100),
+              }}>
+              <Text style={styles.totalText}>Tổng tiền : </Text>
+              <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
+                { totalMoney()} đ{' '}
+              </Text>
             </View>
-          </LinearGradient>
-        )}
+          </View>
+
+          {/* Button Order */}
+
+          <View style={{height: hp(10)}}>
+            <TouchableOpacity
+              onPress={() =>
+                totalMoney() == 0 ? console.log('Không thanh toán vì không có giá tiền') : handlePayment(promotionCode)
+              }
+              style={
+                totalMoney() == 0
+                  ? [styles.orderButton, {backgroundColor: '#a0a0a0a0'}]
+                  : styles.orderButton
+              }>
+              <Text style={styles.orderButtonText}>Thanh toán</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
@@ -531,7 +645,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#525252',
   },
-  headerText:{
+  headerText: {
     fontSize: hp(3),
     fontWeight: '600',
     color: '#525252',

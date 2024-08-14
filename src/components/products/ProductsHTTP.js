@@ -52,7 +52,7 @@ export const getMenuItem = async categoryId => {
   try {
     const url = `v1/menu-items/get-by-category/${categoryId}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.get(url); // GET request không cần body
+    const res = await axiosInstance.get(url); // GET request no need body
     // console.log(res.data,'=========API MENU ITEM=============');
     return res.data; // Trả về dữ liệu từ API
   } catch (err) {
@@ -77,7 +77,7 @@ export const getTables = async tableId => {
     const url = `v1/tables/${tableId}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request không cần body
-    // console.log(res.data,'=========API Table=============');
+    await AsyncStorage.setItem('tableNumber', JSON.stringify(res.data.tableNumber));
     return res.data; // Trả về dữ liệu từ API
   } catch (err) {
     if (err?.response) {
@@ -138,7 +138,6 @@ export const getOrderUser = async () => {
 
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request và gửi token user
-
     // Trả về dữ liệu từ API
     return res;
   } catch (err) {
@@ -156,13 +155,15 @@ export const getOrderUser = async () => {
 };
 
 // get Order User
-export const getOrderTable = async () => {
+export const getOrderTable = async (promotionCode) => {
   try {
     const tableId = await AsyncStorage.getItem('idTable');
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const url = `v1/tables/${tableId}/orders`; // Chèn idTable vào URL
+    const body = promotionCode
+    console.log( 'body getOrder resquest to sever', body);
+    const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
@@ -207,15 +208,20 @@ export const deleteOrder = async (tableId, itemId) => {
 };
 
 // Pay for user with cash
-export const paymentCodUser = async () => {
+export const paymentCodUser = async (promotionCode) => {
+  const tableNumber = await AsyncStorage.getItem('tableNumber');
+  const userId = await AsyncStorage.getItem('userID');
   try {
-    const tableId = await AsyncStorage.getItem('idTable');
-    if (!tableId) {
-      throw new Error('Không tìm thấy ID bàn');
+    const body = {
+    "tableNumber": tableNumber,
+    "voucher": promotionCode,
+    "userId": userId
     }
-    const url = `v1/payments/cashpayment/${tableId}?userId=true`;
+    console.log('body --------- ', body);
+    
+    const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.post(url);
+    const res = await axiosInstance.post(url, body);
     return res.data;
   } catch (err) {
     if (err.response) {
@@ -257,15 +263,20 @@ export const paymentZaloUser = async () => {
 };
 
 // Pay for table with cash
-export const paymentCodTable = async () => {
+export const paymentCodTable = async (promotionCode) => {
+  const tableNumber = await AsyncStorage.getItem('tableNumber');
+  const userId = await AsyncStorage.getItem('userID');
   try {
-    const tableId = await AsyncStorage.getItem('idTable');
-    if (!tableId) {
-      throw new Error('Không tìm thấy ID bàn');
-    }
-    const url = `v1/payments/cashpayment/${tableId}`;
+    const body = {
+      "tableNumber": tableNumber,
+      "voucher": promotionCode,
+      "userId": userId
+      }
+      console.log('body --------- ', body);
+
+    const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.post(url);
+    const res = await axiosInstance.post(url, body);
     return res.data;
   } catch (err) {
     if (err.response) {
@@ -309,7 +320,7 @@ export const paymentZaloTable = async () => {
 // Get all available voucher
 export const getApiVoucher = async () => {
   try {
-    const url = `v1/promotions`;
+    const url = `v1/promotions?isActive=true`;
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
     // Trả về dữ liệu từ API
@@ -350,3 +361,5 @@ export const getHistoryOrder = async() =>{
     }
   }
 }
+
+//

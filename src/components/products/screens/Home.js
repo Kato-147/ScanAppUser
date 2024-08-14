@@ -22,26 +22,62 @@ import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
 import {infoProfile} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
+import {getInfoApi, getNewsApi} from '../../users/UserHTTP';
+import {cutStr} from './Cart';
+import {formatDate} from './DetailHistoryOrder';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = props => {
   const {navigation} = props;
   const [userInfo, setUserInfo] = useState(null);
+  const [news, setnews] = useState([]);
   const isFocused = useIsFocused();
+  const [loading, setloading] = useState(true);
+
+  useEffect(() => {
+    const getAllKeys = async () => {
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        console.log('All keys:', keys);
+      } catch (error) {
+        console.error('Error getting keys:', error);
+      }
+    };
+
+    // Gọi hàm để xem các key
+    getAllKeys();
+  }, []);
 
   useEffect(() => {
     if (isFocused) {
-      const fetchProfileInfo = async () => {
-        try {
-          const data = await infoProfile();
-          setUserInfo(data);
-        } catch (err) {
-          setError(err.message);
-          ToastAndroid.show(err.message, ToastAndroid.SHORT);
-        }
-      };
+      getNews();
       fetchProfileInfo();
     }
   }, [isFocused]);
+
+  const fetchProfileInfo = async () => {
+    try {
+      const data = await infoProfile();
+      setUserInfo(data);
+    } catch (err) {
+      setError(err.message);
+      ToastAndroid.show(err.message, ToastAndroid.SHORT);
+    }
+  };
+
+  const getNews = async () => {
+    try {
+      const response = await getInfoApi();
+      console.log('====================================');
+      console.log(response.data);
+      console.log('====================================');
+      setnews(response.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setloading(false);
+    }
+  };
 
   const handleScanHome = () => {
     navigation.navigate('ScanHome');
@@ -50,16 +86,36 @@ const Home = props => {
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
-        style={{}}
+        style={styles.itemFlatlist}
         activeOpacity={1}
         onPress={() => {
           console.log(item.id);
-          // navigation.navigate('Detail', { newsId: _id });
+           navigation.navigate('DetailNews', {item });
         }}>
-        <View style={styles.itemFlatlist}>
-          <Image style={styles.imageVoucherItem} source={item.image} />
-          <Text>{item.name}</Text>
-          {/* <Text>{item.description}</Text> */}
+        {/* Image */}
+        <View
+          style={{
+            width: wp(25),
+            height: hp(12),
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Image style={styles.image} source={{uri: item.image_url[0]}} />
+        </View>
+
+        {/* info */}
+        <View style={styles.detailsContainer}>
+          <Text
+            numberOfLines={1}
+            style={{fontSize: hp(2.2), fontWeight: 'bold'}}>
+            {item.title}
+          </Text>
+          <Text numberOfLines={1} style={{fontSize: hp(1.8)}}>
+            {item.summary}
+          </Text>
+          <Text numberOfLines={1} style={{fontSize: hp(1.8)}}>
+            Ngày đăng :{formatDate(item.createdAt)}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -96,24 +152,21 @@ const Home = props => {
                   source={{uri: userInfo.data.user.img_avatar_url}}
                   style={styles.avatarImage}
                 />
-                <Text
-                  style={{
-                    fontSize: hp(2.2),
-                    letterSpacing: 1,
-                    fontWeight: 'bold',
-                    color: '#000000',
-                  }}>
-                  {userInfo.data.user.fullName}
-                </Text>
+                <View style={{gap: 5}}>
+                  <Text>Xin chào !</Text>
+                  <Text
+                    style={{
+                      fontSize: hp(2.2),
+                      letterSpacing: 1,
+                      fontWeight: 'bold',
+                      color: '#000000',
+                      marginStart: wp(3),
+                    }}>
+                    {userInfo.data.user.fullName}
+                  </Text>
+                </View>
               </View>
             )}
-            <TouchableOpacity>
-              <IconChat
-                name="chatbox-ellipses-outline"
-                size={wp(7)}
-                color="#E8900C"
-              />
-            </TouchableOpacity>
           </View>
 
           {/* Body */}
@@ -141,28 +194,59 @@ const Home = props => {
               </TouchableOpacity>
             </View>
 
-            {/* Voucher */}
-            <View style={{height: hp(60)}}>
+            {/* News */}
+            <View style={{height: hp(58), width: wp(100)}}>
               <Text
                 style={{
-                  fontSize: hp(2.8),
-                  fontWeight: '500',
+                  fontSize: hp(3),
+                  fontWeight: 'bold',
                   color: 'black',
-                  marginTop: 5,
-                  marginStart: 24,
+                  marginStart: wp(5),
                 }}>
                 Thông báo
               </Text>
-              <FlatList
-                numColumns={2}
-                showsVerticalScrollIndicator={false}
-                style={{width: hp(45), alignSelf: 'center'}}
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={(item, index) =>
-                  item.id ? item.id.toString() : index.toString()
-                }
-              />
+              {loading ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    width: wp(100),
+                    gap: wp(5),
+                    justifyContent: 'center',
+                    height: hp(40),
+                  }}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                  {/* style={styles.avatarImage} */}
+                </View>
+              ) : (
+                <View>
+                  {news.length === 0 ? (
+                    <View
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <Text>Không có thông báo</Text>
+                    </View>
+                  ) : (
+                    <FlatList
+                      //  numColumns={2}
+                      showsVerticalScrollIndicator={false}
+                      style={{
+                        width: '100%',
+                        alignSelf: 'center',
+                        marginTop: hp(2),
+                      }}
+                      data={news}
+                      renderItem={renderItem}
+                      keyExtractor={item => item.id} // Sử dụng `id` làm key
+                      contentContainerStyle={styles.menuList}
+                    />
+                  )}
+                </View>
+              )}
             </View>
           </View>
         </LinearGradient>
@@ -215,84 +299,31 @@ const styles = StyleSheet.create({
     height: 50,
     marginTop: 5,
   },
-  imageVoucherItem: {
-    width: 50,
-    height: 50,
-    backgroundColor: 'red',
-  },
   itemFlatlist: {
-    margin: 5,
+    width: wp(95),
+    height: hp(12),
+    marginVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: 'white',
-    padding: 10,
+    marginHorizontal: wp(2),
     borderRadius: 10,
-    // alignSelf:'center',
-    width: hp(21),
+  },
+  menuList: {
+    paddingBottom: 20,
+    marginTop: 5,
+  },
+  image: {
+    width: wp(25),
+    height: wp(25),
+    borderRadius: 10,
+  },
+  detailsContainer: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'space-around',
+    width: wp(50),
+    paddingStart: wp(2),
   },
 });
-
-const data = [
-  {
-    id: '1',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 1',
-    description: 'Description for item 1',
-  },
-  {
-    id: '2',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 2',
-    description: 'Description for item 2',
-  },
-  {
-    id: '3',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '4',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '5',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '6',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '7',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 3',
-    description: 'Description for item 3',
-  },
-  {
-    id: '6',
-    image: {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
-    },
-    name: 'Item 8',
-    description: 'Description for item 3',
-  },
-];

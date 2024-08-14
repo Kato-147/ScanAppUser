@@ -1,5 +1,5 @@
-import {StyleSheet, Text, View, Image} from 'react-native';
-import React, {useEffect} from 'react';
+import {StyleSheet, Text, View, Image, ToastAndroid} from 'react-native';
+import React, {useEffect, useMemo, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, {useSharedValue, withSpring} from 'react-native-reanimated';
 import {
@@ -7,11 +7,20 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
+import { requestUserPermission } from '../../../helper/notificationService';
 
 const Splash = ({navigation}) => {
+
   const ring1padding = useSharedValue(0);
   const ring2padding = useSharedValue(0);
 
+  // call requestUserPermission function
+  useMemo(() => {
+    
+    requestUserPermission();
+  }, []);
+
+  //Animation logo
   useEffect(() => {
     ring1padding.value = 0;
     ring2padding.value = 0;
@@ -27,8 +36,10 @@ const Splash = ({navigation}) => {
     // setTimeout(() => navigation.navigate('Home'),2500);
   }, []);
 
+  // Call checkToken function
   useEffect(() => {
     const checkToken = async () => {
+
       ring1padding.value = 0;
       ring2padding.value = 0;
       setTimeout(
@@ -55,9 +66,11 @@ const Splash = ({navigation}) => {
         setTimeout(() => navigation.replace('Login'), 1000);
       }
     };
-
+   
     // Gọi hàm checkToken để kiểm tra token khi component được mount
     checkToken();
+    
+
   }, [navigation]);
 
   return (
