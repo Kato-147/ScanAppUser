@@ -43,15 +43,23 @@ const DetailNews = ({route, navigation}) => {
         <Text style={styles.headerText}>THÔNG BÁO </Text>
       </View>
 
-      <ScrollView
-      showsVerticalScrollIndicator = {false}
-      >
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* Body */}
         <View style={styles.bodyContainer}>
-          <Image style={styles.image} source={{uri: itemNews.item.image_url[0]}} />
+          {itemNews.item.image_url.length === 0 ? (
+            <Image
+            style={styles.image}
+            source={{uri: 'https://t3.ftcdn.net/jpg/04/62/93/66/360_F_462936689_BpEEcxfgMuYPfTaIAOC1tCDurmsno7Sp.jpg'}}
+          />
+          ) : (
+            <Image
+              style={styles.image}
+              source={{uri: itemNews.item.image_url[0]}}
+            />
+          )}
 
           {/* info */}
-          <View style={{ paddingHorizontal: wp(3)}}>
+          <View style={{paddingHorizontal: wp(3)}}>
             <Text numberOfLines={2} style={styles.title}>
               {itemNews.item.title}
             </Text>
@@ -60,11 +68,6 @@ const DetailNews = ({route, navigation}) => {
               Thời gian đăng bài : {formatDate(itemNews.item.createdAt)}
             </Text>
 
-            <Text style={styles.description}>{itemNews.item.summary}</Text>
-            <Text style={styles.description}>{itemNews.item.summary}</Text>
-            <Text style={styles.description}>{itemNews.item.summary}</Text>
-            <Text style={styles.description}>{itemNews.item.summary}</Text>
-            <Text style={styles.description}>{itemNews.item.summary}</Text>
             <Text style={styles.description}>{itemNews.item.summary}</Text>
           </View>
         </View>
@@ -114,10 +117,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: hp(2.8),
     color: '#202020',
-    marginVertical: hp(2)
+    marginVertical: hp(2),
   },
   time: {
-    marginBottom: hp(2)
+    marginBottom: hp(2),
   },
   description: {
     color: '#202020',

@@ -72,13 +72,19 @@ export const getMenuItem = async categoryId => {
 };
 
 // Get Table
-export const getTables = async tableId => {
+export const getTables = async (tableId, tableType) => {
   try {
+    const body = {
+      type: tableType,
+    };
     const url = `v1/tables/${tableId}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.get(url); // GET request không cần body
-    await AsyncStorage.setItem('tableNumber', JSON.stringify(res.data.tableNumber));
-    return res.data; // Trả về dữ liệu từ API
+    const res = await axiosInstance.get(url, body); // GET request không cần body
+    await AsyncStorage.setItem(
+      'tableNumber',
+      JSON.stringify(res.data.tableNumber),
+    );
+    return res; // Trả về dữ liệu từ API
   } catch (err) {
     if (err?.response) {
       console.log('API error:', err?.response);
@@ -155,14 +161,14 @@ export const getOrderUser = async () => {
 };
 
 // get Order User
-export const getOrderTable = async (promotionCode) => {
+export const getOrderTable = async promotionCode => {
   try {
     const tableId = await AsyncStorage.getItem('idTable');
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const body = promotionCode
-    console.log( 'body getOrder resquest to sever', body);
+    const body = promotionCode;
+    console.log('body getOrder resquest to sever', body);
     const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
@@ -199,7 +205,9 @@ export const deleteOrder = async (tableId, itemId) => {
     if (error.response.data.message === 'Time out to delete') {
       ToastAndroid.show('Hết thời gian để hủy món', ToastAndroid.SHORT);
     }
-    if (error.response.data.message === 'You cannot delete other people\'s item') {
+    if (
+      error.response.data.message === "You cannot delete other people's item"
+    ) {
       ToastAndroid.show('Không thể hủy món của người khác', ToastAndroid.SHORT);
     }
     console.log('Error deleting order:', error.response.data);
@@ -208,17 +216,17 @@ export const deleteOrder = async (tableId, itemId) => {
 };
 
 // Pay for user with cash
-export const paymentCodUser = async (promotionCode) => {
+export const paymentCodUser = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const userId = await AsyncStorage.getItem('userID');
   try {
     const body = {
-    "tableNumber": tableNumber,
-    "voucher": promotionCode,
-    "userId": userId
-    }
+      tableNumber: tableNumber,
+      voucher: promotionCode,
+      userId: userId,
+    };
     console.log('body --------- ', body);
-    
+
     const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.post(url, body);
@@ -263,16 +271,16 @@ export const paymentZaloUser = async () => {
 };
 
 // Pay for table with cash
-export const paymentCodTable = async (promotionCode) => {
+export const paymentCodTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const userId = await AsyncStorage.getItem('userID');
   try {
     const body = {
-      "tableNumber": tableNumber,
-      "voucher": promotionCode,
-      "userId": userId
-      }
-      console.log('body --------- ', body);
+      tableNumber: tableNumber,
+      voucher: promotionCode,
+      userId: userId,
+    };
+    console.log('body --------- ', body);
 
     const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
@@ -337,11 +345,10 @@ export const getApiVoucher = async () => {
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
   }
-
-}
+};
 
 // Get History Order
-export const getHistoryOrder = async() =>{
+export const getHistoryOrder = async () => {
   try {
     const url = `v1/payments/payments-history`;
     const axiosInstance = await AxiosInstance();
@@ -360,6 +367,75 @@ export const getHistoryOrder = async() =>{
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
   }
-}
+};
 
-//
+// Create Soft QR Code
+export const createQRCodeApi = async () => {
+  try {
+    const data = await AsyncStorage.getItem('idTable');
+    const idTable = JSON.parse(data).tableId;
+    const url = `v1/tables/table-in-use/${idTable}`;
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.post(url); // GET request tới URL đã chỉnh sửa
+
+    // Trả về dữ liệu từ API
+    return response;
+  } catch (error) {
+    if (error.response) {
+      console.log('API error:', error.response.data);
+      throw new Error(error.response.data.message || 'Lỗi create qr code');
+    } else if (error.request) {
+      console.log('No response from API:', error.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', error.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+// Get all User in table
+export const getUserInTableApi = async () => {
+  try {
+    const data = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(data).tableId;
+    const url = `v1/tables/table-in-use/${tableId}`;
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.get(url);
+    // Trả về dữ liệu từ API
+    return response;
+  } catch (error) {
+    if (error.response) {
+      console.log('API error:', error.response.data);
+      throw new Error(error.response.data.message || 'Lỗi get all user in table');
+    } else if (error.request) {
+      console.log('No response from API:', error.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', error.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+// Logout table in menu
+export const logOutTableApi = async()=>{
+  try {
+    const url = `v1/tables/table-in-use`;
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.patch(url);
+    // Trả về dữ liệu từ API
+    return response;
+  } catch (error) {
+    if (error.response) {
+      console.log('API error:', error.response.data);
+      throw new Error(error.response.data.message || 'Lỗi get all user in table');
+    } else if (error.request) {
+      console.log('No response from API:', error.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', error.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+}

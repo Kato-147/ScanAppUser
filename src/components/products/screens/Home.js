@@ -68,9 +68,6 @@ const Home = props => {
   const getNews = async () => {
     try {
       const response = await getInfoApi();
-      console.log('====================================');
-      console.log(response.data);
-      console.log('====================================');
       setnews(response.data);
     } catch (error) {
       console.log(error);
@@ -83,6 +80,7 @@ const Home = props => {
     navigation.navigate('ScanHome');
   };
 
+  //Render News
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
@@ -90,18 +88,35 @@ const Home = props => {
         activeOpacity={1}
         onPress={() => {
           console.log(item.id);
-           navigation.navigate('DetailNews', {item });
+          navigation.navigate('DetailNews', {item});
         }}>
         {/* Image */}
-        <View
-          style={{
-            width: wp(25),
-            height: hp(12),
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image style={styles.image} source={{uri: item.image_url[0]}} />
-        </View>
+        {item.image_url.length === 0 ? (
+          <View
+            style={{
+              width: wp(25),
+              height: hp(12),
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              style={styles.image}
+              source={{
+                uri: 'https://t3.ftcdn.net/jpg/04/62/93/66/360_F_462936689_BpEEcxfgMuYPfTaIAOC1tCDurmsno7Sp.jpg',
+              }}
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              width: wp(25),
+              height: hp(12),
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image style={styles.image} source={{uri: item.image_url[0]}} />
+          </View>
+        )}
 
         {/* info */}
         <View style={styles.detailsContainer}>
@@ -195,7 +210,7 @@ const Home = props => {
             </View>
 
             {/* News */}
-            <View style={{height: hp(58), width: wp(100)}}>
+            <View style={{height: hp(54), width: wp(100)}}>
               <Text
                 style={{
                   fontSize: hp(3),

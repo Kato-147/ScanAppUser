@@ -117,6 +117,8 @@ const DetailHistoryOrder = ({route, navigation}) => {
           contentContainerStyle={{paddingBottom: 20, marginTop: 5}}
         />
       </View>
+
+      
       <View style={{width:wp(100), alignItems:'center', justifyContent:'center'}}>
       <TouchableOpacity
         style={styles.infoContainer}
