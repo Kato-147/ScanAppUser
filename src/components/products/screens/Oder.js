@@ -102,27 +102,26 @@ const Oder = ({navigation}) => {
   const isFocused = useIsFocused();
   const [promotionCode, setpromotionCode] = useState('');
 
-
   useEffect(() => {
     if (isFocused) {
-     // fix();
-      loadOrderUser();
+      // fix();
+      loadOrderUser(promotionCode);
       loadOrderTable(promotionCode);
     }
   }, [
     isFocused,
     loadOrderUser,
     deleted,
-   orderType,
+    orderType,
     loadOrderTable,
     handleApplyVoucher,
   ]);
 
   // gọi api load order theo user
-  const loadOrderUser = async () => {
+  const loadOrderUser = async promotionCode => {
     try {
-      const response = await getOrderUser();
-      
+      const response = await getOrderUser(promotionCode);
+
       if (response.success === 'success') {
         const mergedItems = mergeOrderItems(response?.data);
         setOderItems(mergedItems);
@@ -143,7 +142,7 @@ const Oder = ({navigation}) => {
   const loadOrderTable = async promotionCode => {
     try {
       const response = await getOrderTable(promotionCode);
-     // console.log(response);
+      // console.log(response);
       if (response.success === 'success') {
         settotalTable(response.totalAmount);
         const mergedItems = mergeOrderItems(response?.data);
@@ -161,11 +160,9 @@ const Oder = ({navigation}) => {
 
   const onclickUser = async () => {
     setorderType('user');
-   
   };
   const onclickTable = () => {
     setorderType('table');
-    
   };
 
   if (loading) {
@@ -223,8 +220,8 @@ const Oder = ({navigation}) => {
     }
   };
 
-// Hàm xử lý khi người dùng nhấn nút thanh toán
-  const handlePayment = (promotionCode) => {
+  // Hàm xử lý khi người dùng nhấn nút thanh toán
+  const handlePayment = promotionCode => {
     if (orderType === 'user' && selectedMethod === 'COD') {
       handlePaymentCOD(promotionCode);
     }
@@ -243,12 +240,14 @@ const Oder = ({navigation}) => {
   };
 
   // Hàm xử lý thanh toán tiền mặt
-  const handlePaymentCOD = async (promotionCode) => {
+  const handlePaymentCOD = async promotionCode => {
     console.log('COD');
     try {
       await paymentCodUser(promotionCode);
-      Alert.alert('Chờ phục vụ xác nhận ... ', 'Vui lòng chờ phục vụ xác nhận thanh toán !');
-     
+      Alert.alert(
+        'Chờ phục vụ xác nhận ... ',
+        'Vui lòng chờ phục vụ xác nhận thanh toán !',
+      );
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
@@ -275,11 +274,14 @@ const Oder = ({navigation}) => {
   };
 
   // Hàm xử lý thanh toán tiền mặt theo bàn
-  const handlePaymentCodTable = async (promotionCode) => {
+  const handlePaymentCodTable = async promotionCode => {
     console.log('pay cod table');
     try {
       await paymentCodTable(promotionCode);
-      Alert.alert('Chờ phục vụ xác nhận ... ', 'Vui lòng chờ phục vụ xác nhận thanh toán !');
+      Alert.alert(
+        'Chờ phục vụ xác nhận ... ',
+        'Vui lòng chờ phục vụ xác nhận thanh toán !',
+      );
     } catch (err) {
       // setError(err.message);
       console.log('------error-------', err);
@@ -287,7 +289,7 @@ const Oder = ({navigation}) => {
     }
   };
 
-// Hàm xử lý thanh toán zalo theo bàn
+  // Hàm xử lý thanh toán zalo theo bàn
   const handlePaymentZaloTable = async () => {
     console.log(' pay Zalo table');
     try {
@@ -318,7 +320,7 @@ const Oder = ({navigation}) => {
     }
   };
 
-// Hàm hiển thị item món ăn
+  // Hàm hiển thị item món ăn
   const renderOrderItem = ({item}) => {
     return (
       <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
@@ -377,12 +379,14 @@ const Oder = ({navigation}) => {
     );
   };
 
-// Hàm tính tổng tiền
-function totalMoney (){
-return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
-}
+  // Hàm tính tổng tiền
+  function totalMoney() {
+    return orderType === 'user'
+      ? checkPrice(totalOrder)
+      : checkPrice(totalTable);
+  }
 
-//Hàm hiển thị flatlist
+  //Hàm hiển thị flatlist
   const handleFlatlist = () => {
     if (orderType === 'user') {
       if (oderItems.length === 0) {
@@ -404,15 +408,15 @@ return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
           </View>
         );
       } else {
-        return  (
+        return (
           <FlatList
-          data={oderItems}
-          keyExtractor={item => item._id.toString()}
-          renderItem={renderOrderItem}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.menuList}
-        />
-        )
+            data={oderItems}
+            keyExtractor={item => item._id.toString()}
+            renderItem={renderOrderItem}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.menuList}
+          />
+        );
       }
     } else {
       if (orderTables.length === 0) {
@@ -596,7 +600,7 @@ return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
               }}>
               <Text style={styles.totalText}>Tổng tiền : </Text>
               <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
-                { totalMoney()} đ{' '}
+                {totalMoney()} đ{' '}
               </Text>
             </View>
           </View>
@@ -606,7 +610,9 @@ return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
           <View style={{height: hp(10)}}>
             <TouchableOpacity
               onPress={() =>
-                totalMoney() == 0 ? console.log('Không thanh toán vì không có giá tiền') : handlePayment(promotionCode)
+                totalMoney() == 0
+                  ? console.log('Không thanh toán vì không có giá tiền')
+                  : handlePayment(promotionCode)
               }
               style={
                 totalMoney() == 0

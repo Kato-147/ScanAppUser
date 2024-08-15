@@ -77,7 +77,10 @@ export const getTables = async tableId => {
     const url = `v1/tables/${tableId}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request không cần body
-    await AsyncStorage.setItem('tableNumber', JSON.stringify(res.data.tableNumber));
+    await AsyncStorage.setItem(
+      'tableNumber',
+      JSON.stringify(res.data.tableNumber),
+    );
     return res.data; // Trả về dữ liệu từ API
   } catch (err) {
     if (err?.response) {
@@ -128,13 +131,14 @@ export const postOrder = async () => {
 };
 
 // get Order User
-export const getOrderUser = async () => {
+export const getOrderUser = async promotionCode => {
   try {
     const tableId = await AsyncStorage.getItem('idTable');
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const url = `v1/tables/${tableId}/orders?userId=true`; // Endpoint API
+    const body = promotionCode;
+    const url = `v1/tables/${tableId}/orders?userId=true&promotionCode=${body}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request và gửi token user
@@ -155,20 +159,19 @@ export const getOrderUser = async () => {
 };
 
 // get Order User
-export const getOrderTable = async (promotionCode) => {
+export const getOrderTable = async promotionCode => {
   try {
     const tableId = await AsyncStorage.getItem('idTable');
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const body = promotionCode
-    console.log( 'body getOrder resquest to sever', body);
+    const body = promotionCode;
+    console.log('body getOrder resquest to sever', body);
     const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
 
-    // Trả về dữ liệu từ API
     return response;
   } catch (err) {
     if (err.response) {
@@ -199,7 +202,9 @@ export const deleteOrder = async (tableId, itemId) => {
     if (error.response.data.message === 'Time out to delete') {
       ToastAndroid.show('Hết thời gian để hủy món', ToastAndroid.SHORT);
     }
-    if (error.response.data.message === 'You cannot delete other people\'s item') {
+    if (
+      error.response.data.message === "You cannot delete other people's item"
+    ) {
       ToastAndroid.show('Không thể hủy món của người khác', ToastAndroid.SHORT);
     }
     console.log('Error deleting order:', error.response.data);
@@ -208,17 +213,17 @@ export const deleteOrder = async (tableId, itemId) => {
 };
 
 // Pay for user with cash
-export const paymentCodUser = async (promotionCode) => {
+export const paymentCodUser = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const userId = await AsyncStorage.getItem('userID');
   try {
     const body = {
-    "tableNumber": tableNumber,
-    "voucher": promotionCode,
-    "userId": userId
-    }
+      tableNumber: tableNumber,
+      voucher: promotionCode,
+      userId: userId,
+    };
     console.log('body --------- ', body);
-    
+
     const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.post(url, body);
@@ -263,16 +268,16 @@ export const paymentZaloUser = async () => {
 };
 
 // Pay for table with cash
-export const paymentCodTable = async (promotionCode) => {
+export const paymentCodTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const userId = await AsyncStorage.getItem('userID');
   try {
     const body = {
-      "tableNumber": tableNumber,
-      "voucher": promotionCode,
-      "userId": userId
-      }
-      console.log('body --------- ', body);
+      tableNumber: tableNumber,
+      voucher: promotionCode,
+      userId: userId,
+    };
+    console.log('body --------- ', body);
 
     const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
@@ -337,11 +342,10 @@ export const getApiVoucher = async () => {
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
   }
-
-}
+};
 
 // Get History Order
-export const getHistoryOrder = async() =>{
+export const getHistoryOrder = async () => {
   try {
     const url = `v1/payments/payments-history`;
     const axiosInstance = await AxiosInstance();
@@ -360,6 +364,6 @@ export const getHistoryOrder = async() =>{
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
   }
-}
+};
 
 //

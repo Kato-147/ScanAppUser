@@ -90,7 +90,7 @@ const Home = props => {
         activeOpacity={1}
         onPress={() => {
           console.log(item.id);
-           navigation.navigate('DetailNews', {item });
+          navigation.navigate('DetailNews', {item});
         }}>
         {/* Image */}
         <View
@@ -107,13 +107,13 @@ const Home = props => {
         <View style={styles.detailsContainer}>
           <Text
             numberOfLines={1}
-            style={{fontSize: hp(2.2), fontWeight: 'bold'}}>
+            style={{fontSize: hp(2.2), fontWeight: 'bold', color: 'black'}}>
             {item.title}
           </Text>
-          <Text numberOfLines={1} style={{fontSize: hp(1.8)}}>
+          <Text numberOfLines={1} style={{fontSize: hp(1.8), color: 'black'}}>
             {item.summary}
           </Text>
-          <Text numberOfLines={1} style={{fontSize: hp(1.8)}}>
+          <Text numberOfLines={1} style={{fontSize: hp(1.8), color: 'black'}}>
             Ngày đăng :{formatDate(item.createdAt)}
           </Text>
         </View>
