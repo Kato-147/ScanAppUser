@@ -26,6 +26,7 @@ import {
   getOrderUser,
   paymentCodTable,
   paymentCodUser,
+  paymentZaloTable,
   paymentZaloUser,
 } from '../ProductsHTTP';
 import {useIsFocused} from '@react-navigation/native';
@@ -101,12 +102,15 @@ const Oder = ({navigation}) => {
   const [orderType, setorderType] = useState('user'); //table
   const isFocused = useIsFocused();
   const [promotionCode, setpromotionCode] = useState('');
+  console.log('====================================');
+  console.log(totalOrder);
+  console.log('====================================');
 
 
   useEffect(() => {
     if (isFocused) {
      // fix();
-      loadOrderUser();
+      loadOrderUser(promotionCode);
       loadOrderTable(promotionCode);
     }
   }, [
@@ -119,9 +123,9 @@ const Oder = ({navigation}) => {
   ]);
 
   // gọi api load order theo user
-  const loadOrderUser = async () => {
+  const loadOrderUser = async (promotionCode) => {
     try {
-      const response = await getOrderUser();
+      const response = await getOrderUser(promotionCode);
       
       if (response.success === 'success') {
         const mergedItems = mergeOrderItems(response?.data);
@@ -229,13 +233,13 @@ const Oder = ({navigation}) => {
       handlePaymentCOD(promotionCode);
     }
     if (orderType === 'user' && selectedMethod === 'Zalo') {
-      handlePaymentZalo();
+      handlePaymentZalo(promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'COD') {
       handlePaymentCodTable(promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'Zalo') {
-      handlePaymentZaloTable();
+      handlePaymentZaloTable(promotionCode);
     }
     // } else{
     //   ToastAndroid.show('co loi xay ra!', ToastAndroid.SHORT);
@@ -257,10 +261,10 @@ const Oder = ({navigation}) => {
   };
 
   // Hàm xử lý thanh toán zalo
-  const handlePaymentZalo = async () => {
+  const handlePaymentZalo = async (promotionCode) => {
     console.log('Zalo');
     try {
-      const response = await paymentZaloUser();
+      const response = await paymentZaloUser(promotionCode);
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
@@ -288,15 +292,14 @@ const Oder = ({navigation}) => {
   };
 
 // Hàm xử lý thanh toán zalo theo bàn
-  const handlePaymentZaloTable = async () => {
+  const handlePaymentZaloTable = async (promotionCode) => {
     console.log(' pay Zalo table');
     try {
-      const response = await paymentZaloUser();
+      const response = await paymentZaloTable(promotionCode);
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
           payZP.payOrder(response.order_token);
-          await AsyncStorage.removeItem('idTable');
         };
         payOrder();
       }
@@ -312,7 +315,7 @@ const Oder = ({navigation}) => {
     console.log('Handle ApplyVoucher', promotionCode);
     console.log('====================================');
     try {
-      loadOrderTable(promotionCode);
+      orderType === 'user' ? loadOrderUser(promotionCode) :loadOrderTable(promotionCode);
     } catch (error) {
       console.log('handle Apply Voucher', error);
     }

@@ -104,7 +104,8 @@ export const postOrder = async () => {
   try {
     // Lấy dữ liệu giỏ hàng từ AsyncStorage
     let cartItems = await AsyncStorage.getItem('cartItems');
-    let tableId = await AsyncStorage.getItem('idTable');
+    const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
     console.log('...tableId ', tableId);
 
     cartItems = cartItems ? JSON.parse(cartItems) : [];
@@ -134,13 +135,16 @@ export const postOrder = async () => {
 };
 
 // get Order User
-export const getOrderUser = async () => {
+export const getOrderUser = async (promotionCode) => {
   try {
-    const tableId = await AsyncStorage.getItem('idTable');
+    const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const url = `v1/tables/${tableId}/orders?userId=true`; // Endpoint API
+    const body = promotionCode;
+    console.log('body getOrder User resquest to sever', body);
+    const url = `v1/tables/${tableId}/orders?userId=true&promotionCode=${body}`; // Endpoint API
 
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request và gửi token user
@@ -163,12 +167,13 @@ export const getOrderUser = async () => {
 // get Order User
 export const getOrderTable = async promotionCode => {
   try {
-    const tableId = await AsyncStorage.getItem('idTable');
+    const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
     const body = promotionCode;
-    console.log('body getOrder resquest to sever', body);
+    console.log('body getOrder table resquest to sever', body);
     const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
@@ -246,15 +251,21 @@ export const paymentCodUser = async promotionCode => {
 };
 
 // Pay for user with ZaloPay
-export const paymentZaloUser = async () => {
+export const paymentZaloUser = async (promotionCode) => {
+  const tableNumber = await AsyncStorage.getItem('tableNumber');
+  const userId = await AsyncStorage.getItem('userID');
+  const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
   try {
-    const tableId = await AsyncStorage.getItem('idTable');
-    if (!tableId) {
-      throw new Error('Không tìm thấy ID bàn');
-    }
+    const body = {
+      tableNumber: tableNumber,
+      promotionCode: promotionCode,
+      userId: userId,
+    };
+    console.log('body --------- ', body);
     const url = `v1/payments/zalopayment/${tableId}?userId=true`;
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.post(url);
+    const res = await axiosInstance.post(url,body);
     return res;
   } catch (err) {
     if (err.response) {
@@ -301,15 +312,21 @@ export const paymentCodTable = async promotionCode => {
 };
 
 // Pay for table with ZaloPay
-export const paymentZaloTable = async () => {
+export const paymentZaloTable = async (promotionCode) => {
+  const tableNumber = await AsyncStorage.getItem('tableNumber');
+  const userId = await AsyncStorage.getItem('userID');
+  const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
   try {
-    const tableId = await AsyncStorage.getItem('idTable');
-    if (!tableId) {
-      throw new Error('Không tìm thấy ID bàn');
-    }
+    const body = {
+      tableNumber: tableNumber,
+      promotionCode: promotionCode,
+      userId: userId,
+    };
+    console.log('body --------- ', body);
     const url = `v1/payments/zalopayment/${tableId}`;
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.post(url);
+    const res = await axiosInstance.post(url,body);
     return res;
   } catch (err) {
     if (err.response) {

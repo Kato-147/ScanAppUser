@@ -68,7 +68,7 @@ const BtShitMenu = ({setMoreOptions, setShowModal,setShowModalUser, onLogoutPres
             <ScrollView showsVerticalScrollIndicator={false} style={styles.infoContainer}>
 
                 <TouchableOpacity onPress={()=>handleCreateQR()} activeOpacity={1} style={styles.onclick}>
-                    <Text style={styles.text}>Tạo mã QR</Text>
+                    <Text style={styles.text}>Chia sẻ bàn</Text>
                     <Icon name ="keyboard-arrow-right" style={styles.icon}/>
                 </TouchableOpacity>
 
