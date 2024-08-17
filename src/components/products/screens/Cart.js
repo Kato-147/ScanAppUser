@@ -41,6 +41,8 @@ const Cart = ({navigation}) => {
   const handlePlaceOrder = async () => {
     try {
       const response = await postOrder();
+      console.log(response);
+      
       if (response.status === 'success') {
         await AsyncStorage.removeItem('cartItems');
         console.log('Cart items cleared');

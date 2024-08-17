@@ -15,7 +15,7 @@ import {
   NativeEventEmitter,
   Alert,
 } from 'react-native';
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -26,6 +26,7 @@ import {
   getOrderUser,
   paymentCodTable,
   paymentCodUser,
+  paymentZaloTable,
   paymentZaloUser,
 } from '../ProductsHTTP';
 import {useIsFocused} from '@react-navigation/native';
@@ -96,29 +97,40 @@ const Oder = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleted, setdeleted] = useState([]);
-  const [totalOrder, settotalOrder] = useState(0);
-  const [totalTable, settotalTable] = useState(0);
-  const [orderType, setorderType] = useState('user');
+  const [totalOrder, settotalOrder] = useState(totalOrder);
+  const [totalTable, settotalTable] = useState(totalTable);
+  const [orderType, setorderType] = useState('user'); //table
   const isFocused = useIsFocused();
-  const [totalAmout, settotalAmout] = useState(totalOrder);
   const [promotionCode, setpromotionCode] = useState('');
- // console.log('ádfádfsấdf', totalAmout);
-  //orderType === 'user' ? totalOrder : totalTable
+  console.log('====================================');
+  console.log(totalOrder);
+  console.log('====================================');
+
 
   useEffect(() => {
     if (isFocused) {
-      loadOrderUser();
+     // fix();
+      loadOrderUser(promotionCode);
       loadOrderTable(promotionCode);
     }
-  }, [isFocused, loadOrderUser, deleted, orderType, loadOrderTable, handleApplyVoucher]);
+  }, [
+    isFocused,
+    loadOrderUser,
+    deleted,
+   orderType,
+    loadOrderTable,
+    handleApplyVoucher,
+  ]);
 
-  const loadOrderUser = async () => {
+  // gọi api load order theo user
+  const loadOrderUser = async (promotionCode) => {
     try {
-      const response = await getOrderUser();
+      const response = await getOrderUser(promotionCode);
+      
       if (response.success === 'success') {
         const mergedItems = mergeOrderItems(response?.data);
         setOderItems(mergedItems);
-        settotalOrder(response?.totalAmount);
+        settotalOrder(response.totalAmount);
         setError(null);
       } else {
         console.log('Failed to fetch orderUser data:', response?.data);
@@ -131,11 +143,11 @@ const Oder = ({navigation}) => {
     }
   };
 
+  // gọi api load order bàn
   const loadOrderTable = async promotionCode => {
-
     try {
       const response = await getOrderTable(promotionCode);
-      console.log(response);
+     // console.log(response);
       if (response.success === 'success') {
         settotalTable(response.totalAmount);
         const mergedItems = mergeOrderItems(response?.data);
@@ -149,6 +161,15 @@ const Oder = ({navigation}) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onclickUser = async () => {
+    setorderType('user');
+   
+  };
+  const onclickTable = () => {
+    setorderType('table');
+    
   };
 
   if (loading) {
@@ -181,6 +202,7 @@ const Oder = ({navigation}) => {
   //   );
   // }
 
+  // Hủy món
   const handleDeleteItems = async itemId => {
     console.log(itemId);
     try {
@@ -205,31 +227,32 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handlePayment = () => {
+// Hàm xử lý khi người dùng nhấn nút thanh toán
+  const handlePayment = (promotionCode) => {
     if (orderType === 'user' && selectedMethod === 'COD') {
-      handlePaymentCOD();
+      handlePaymentCOD(promotionCode);
     }
     if (orderType === 'user' && selectedMethod === 'Zalo') {
-      handlePaymentZalo();
+      handlePaymentZalo(promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'COD') {
-      handlePaymentCodTable();
+      handlePaymentCodTable(promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'Zalo') {
-      handlePaymentZaloTable();
+      handlePaymentZaloTable(promotionCode);
     }
     // } else{
     //   ToastAndroid.show('co loi xay ra!', ToastAndroid.SHORT);
     // }
   };
 
-  // Hàm để xử lý thanh toán COD khi người dùng nhấn nút
-  const handlePaymentCOD = async () => {
+  // Hàm xử lý thanh toán tiền mặt
+  const handlePaymentCOD = async (promotionCode) => {
     console.log('COD');
     try {
-      await paymentCodUser();
-      Alert.alert('Thanh toán thành công!');
-      await AsyncStorage.removeItem('idTable');
+      await paymentCodUser(promotionCode);
+      Alert.alert('Chờ phục vụ xác nhận ... ', 'Vui lòng chờ phục vụ xác nhận thanh toán !');
+     
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
@@ -237,10 +260,11 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handlePaymentZalo = async () => {
+  // Hàm xử lý thanh toán zalo
+  const handlePaymentZalo = async (promotionCode) => {
     console.log('Zalo');
     try {
-      const response = await paymentZaloUser();
+      const response = await paymentZaloUser(promotionCode);
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
@@ -254,12 +278,12 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handlePaymentCodTable = async () => {
+  // Hàm xử lý thanh toán tiền mặt theo bàn
+  const handlePaymentCodTable = async (promotionCode) => {
     console.log('pay cod table');
     try {
-      await paymentCodTable();
-      Alert.alert('Thanh toán thành công!');
-      await AsyncStorage.removeItem('idTable');
+      await paymentCodTable(promotionCode);
+      Alert.alert('Chờ phục vụ xác nhận ... ', 'Vui lòng chờ phục vụ xác nhận thanh toán !');
     } catch (err) {
       // setError(err.message);
       console.log('------error-------', err);
@@ -267,15 +291,15 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handlePaymentZaloTable = async () => {
+// Hàm xử lý thanh toán zalo theo bàn
+  const handlePaymentZaloTable = async (promotionCode) => {
     console.log(' pay Zalo table');
     try {
-      const response = await paymentZaloUser();
+      const response = await paymentZaloTable(promotionCode);
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
           payZP.payOrder(response.order_token);
-          await AsyncStorage.removeItem('idTable');
         };
         payOrder();
       }
@@ -285,19 +309,19 @@ const Oder = ({navigation}) => {
     }
   };
 
-  const handleApplyVoucher = async(promotionCode) => {
-
+  //Hàm xử lý khi người dùng nhấn nút apply Voucher
+  const handleApplyVoucher = async promotionCode => {
     console.log('====================================');
     console.log('Handle ApplyVoucher', promotionCode);
     console.log('====================================');
     try {
-      
-       loadOrderTable(promotionCode)
+      orderType === 'user' ? loadOrderUser(promotionCode) :loadOrderTable(promotionCode);
     } catch (error) {
       console.log('handle Apply Voucher', error);
     }
   };
 
+// Hàm hiển thị item món ăn
   const renderOrderItem = ({item}) => {
     return (
       <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
@@ -356,8 +380,12 @@ const Oder = ({navigation}) => {
     );
   };
 
-  //const totalPrice = calculateTotalPrice(oderItems);
+// Hàm tính tổng tiền
+function totalMoney (){
+return orderType === 'user' ? checkPrice(totalOrder) : checkPrice(totalTable)
+}
 
+//Hàm hiển thị flatlist
   const handleFlatlist = () => {
     if (orderType === 'user') {
       if (oderItems.length === 0) {
@@ -379,15 +407,15 @@ const Oder = ({navigation}) => {
           </View>
         );
       } else {
-        return (
+        return  (
           <FlatList
-            data={oderItems}
-            keyExtractor={item => item._id.toString()}
-            renderItem={renderOrderItem}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.menuList}
-          />
-        );
+          data={oderItems}
+          keyExtractor={item => item._id.toString()}
+          renderItem={renderOrderItem}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.menuList}
+        />
+        )
       }
     } else {
       if (orderTables.length === 0) {
@@ -436,8 +464,7 @@ const Oder = ({navigation}) => {
                 {borderColor: orderType === 'user' ? '#E8900C' : '#525252'},
               ]}
               onPress={() => {
-                setorderType('user');
-                settotalAmout(totalOrder);
+                onclickUser();
               }}>
               <Text
                 style={[
@@ -456,8 +483,7 @@ const Oder = ({navigation}) => {
                 },
               ]}
               onPress={() => {
-                setorderType('table');
-                settotalAmout(totalTable);
+                onclickTable();
               }}>
               <Text
                 style={[
@@ -487,14 +513,14 @@ const Oder = ({navigation}) => {
                   <Icon
                     name="tagso"
                     size={24}
-                    color={totalAmout === 0 ? '#a0a0a0' : '#E8900C'}
+                    color={totalMoney() == 0 ? '#a0a0a0' : '#E8900C'}
                   />
 
                   <TextInput
                     // value={query}
                     placeholder="Nhập mã giảm giá"
                     style={
-                      totalAmout === 0
+                      totalMoney() == 0
                         ? [styles.voucherTextInput, {borderColor: '#a0a0a0'}]
                         : styles.voucherTextInput
                     }
@@ -503,9 +529,9 @@ const Oder = ({navigation}) => {
                 </View>
 
                 <TouchableOpacity
-                  onPress={()=>handleApplyVoucher(promotionCode)}
+                  onPress={() => handleApplyVoucher(promotionCode)}
                   style={{
-                    backgroundColor: totalAmout === 0 ? '#a0a0a0' : '#E8900C',
+                    backgroundColor: totalMoney() == 0 ? '#a0a0a0' : '#E8900C',
                     padding: hp(1.2),
                     borderRadius: 8,
                   }}>
@@ -573,7 +599,7 @@ const Oder = ({navigation}) => {
               }}>
               <Text style={styles.totalText}>Tổng tiền : </Text>
               <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
-                {checkPrice(totalAmout)} đ{' '}
+                { totalMoney()} đ{' '}
               </Text>
             </View>
           </View>
@@ -583,10 +609,10 @@ const Oder = ({navigation}) => {
           <View style={{height: hp(10)}}>
             <TouchableOpacity
               onPress={() =>
-                totalAmout === 0 ? console.log('có cái đb') : handlePayment()
+                totalMoney() == 0 ? console.log('Không thanh toán vì không có giá tiền') : handlePayment(promotionCode)
               }
               style={
-                totalAmout === 0
+                totalMoney() == 0
                   ? [styles.orderButton, {backgroundColor: '#a0a0a0a0'}]
                   : styles.orderButton
               }>

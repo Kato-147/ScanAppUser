@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SearchBar from '../../fragment/SearchBar';
@@ -22,9 +23,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
 import {infoProfile} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
-import {getNewsApi} from '../../users/UserHTTP';
-import { cutStr } from './Cart';
-import { formatDate } from './DetailHistoryOrder';
+import {getInfoApi, getNewsApi} from '../../users/UserHTTP';
+import {cutStr} from './Cart';
+import {formatDate} from './DetailHistoryOrder';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 
 const Home = props => {
   const {navigation} = props;
@@ -32,6 +35,71 @@ const Home = props => {
   const [news, setnews] = useState([]);
   const isFocused = useIsFocused();
   const [loading, setloading] = useState(true);
+
+  //lưu noti vào Asyntorage
+  const addNotificationToStorage = async (notification) => {
+    try {
+      const currentNotifications = await AsyncStorage.getItem('notifications');
+      let notifications = [];
+  
+      if (currentNotifications) {
+        notifications = JSON.parse(currentNotifications);
+      }
+  
+      notifications.push(notification); // Add new notification to array
+  
+      const serializedNotifications = JSON.stringify(notifications); // Convert to JSON string
+      await AsyncStorage.setItem('notifications', serializedNotifications); // Store in AsyncStorage
+    } catch (error) {
+      console.error('Error adding notification to storage:', error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+      console.log('====================================');
+      console.log('-----remoteMessage',remoteMessage);
+      console.log('====================================');
+      if (remoteMessage.notification) {
+        const { title, body } = remoteMessage.notification;
+  
+        console.log('nè nè nè', remoteMessage.data);
+  
+        if (title && body) {
+          addNotificationToStorage({ title, body }); // Add notification to AsyncStorage
+  
+          Alert.alert(
+            title,
+            body,
+            [
+              { text: 'Đóng', style: 'cancel' },
+              {
+                text: 'Đi tới hóa đơn ' + body,
+                onPress: () => navigation.navigate('HistoryOrder'),
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      }
+    });
+  
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const getAllKeys = async () => {
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        console.log('All keys:', keys);
+      } catch (error) {
+        console.error('Error getting keys:', error);
+      }
+    };
+
+    // Gọi hàm để xem các key
+    getAllKeys();
+  }, []);
 
   useEffect(() => {
     if (isFocused) {
@@ -52,12 +120,11 @@ const Home = props => {
 
   const getNews = async () => {
     try {
-      const res = await getNewsApi();
-      console.log('---------News- length------', res.data.results.length);
-      setnews(res.data.results);
+      const response = await getInfoApi();
+      setnews(response.data);
     } catch (error) {
       console.log(error);
-    }finally{
+    } finally {
       setloading(false);
     }
   };
@@ -66,6 +133,7 @@ const Home = props => {
     navigation.navigate('ScanHome');
   };
 
+  //Render News
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
@@ -73,36 +141,48 @@ const Home = props => {
         activeOpacity={1}
         onPress={() => {
           console.log(item.id);
-           navigation.navigate('DetailNews', {item });
+          navigation.navigate('DetailNews', {item});
         }}>
-          {/* Image */}
-        <View
-          style={{
-            width: wp(25),
-            height: hp(12),
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image style={styles.image} source={{uri: item.image_url}} />
-        </View>
+        {/* Image */}
+        {item.image_url.length === 0 ? (
+          <View
+            style={{
+              width: wp(25),
+              height: hp(12),
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              style={styles.image}
+              source={{
+                uri: 'https://t3.ftcdn.net/jpg/04/62/93/66/360_F_462936689_BpEEcxfgMuYPfTaIAOC1tCDurmsno7Sp.jpg',
+              }}
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              width: wp(25),
+              height: hp(12),
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image style={styles.image} source={{uri: item.image_url[0]}} />
+          </View>
+        )}
 
         {/* info */}
         <View style={styles.detailsContainer}>
           <Text
-          numberOfLines={1}
-          style={{fontSize: hp(2.2), fontWeight: 'bold'}}>
+            numberOfLines={1}
+            style={{fontSize: hp(2.2), fontWeight: 'bold'}}>
             {item.title}
           </Text>
-          <Text
-          numberOfLines={1}
-          style={{fontSize: hp(1.8)}}>
+          <Text numberOfLines={1} style={{fontSize: hp(1.8)}}>
             {item.summary}
           </Text>
-          <Text
-          numberOfLines={1}
-          style={{fontSize: hp(1.8)}}>
-            Ngày đăng : 
-            {formatDate(item.published_at)}
+          <Text numberOfLines={1} style={{fontSize: hp(1.8)}}>
+            Ngày đăng :{formatDate(item.createdAt)}
           </Text>
         </View>
       </TouchableOpacity>
@@ -142,16 +222,16 @@ const Home = props => {
                 />
                 <View style={{gap: 5}}>
                   <Text>Xin chào !</Text>
-                <Text
-                  style={{
-                    fontSize: hp(2.2),
-                    letterSpacing: 1,
-                    fontWeight: 'bold',
-                    color: '#000000',
-                    marginStart: wp(3)
-                  }}>
-                  {userInfo.data.user.fullName}
-                </Text>
+                  <Text
+                    style={{
+                      fontSize: hp(2.2),
+                      letterSpacing: 1,
+                      fontWeight: 'bold',
+                      color: '#000000',
+                      marginStart: wp(3),
+                    }}>
+                    {userInfo.data.user.fullName}
+                  </Text>
                 </View>
               </View>
             )}
@@ -183,7 +263,7 @@ const Home = props => {
             </View>
 
             {/* News */}
-            <View style={{height: hp(58), width: wp(100)}}>
+            <View style={{height: hp(54), width: wp(100)}}>
               <Text
                 style={{
                   fontSize: hp(3),
@@ -195,29 +275,46 @@ const Home = props => {
               </Text>
               {loading ? (
                 <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  width: wp(100),
-                  gap: wp(5),
-                  justifyContent:'center',
-                  height: hp(40)
-                }}>
-                <ActivityIndicator size="large" color="#0000ff" />
-                {/* style={styles.avatarImage} */}
-              </View>
-              ):(
-                <FlatList
-                //  numColumns={2}
-                showsVerticalScrollIndicator={false}
-                style={{width: '100%', alignSelf: 'center', marginTop: hp(2)}}
-                data={news}
-                renderItem={renderItem}
-                keyExtractor={item => item.id} // Sử dụng `id` làm key
-                contentContainerStyle={styles.menuList}
-              />
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    width: wp(100),
+                    gap: wp(5),
+                    justifyContent: 'center',
+                    height: hp(40),
+                  }}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                  {/* style={styles.avatarImage} */}
+                </View>
+              ) : (
+                <View>
+                  {news.length === 0 ? (
+                    <View
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <Text>Không có thông báo</Text>
+                    </View>
+                  ) : (
+                    <FlatList
+                      //  numColumns={2}
+                      showsVerticalScrollIndicator={false}
+                      style={{
+                        width: '100%',
+                        alignSelf: 'center',
+                        marginTop: hp(2),
+                      }}
+                      data={news}
+                      renderItem={renderItem}
+                     // keyExtractor={item => item.id} // Sử dụng `id` làm key
+                      contentContainerStyle={styles.menuList}
+                    />
+                  )}
+                </View>
               )}
-            
             </View>
           </View>
         </LinearGradient>
@@ -278,8 +375,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: 'white',
-    marginHorizontal:wp(2),
-    borderRadius: 10
+    marginHorizontal: wp(2),
+    borderRadius: 10,
   },
   menuList: {
     paddingBottom: 20,
@@ -295,6 +392,6 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'space-around',
     width: wp(50),
-    paddingStart: wp(2)
+    paddingStart: wp(2),
   },
 });
