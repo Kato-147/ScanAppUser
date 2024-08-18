@@ -29,6 +29,24 @@ import {formatDate} from './DetailHistoryOrder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
+export const addNotificationToStorage = async (notification) => {
+  try {
+    const currentNotifications = await AsyncStorage.getItem('notifications');
+    let notifications = [];
+
+    if (currentNotifications) {
+      notifications = JSON.parse(currentNotifications);
+    }
+
+    notifications.push(notification); // Add new notification to array
+
+    const serializedNotifications = JSON.stringify(notifications); // Convert to JSON string
+    await AsyncStorage.setItem('notifications', serializedNotifications); // Store in AsyncStorage
+  } catch (error) {
+    console.error('Error adding notification to storage:', error);
+  }
+};
+
 const Home = props => {
   const {navigation} = props;
   const [userInfo, setUserInfo] = useState(null);
@@ -36,56 +54,39 @@ const Home = props => {
   const isFocused = useIsFocused();
   const [loading, setloading] = useState(true);
 
-  //lưu noti vào Asyntorage
-  const addNotificationToStorage = async (notification) => {
-    try {
-      const currentNotifications = await AsyncStorage.getItem('notifications');
-      let notifications = [];
   
-      if (currentNotifications) {
-        notifications = JSON.parse(currentNotifications);
-      }
-  
-      notifications.push(notification); // Add new notification to array
-  
-      const serializedNotifications = JSON.stringify(notifications); // Convert to JSON string
-      await AsyncStorage.setItem('notifications', serializedNotifications); // Store in AsyncStorage
-    } catch (error) {
-      console.error('Error adding notification to storage:', error);
-    }
-  };
 
-  useEffect(() => {
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      console.log('====================================');
-      console.log('-----remoteMessage',remoteMessage);
-      console.log('====================================');
-      if (remoteMessage.notification) {
-        const { title, body } = remoteMessage.notification;
+  // useEffect(() => {
+  //   const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+  //     console.log('====================================');
+  //     console.log('-----remoteMessage',remoteMessage);
+  //     console.log('====================================');
+  //     if (remoteMessage.notification) {
+  //       const { title, body } = remoteMessage.notification;
   
-        console.log('nè nè nè', remoteMessage.data);
+  //       console.log('nè nè nè', remoteMessage.data);
   
-        if (title && body) {
-          addNotificationToStorage({ title, body }); // Add notification to AsyncStorage
+  //       if (title && body) {
+  //         addNotificationToStorage({ title, body }); // Add notification to AsyncStorage
   
-          Alert.alert(
-            title,
-            body,
-            [
-              { text: 'Đóng', style: 'cancel' },
-              {
-                text: 'Đi tới hóa đơn ' + body,
-                onPress: () => navigation.navigate('HistoryOrder'),
-              },
-            ],
-            { cancelable: false }
-          );
-        }
-      }
-    });
+  //         Alert.alert(
+  //           title,
+  //           body,
+  //           [
+  //             { text: 'Đóng', style: 'cancel' },
+  //             {
+  //               text: 'Đi tới hóa đơn ' + body,
+  //               onPress: () => navigation.navigate('HistoryOrder'),
+  //             },
+  //           ],
+  //           { cancelable: false }
+  //         );
+  //       }
+  //     }
+  //   });
   
-    return unsubscribe;
-  }, []);
+  //   return unsubscribe;
+  // }, []);
 
   useEffect(() => {
     const getAllKeys = async () => {
