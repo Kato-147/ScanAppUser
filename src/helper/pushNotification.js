@@ -15,7 +15,7 @@ PushNotification.configure({
    // Kiểm tra màu sắc của thông báo
   if (notification.color === 'blue') {
     // Nếu màu là xanh dương, mở một URL hoặc deep link
-    Linking.openURL('mychat://order'); // Thay thế 'your-app-scheme' bằng scheme của ứng dụng
+    Linking.openURL('myapp://order'); // Thay thế 'your-app-scheme' bằng scheme của ứng dụng
   }
 
 

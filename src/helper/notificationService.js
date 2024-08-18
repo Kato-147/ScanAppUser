@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
-import {PermissionsAndroid, Platform} from 'react-native';
+import {Alert, Linking, PermissionsAndroid, Platform} from 'react-native';
 import PushNotification from './pushNotification';
+import { addNotificationToStorage } from '../components/products/screens/Home';
 
 export async function requestUserPermission() {
   if (Platform.OS == 'android' && Platform.Version < 33) {
@@ -53,13 +54,11 @@ messaging().onMessage(async remoteMessage => {
   displayNotification(title, body);
 });
 
-// Lắng nghe sự kiện tin nhắn khi ứng dụng được khởi động từ một thông báo
-messaging().onNotificationOpenedApp(remoteMessage => {
-  console.log(
-    'Notification caused app to open from background state:',
-    remoteMessage.notification,
-  );
-});
+//cấu hình back ground
+
+
+
+
 
 // Kiểm tra tin nhắn khi ứng dụng được khởi động từ một thông báo (khi app bị kill và được mở lại)
 messaging()

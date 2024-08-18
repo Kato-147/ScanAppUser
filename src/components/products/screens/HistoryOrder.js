@@ -22,12 +22,7 @@ import { formatDate } from './DetailHistoryOrder';
 const HistoryOrder = ({navigation}) => {
   const [items, setitems] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  console.log('====================================');
-  console.log(items);
-  console.log('====================================');
  
-
   //Back to Profile Screen
   const handleBack = () => {
     console.log('>>>>>> Click Back Button');
