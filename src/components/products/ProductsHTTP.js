@@ -74,16 +74,20 @@ export const getMenuItem = async categoryId => {
 // Get Table
 export const getTables = async (tableId, tableType) => {
   try {
-    const body = {
-      type: tableType,
-    };
-    const url = `v1/tables/${tableId}`; // Endpoint API
+
+    console.log('Table type request to sever : ', tableType ,tableId);
+    
+    const url = `v1/tables/${tableId}?type=${tableType}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.get(url, body); // GET request không cần body
+    const res = await axiosInstance.get(url); // GET request không cần body
+    console.log('===================api get table=================');
+    console.log(res);
+    console.log('====================================');
     await AsyncStorage.setItem(
       'tableNumber',
       JSON.stringify(res.data.tableNumber),
     );
+   
     return res; // Trả về dữ liệu từ API
   } catch (err) {
     if (err?.response) {
@@ -178,7 +182,6 @@ export const getOrderTable = async promotionCode => {
 
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
-
     // Trả về dữ liệu từ API
     return response;
   } catch (err) {

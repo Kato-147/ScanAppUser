@@ -29,23 +29,23 @@ import {formatDate} from './DetailHistoryOrder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
-export const addNotificationToStorage = async (notification) => {
-  try {
-    const currentNotifications = await AsyncStorage.getItem('notifications');
-    let notifications = [];
+// export const addNotificationToStorage = async (notification) => {
+//   try {
+//     const currentNotifications = await AsyncStorage.getItem('notifications');
+//     let notifications = [];
 
-    if (currentNotifications) {
-      notifications = JSON.parse(currentNotifications);
-    }
+//     if (currentNotifications) {
+//       notifications = JSON.parse(currentNotifications);
+//     }
 
-    notifications.push(notification); // Add new notification to array
+//     notifications.push(notification); // Add new notification to array
 
-    const serializedNotifications = JSON.stringify(notifications); // Convert to JSON string
-    await AsyncStorage.setItem('notifications', serializedNotifications); // Store in AsyncStorage
-  } catch (error) {
-    console.error('Error adding notification to storage:', error);
-  }
-};
+//     const serializedNotifications = JSON.stringify(notifications); // Convert to JSON string
+//     await AsyncStorage.setItem('notifications', serializedNotifications); // Store in AsyncStorage
+//   } catch (error) {
+//     console.error('Error adding notification to storage:', error);
+//   }
+// };
 
 const Home = props => {
   const {navigation} = props;

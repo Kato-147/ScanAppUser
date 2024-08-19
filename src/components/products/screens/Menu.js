@@ -94,12 +94,17 @@ const Menu = ({navigation}) => {
       //{"tableId":"6679893df3da9df0bfcf3da9","type":"hardQRCode"}
       const idtable = JSON.parse(idTable).tableId;
       const tableType = JSON.parse(idTable).type;
-      console.log('ID Table từ AsyncStorage', idTable);
+      console.log('ID Table từ AsyncStorage', idtable, tableType);
+
       const table = await getTables(idtable, tableType);
-      console.log('===table==', table);
+      console.log('===table==========', table);
+
       setTable(table);
     } catch (error) {
       console.error('Table error', error);
+    } finally{
+      console.log('done finaly get table');
+      setLoading(false);
     }
   };
 
@@ -107,6 +112,9 @@ const Menu = ({navigation}) => {
   const loadCategories = async () => {
     try {
       const data = await getCategories();
+      console.log('====================================');
+      console.log(data);
+      console.log('====================================');
       setCategories(data);
       if (data.length > 0) {
         setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
@@ -114,7 +122,9 @@ const Menu = ({navigation}) => {
       }
     } catch (error) {
       console.error(error);
-    } finally {
+    } 
+    finally {
+      console.log('done finaly get category');
       setLoading(false);
     }
   };

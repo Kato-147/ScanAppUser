@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import {Alert, Linking, PermissionsAndroid, Platform} from 'react-native';
 import PushNotification from './pushNotification';
-import { addNotificationToStorage } from '../components/products/screens/Home';
 
 export async function requestUserPermission() {
   if (Platform.OS == 'android' && Platform.Version < 33) {

@@ -17,7 +17,8 @@ import {
 } from 'react-native-responsive-screen';
 
 // id ban 1 : 666c5a75c55050edf1b3168e
-// id ban 3 :
+// id ban 3 : 6679893df3da9df0bfcf3da9
+//{"tableId":"6679893df3da9df0bfcf3da9","type":"softQRCode"} : hardQRCode
 
 const ScanHome = ({navigation}) => {
   const [data, setData] = useState('scan something');

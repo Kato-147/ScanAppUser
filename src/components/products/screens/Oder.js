@@ -102,9 +102,6 @@ const Oder = ({navigation}) => {
   const [orderType, setorderType] = useState('user'); //table
   const isFocused = useIsFocused();
   const [promotionCode, setpromotionCode] = useState('');
-  console.log('====================================');
-  console.log(totalOrder);
-  console.log('====================================');
 
 
   useEffect(() => {
