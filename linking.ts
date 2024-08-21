@@ -5,18 +5,10 @@ import Oder from "./src/components/products/screens/Oder";
 
 const config = {
     screens: {
-        tab: {
-        path: 'tab',
-        screens: {
-          Oder: {
-            path:'Oder',
-          },
-          
-        },
-      },
-      TaskDetail: {
-        path: 'task-detail/:id',
-      },
+        
+      // TaskDetail: {
+      //   path: 'task-detail/:id',
+      // },
       HistoryOrder:{
         path:'HistoryOrder'
     }

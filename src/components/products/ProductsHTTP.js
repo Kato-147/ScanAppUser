@@ -74,16 +74,20 @@ export const getMenuItem = async categoryId => {
 // Get Table
 export const getTables = async (tableId, tableType) => {
   try {
-    const body = {
-      type: tableType,
-    };
-    const url = `v1/tables/${tableId}`; // Endpoint API
+
+    console.log('Table type request to sever : ', tableType ,tableId);
+    
+    const url = `v1/tables/${tableId}?type=${tableType}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.get(url, body); // GET request không cần body
+    const res = await axiosInstance.get(url); // GET request không cần body
+    console.log('===================api get table=================');
+    console.log(res);
+    console.log('====================================');
     await AsyncStorage.setItem(
       'tableNumber',
       JSON.stringify(res.data.tableNumber),
     );
+   
     return res; // Trả về dữ liệu từ API
   } catch (err) {
     if (err?.response) {
@@ -99,7 +103,7 @@ export const getTables = async (tableId, tableType) => {
   }
 };
 
-// Create Order
+// Create Order in cart
 export const postOrder = async () => {
   try {
     // Lấy dữ liệu giỏ hàng từ AsyncStorage
@@ -135,7 +139,37 @@ export const postOrder = async () => {
 };
 
 // get Order User
-export const getOrderUser = async (promotionCode) => {
+export const getOrderTable = async promotionCode => {
+  try {
+    const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
+    if (!tableId) {
+      throw new Error('ID Table không tồn tại');
+    }
+    const body = promotionCode;
+    console.log('body getOrder table resquest to sever', body);
+    const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
+
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
+    // Trả về dữ liệu từ API
+    return response;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response.data);
+      throw new Error(err.response.data.message || 'Chưa đặt món table');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+//get Order user
+export const getOrderUserApi = async (promotionCode) => {
   try {
     const id = await AsyncStorage.getItem('idTable');
     const tableId = JSON.parse(id).tableId;
@@ -144,7 +178,7 @@ export const getOrderUser = async (promotionCode) => {
     }
     const body = promotionCode;
     console.log('body getOrder User resquest to sever', body);
-    const url = `v1/tables/${tableId}/orders?userId=true&promotionCode=${body}`; // Endpoint API
+    const url = `v1/tables/${tableId}/orders/get-order-for-client?userId=true`; // Endpoint API
 
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request và gửi token user
@@ -164,8 +198,8 @@ export const getOrderUser = async (promotionCode) => {
   }
 };
 
-// get Order User
-export const getOrderTable = async promotionCode => {
+// get Order Table
+export const getOrderTableApi = async promotionCode => {
   try {
     const id = await AsyncStorage.getItem('idTable');
     const tableId = JSON.parse(id).tableId;
@@ -174,11 +208,10 @@ export const getOrderTable = async promotionCode => {
     }
     const body = promotionCode;
     console.log('body getOrder table resquest to sever', body);
-    const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
+    const url = `v1/tables/${tableId}/orders/get-order-for-client`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
-
     // Trả về dữ liệu từ API
     return response;
   } catch (err) {
