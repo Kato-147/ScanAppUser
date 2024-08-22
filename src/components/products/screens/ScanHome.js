@@ -17,13 +17,14 @@ import {
 } from 'react-native-responsive-screen';
 
 // id ban 1 : 666c5a75c55050edf1b3168e
-// id ban 3 :
+// id ban 3 : 6679893df3da9df0bfcf3da9
+//{"tableId":"6679893df3da9df0bfcf3da9","type":"softQRCode"} : hardQRCode
 
 const ScanHome = ({navigation}) => {
   const [data, setData] = useState('scan something');
   const [scanning, setScanning] = useState(true); // Trạng thái để quản lý việc kích hoạt máy quét
-  console.log();
 
+  
   const handleMenu = async scannedData => {
     if (scannedData) {
       // Lưu dữ liệu vào AsyncStorage nếu cần
@@ -32,6 +33,13 @@ const ScanHome = ({navigation}) => {
       navigation.replace('Menu');
     }
   };
+
+  // bàn 3 6679893df3da9df0bfcf3da9
+  const fastGo = async()=>{
+    const cc = {'tableId':"6679893df3da9df0bfcf3da9","type":"hardQRCode"}
+    await AsyncStorage.setItem('idTable', JSON.stringify(cc));
+    navigation.replace('Menu');
+  }
 
   const handleBack = () => {
     console.log('back to Home');
@@ -66,7 +74,7 @@ const ScanHome = ({navigation}) => {
       // Bottom
       bottomContent={
         <TouchableOpacity
-          onPress={() => handleMenu('666c5a75c55050edf1b3168e')}>
+          onPress={() => fastGo()}>
           <Text> Menu</Text>
         </TouchableOpacity>
       }

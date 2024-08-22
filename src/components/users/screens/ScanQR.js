@@ -16,7 +16,7 @@ const ScanQR = ({navigation}) => {
     if (scannedData) {
       // Lưu dữ liệu vào AsyncStorage nếu cần
       // Điều hướng đến màn hình Menu
-      navigation.replace('MenuNoLogin', scannedData);
+      navigation.replace('MenuNoLogin');
     }
   };
 

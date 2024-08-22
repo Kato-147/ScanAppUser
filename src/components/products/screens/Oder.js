@@ -14,6 +14,7 @@ import {
   NativeModules,
   NativeEventEmitter,
   Alert,
+  ScrollView,
 } from 'react-native';
 import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {
@@ -23,9 +24,12 @@ import {
 import {
   deleteOrder,
   getOrderTable,
+  getOrderTableApi,
   getOrderUser,
+  getOrderUserApi,
   paymentCodTable,
   paymentCodUser,
+  paymentZaloTable,
   paymentZaloUser,
 } from '../ProductsHTTP';
 import {useIsFocused} from '@react-navigation/native';
@@ -33,6 +37,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {RadioButton} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AccodianUserOrder from '../../fragment/AccodianUserOrder';
+import AccodianTableOrder from '../../fragment/AccodianTableOrder';
 const {PayZaloBridge} = NativeModules;
 
 // const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
@@ -89,9 +95,7 @@ export const checkPrice = amount => {
     : formattedIntegerPart;
 };
 
-const Oder = ({navigation}) => {
-  const [oderItems, setOderItems] = useState([]);
-  const [orderTables, setorderTables] = useState([]);
+const Oder = ({}) => {
   const [selectedMethod, setSelectedMethod] = useState('COD');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -101,30 +105,30 @@ const Oder = ({navigation}) => {
   const [orderType, setorderType] = useState('user'); //table
   const isFocused = useIsFocused();
   const [promotionCode, setpromotionCode] = useState('');
+  const [orderUserItems, setOrderUserItems] = useState([]);
+  const [orderTableItems, setorderTableItems] = useState([]);
+
 
   useEffect(() => {
     if (isFocused) {
-      // fix();
-      loadOrderUser(promotionCode);
-      loadOrderTable(promotionCode);
+      orderUser(promotionCode);
+      orderTable(promotionCode);
     }
   }, [
     isFocused,
-    loadOrderUser,
     deleted,
     orderType,
-    loadOrderTable,
     handleApplyVoucher,
+    orderUser,
+    orderTable,
   ]);
 
-  // gọi api load order theo user
-  const loadOrderUser = async promotionCode => {
+  // gọi api load order theo user (new)
+  const orderUser = async promotionCode => {
     try {
-      const response = await getOrderUser(promotionCode);
-
-      if (response.success === 'success') {
-        const mergedItems = mergeOrderItems(response?.data);
-        setOderItems(mergedItems);
+      const response = await getOrderUserApi(promotionCode);
+      if (response.status === 'success') {
+        setOrderUserItems(response.data);
         settotalOrder(response.totalAmount);
         setError(null);
       } else {
@@ -138,25 +142,25 @@ const Oder = ({navigation}) => {
     }
   };
 
-  // gọi api load order bàn
-  const loadOrderTable = async promotionCode => {
+  // gọi api load order theo user (new)
+  const orderTable = async promotionCode => {
     try {
-      const response = await getOrderTable(promotionCode);
-      // console.log(response);
-      if (response.success === 'success') {
+      const response = await getOrderTableApi(promotionCode);
+      if (response.status === 'success') {
+        setorderTableItems(response.data);
         settotalTable(response.totalAmount);
-        const mergedItems = mergeOrderItems(response?.data);
-        setorderTables(mergedItems);
+        setError(null);
       } else {
-        console.log('Failed to fetch orderTable data:', response?.data);
+        console.log('Failed to fetch orderUser data:', response?.data);
       }
     } catch (error) {
       setError(error.message);
-      console.log('======OrderTable=====', error);
+      console.log('=====loadOrderUser======', error);
     } finally {
       setLoading(false);
     }
   };
+
 
   const onclickUser = async () => {
     setorderType('user');
@@ -226,13 +230,13 @@ const Oder = ({navigation}) => {
       handlePaymentCOD(promotionCode);
     }
     if (orderType === 'user' && selectedMethod === 'Zalo') {
-      handlePaymentZalo();
+      handlePaymentZalo(promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'COD') {
       handlePaymentCodTable(promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'Zalo') {
-      handlePaymentZaloTable();
+      handlePaymentZaloTable(promotionCode);
     }
     // } else{
     //   ToastAndroid.show('co loi xay ra!', ToastAndroid.SHORT);
@@ -256,10 +260,10 @@ const Oder = ({navigation}) => {
   };
 
   // Hàm xử lý thanh toán zalo
-  const handlePaymentZalo = async () => {
+  const handlePaymentZalo = async promotionCode => {
     console.log('Zalo');
     try {
-      const response = await paymentZaloUser();
+      const response = await paymentZaloUser(promotionCode);
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
@@ -268,8 +272,8 @@ const Oder = ({navigation}) => {
         payOrder();
       }
     } catch (error) {
-      console.log('-------------', err);
-      Alert.alert(`Lỗi thanh toán: ${err.message}`);
+      console.log('-------------', error);
+      Alert.alert(`Lỗi thanh toán: ${error.message}`);
     }
   };
 
@@ -290,15 +294,14 @@ const Oder = ({navigation}) => {
   };
 
   // Hàm xử lý thanh toán zalo theo bàn
-  const handlePaymentZaloTable = async () => {
+  const handlePaymentZaloTable = async promotionCode => {
     console.log(' pay Zalo table');
     try {
-      const response = await paymentZaloUser();
+      const response = await paymentZaloTable(promotionCode);
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
           payZP.payOrder(response.order_token);
-          await AsyncStorage.removeItem('idTable');
         };
         payOrder();
       }
@@ -310,74 +313,16 @@ const Oder = ({navigation}) => {
 
   //Hàm xử lý khi người dùng nhấn nút apply Voucher
   const handleApplyVoucher = async promotionCode => {
-    console.log('====================================');
-    console.log('Handle ApplyVoucher', promotionCode);
-    console.log('====================================');
+    console.log('Handle ApplyVoucher || promotion Code : ', promotionCode);
     try {
-      loadOrderTable(promotionCode);
+      orderType === 'user'
+        ? orderUser(promotionCode)
+        : orderTable(promotionCode);
     } catch (error) {
       console.log('handle Apply Voucher', error);
     }
   };
 
-  // Hàm hiển thị item món ăn
-  const renderOrderItem = ({item}) => {
-    return (
-      <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
-        {/* Image wp30 */}
-        <View
-          style={{
-            width: wp(30),
-            height: hp(12),
-            padding: 14,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            source={{uri: item.menuItemId.image_url}}
-            style={styles.image}
-          />
-        </View>
-
-        <View style={styles.detailsContainer}>
-          <Text style={styles.name}>{item.menuItemId.name}</Text>
-          <Text style={styles.price}>
-            {checkPrice(item.menuItemId.price)} đ
-          </Text>
-
-          {/* Options */}
-          {item.options === '' || error ? (
-            <View />
-          ) : (
-            <Text style={styles.options}>{item.options}</Text>
-          )}
-        </View>
-
-        <View
-          style={{
-            width: wp(20),
-            height: '100%',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={() => {
-              handleDeleteItems(item._id);
-            }}
-            style={{
-              marginTop: hp(1),
-              backgroundColor: '#E8900C',
-              padding: wp(2),
-              borderRadius: 99,
-            }}>
-            <Icon name="delete" size={wp(5)} color="#ffffff" />
-          </TouchableOpacity>
-
-          <Text style={styles.quantity}>x {item.quantity}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
 
   // Hàm tính tổng tiền
   function totalMoney() {
@@ -389,7 +334,7 @@ const Oder = ({navigation}) => {
   //Hàm hiển thị flatlist
   const handleFlatlist = () => {
     if (orderType === 'user') {
-      if (oderItems.length === 0) {
+      if (orderUserItems.length === 0) {
         return (
           <View
             style={{
@@ -409,17 +354,22 @@ const Oder = ({navigation}) => {
         );
       } else {
         return (
-          <FlatList
-            data={oderItems}
-            keyExtractor={item => item._id.toString()}
-            renderItem={renderOrderItem}
+          <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.menuList}
-          />
+            style={{height: hp(40)}}>
+            {orderUserItems.map((item, index) => (
+              <AccodianUserOrder
+                key={index.toString()}
+                title={item.orderCount}
+                quantity={item.totalQuantityOfOrderCount}
+                items={item.items}
+              />
+            ))}
+          </ScrollView>
         );
       }
     } else {
-      if (orderTables.length === 0) {
+      if (orderTableItems.length === 0) {
         return (
           <View
             style={{
@@ -439,13 +389,21 @@ const Oder = ({navigation}) => {
         );
       } else {
         return (
-          <FlatList
-            data={orderTables}
-            keyExtractor={item => item._id.toString()}
-            renderItem={renderOrderItem}
+          <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.menuList}
-          />
+            style={{height: hp(40)}}>
+            {orderTableItems.map((item, index) => (
+              <AccodianTableOrder
+                key={index.toString()}
+                name={item.name}
+                quantity={item.quantity}
+                amount={item.amount}
+                image={item.image_url}
+                options={item.options}
+                userOrders={item.userOrders}
+              />
+            ))}
+          </ScrollView>
         );
       }
     }
