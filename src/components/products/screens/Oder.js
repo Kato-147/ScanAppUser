@@ -96,7 +96,6 @@ export const checkPrice = amount => {
 };
 
 const Oder = ({}) => {
-  const [orderTables, setorderTables] = useState([]);
   const [selectedMethod, setSelectedMethod] = useState('COD');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -109,13 +108,9 @@ const Oder = ({}) => {
   const [orderUserItems, setOrderUserItems] = useState([]);
   const [orderTableItems, setorderTableItems] = useState([]);
 
-  console.log('====================================');
-  console.log(orderTableItems);
-  console.log('====================================');
 
   useEffect(() => {
     if (isFocused) {
-      loadOrderTable(promotionCode);
       orderUser(promotionCode);
       orderTable(promotionCode);
     }
@@ -166,25 +161,6 @@ const Oder = ({}) => {
     }
   };
 
-  // gọi api load order bàn
-  const loadOrderTable = async promotionCode => {
-    try {
-      const response = await getOrderTable(promotionCode);
-      // console.log(response);
-      if (response.success === 'success') {
-        settotalTable(response.totalAmount);
-        const mergedItems = mergeOrderItems(response?.data);
-        setorderTables(mergedItems);
-      } else {
-        console.log('Failed to fetch orderTable data:', response?.data);
-      }
-    } catch (error) {
-      setError(error.message);
-      console.log('======OrderTable=====', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const onclickUser = async () => {
     setorderType('user');
@@ -337,76 +313,16 @@ const Oder = ({}) => {
 
   //Hàm xử lý khi người dùng nhấn nút apply Voucher
   const handleApplyVoucher = async promotionCode => {
-    console.log('====================================');
-    console.log('Handle ApplyVoucher', promotionCode);
-    console.log('====================================');
+    console.log('Handle ApplyVoucher || promotion Code : ', promotionCode);
     try {
       orderType === 'user'
-        ? loadOrderUser(promotionCode)
-        : loadOrderTable(promotionCode);
+        ? orderUser(promotionCode)
+        : orderTable(promotionCode);
     } catch (error) {
       console.log('handle Apply Voucher', error);
     }
   };
 
-  // Hàm hiển thị item món ăn
-  const renderOrderItem = ({item}) => {
-    return (
-      <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
-        {/* Image wp30 */}
-        <View
-          style={{
-            width: wp(30),
-            height: hp(12),
-            padding: 14,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            source={{uri: item.menuItemId.image_url}}
-            style={styles.image}
-          />
-        </View>
-
-        <View style={styles.detailsContainer}>
-          <Text style={styles.name}>{item.menuItemId.name}</Text>
-          <Text style={styles.price}>
-            {checkPrice(item.menuItemId.price)} đ
-          </Text>
-
-          {/* Options */}
-          {item.options === '' || error ? (
-            <View />
-          ) : (
-            <Text style={styles.options}>{item.options}</Text>
-          )}
-        </View>
-
-        <View
-          style={{
-            width: wp(20),
-            height: '100%',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={() => {
-              handleDeleteItems(item._id);
-            }}
-            style={{
-              marginTop: hp(1),
-              backgroundColor: '#E8900C',
-              padding: wp(2),
-              borderRadius: 99,
-            }}>
-            <Icon name="delete" size={wp(5)} color="#ffffff" />
-          </TouchableOpacity>
-
-          <Text style={styles.quantity}>x {item.quantity}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
 
   // Hàm tính tổng tiền
   function totalMoney() {
