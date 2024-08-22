@@ -153,11 +153,6 @@ const UpdateInfo = ({navigation}) => {
                             openCamera();
                           }}>
                           <View style={{alignItems: 'center'}}>
-                            {/* <MaterialCommunityIcons
-                          name="camera"
-                          color="black"
-                          size={40}
-                        /> */}
                             <Text style={styles.text1}>Chụp từ camera</Text>
                           </View>
                         </TouchableOpacity>
@@ -167,11 +162,6 @@ const UpdateInfo = ({navigation}) => {
                             openLibrary();
                           }}>
                           <View style={{alignItems: 'center'}}>
-                            {/* <MaterialCommunityIcons
-                          name="image-area"
-                          color="black"
-                          size={40}
-                        /> */}
                             <Text style={styles.text1}>Lấy từ thư viện</Text>
                           </View>
                         </TouchableOpacity>

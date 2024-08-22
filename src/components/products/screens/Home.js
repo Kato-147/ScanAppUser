@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SearchBar from '../../fragment/SearchBar';
@@ -26,6 +27,25 @@ import {getInfoApi, getNewsApi} from '../../users/UserHTTP';
 import {cutStr} from './Cart';
 import {formatDate} from './DetailHistoryOrder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
+
+// export const addNotificationToStorage = async (notification) => {
+//   try {
+//     const currentNotifications = await AsyncStorage.getItem('notifications');
+//     let notifications = [];
+
+//     if (currentNotifications) {
+//       notifications = JSON.parse(currentNotifications);
+//     }
+
+//     notifications.push(notification); // Add new notification to array
+
+//     const serializedNotifications = JSON.stringify(notifications); // Convert to JSON string
+//     await AsyncStorage.setItem('notifications', serializedNotifications); // Store in AsyncStorage
+//   } catch (error) {
+//     console.error('Error adding notification to storage:', error);
+//   }
+// };
 
 const Home = props => {
   const {navigation} = props;
@@ -33,6 +53,40 @@ const Home = props => {
   const [news, setnews] = useState([]);
   const isFocused = useIsFocused();
   const [loading, setloading] = useState(true);
+
+  
+
+  // useEffect(() => {
+  //   const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+  //     console.log('====================================');
+  //     console.log('-----remoteMessage',remoteMessage);
+  //     console.log('====================================');
+  //     if (remoteMessage.notification) {
+  //       const { title, body } = remoteMessage.notification;
+  
+  //       console.log('nè nè nè', remoteMessage.data);
+  
+  //       if (title && body) {
+  //         addNotificationToStorage({ title, body }); // Add notification to AsyncStorage
+  
+  //         Alert.alert(
+  //           title,
+  //           body,
+  //           [
+  //             { text: 'Đóng', style: 'cancel' },
+  //             {
+  //               text: 'Đi tới hóa đơn ' + body,
+  //               onPress: () => navigation.navigate('HistoryOrder'),
+  //             },
+  //           ],
+  //           { cancelable: false }
+  //         );
+  //       }
+  //     }
+  //   });
+  
+  //   return unsubscribe;
+  // }, []);
 
   useEffect(() => {
     const getAllKeys = async () => {
@@ -68,9 +122,6 @@ const Home = props => {
   const getNews = async () => {
     try {
       const response = await getInfoApi();
-      console.log('====================================');
-      console.log(response.data);
-      console.log('====================================');
       setnews(response.data);
     } catch (error) {
       console.log(error);
@@ -83,6 +134,7 @@ const Home = props => {
     navigation.navigate('ScanHome');
   };
 
+  //Render News
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
@@ -93,15 +145,32 @@ const Home = props => {
           navigation.navigate('DetailNews', {item});
         }}>
         {/* Image */}
-        <View
-          style={{
-            width: wp(25),
-            height: hp(12),
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image style={styles.image} source={{uri: item.image_url[0]}} />
-        </View>
+        {item.image_url.length === 0 ? (
+          <View
+            style={{
+              width: wp(25),
+              height: hp(12),
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              style={styles.image}
+              source={{
+                uri: 'https://t3.ftcdn.net/jpg/04/62/93/66/360_F_462936689_BpEEcxfgMuYPfTaIAOC1tCDurmsno7Sp.jpg',
+              }}
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              width: wp(25),
+              height: hp(12),
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image style={styles.image} source={{uri: item.image_url[0]}} />
+          </View>
+        )}
 
         {/* info */}
         <View style={styles.detailsContainer}>
@@ -195,7 +264,7 @@ const Home = props => {
             </View>
 
             {/* News */}
-            <View style={{height: hp(58), width: wp(100)}}>
+            <View style={{height: hp(54), width: wp(100)}}>
               <Text
                 style={{
                   fontSize: hp(3),
@@ -241,7 +310,7 @@ const Home = props => {
                       }}
                       data={news}
                       renderItem={renderItem}
-                      keyExtractor={item => item.id} // Sử dụng `id` làm key
+                     // keyExtractor={item => item.id} // Sử dụng `id` làm key
                       contentContainerStyle={styles.menuList}
                     />
                   )}

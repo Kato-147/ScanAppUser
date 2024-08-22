@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from '../users/screens/Login';
 import Register from '../users/screens/Register';
@@ -16,31 +16,52 @@ import DetailHistoryOrder from '../products/screens/DetailHistoryOrder';
 import Help from '../products/screens/Help';
 import DetailNews from '../products/screens/DetailNews';
 import MenuNoLogin from '../users/screens/MenuNoLogin';
+import {useLinkTo} from '@react-navigation/native';
+import messaging from '@react-native-firebase/messaging';
+
 
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
+  const linkTo = useLinkTo();
+
+  useEffect(() => {
+    // Lắng nghe sự kiện tin nhắn khi ứng dụng được khởi động từ một thông báo
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log(
+        'Notification caused app to open from background state:',
+        remoteMessage.notification,
+      );
+      // const {title, body} = remoteMessage.notification;
+      // if (title && body) {
+      //   addNotificationToStorage({title, body}); // Add notification to AsyncStorage
+       
+      // }
+      linkTo('/HistoryOrder');
+    });
+  }, []);
+
   return (
-    
-      <Stack.Navigator initialRouteName='Splash' screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="ScanQR" component={ScanQR} />
-        <Stack.Screen name="OtpLogin" component={OtpLogin} />
-        <Stack.Screen name="tab" component={TabBar} />
-        <Stack.Screen name="ScanHome" component={ScanHome} />
-        <Stack.Screen name="Help" component={Help} />
-        <Stack.Screen name="Menu" component={Menu} />
-        <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
-        <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
-        <Stack.Screen name="Cart" component={Cart} />
-        <Stack.Screen name="HistoryOrder" component={HistoryOrder} />
-        <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
-        <Stack.Screen name="DetailNews" component={DetailNews} />
-        <Stack.Screen name="MenuNoLogin" component={MenuNoLogin} />
-      </Stack.Navigator>
- 
+    <Stack.Navigator
+      initialRouteName="Splash"
+      screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Register" component={Register} />
+      <Stack.Screen name="ScanQR" component={ScanQR} />
+      <Stack.Screen name="OtpLogin" component={OtpLogin} />
+      <Stack.Screen name="tab" component={TabBar} />
+      <Stack.Screen name="ScanHome" component={ScanHome} />
+      <Stack.Screen name="Help" component={Help} />
+      <Stack.Screen name="Menu" component={Menu} />
+      <Stack.Screen name="Splash" component={Splash} />
+      <Stack.Screen name="UpdateInfo" component={UpdateInfo} />
+      <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
+      <Stack.Screen name="Cart" component={Cart} />
+      <Stack.Screen name="HistoryOrder" component={HistoryOrder} />
+      <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
+      <Stack.Screen name="DetailNews" component={DetailNews} />
+      <Stack.Screen name="MenuNoLogin" component={MenuNoLogin} />
+    </Stack.Navigator>
   );
 };
 

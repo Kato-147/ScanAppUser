@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   FlatList,
   ScrollView,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -15,12 +17,20 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getCategories, getTables} from '../ProductsHTTP';
+import {
+  createQRCodeApi,
+  getCategories,
+  getTables,
+  getUserInTableApi,
+  logOutTableApi,
+} from '../ProductsHTTP';
 import {getMenuItem} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
 import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
 import {checkPrice} from './Oder';
+import MoreIcon from 'react-native-vector-icons/Feather';
+import BtShitMenu from '../../fragment/BtShitMenu';
 
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -31,6 +41,12 @@ const Menu = ({navigation}) => {
   const [activeOptions, setActiveOptions] = useState({});
   const [quantityCard, setquantityCard] = useState([]);
   const isFocused = useIsFocused();
+  const [moreOptions, setMoreOptions] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [softQrCode, setSoftQrCode] = useState('');
+  const [showModalUser, setShowModalUser] = useState(false);
+  const [userInTable, setUserInTable] = useState('');
+  const [totalUser, setTotalUser] = useState(0);
 
   // Back to home function
   const handleHome = () => {
@@ -67,17 +83,28 @@ const Menu = ({navigation}) => {
   useEffect(() => {
     idTable();
     loadCategories();
+    createSoftQR();
+    getUserInTable();
   }, []);
 
+  //Get tableNumber
   const idTable = async () => {
     try {
       const idTable = await AsyncStorage.getItem('idTable');
-      console.log('ID Table từ AsyncStorage', idTable);
-      const table = await getTables(idTable);
-      //  console.log('===table==', table);
+      //{"tableId":"6679893df3da9df0bfcf3da9","type":"hardQRCode"}
+      const idtable = JSON.parse(idTable).tableId;
+      const tableType = JSON.parse(idTable).type;
+      console.log('ID Table từ AsyncStorage', idtable, tableType);
+
+      const table = await getTables(idtable, tableType);
+      console.log('===table==========', table);
+
       setTable(table);
     } catch (error) {
       console.error('Table error', error);
+    } finally{
+      console.log('done finaly get table');
+      setLoading(false);
     }
   };
 
@@ -85,6 +112,9 @@ const Menu = ({navigation}) => {
   const loadCategories = async () => {
     try {
       const data = await getCategories();
+      console.log('====================================');
+      console.log(data);
+      console.log('====================================');
       setCategories(data);
       if (data.length > 0) {
         setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
@@ -92,7 +122,9 @@ const Menu = ({navigation}) => {
       }
     } catch (error) {
       console.error(error);
-    } finally {
+    } 
+    finally {
+      console.log('done finaly get category');
       setLoading(false);
     }
   };
@@ -121,7 +153,7 @@ const Menu = ({navigation}) => {
         name: item.name,
         price: item.price,
         quantity: 1, // Set initial quantity to 1
-        option: selectedOption ,
+        option: selectedOption,
       };
 
       let cartItems = await AsyncStorage.getItem('cartItems');
@@ -152,6 +184,41 @@ const Menu = ({navigation}) => {
       console.error(error);
     }
   };
+
+  // Create soft qr code
+  const createSoftQR = async () => {
+    try {
+      const res = await createQRCodeApi();
+      setSoftQrCode(res);
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Get all user in table
+  const getUserInTable = async () => {
+    try {
+      const res = await getUserInTableApi();
+      setTotalUser(res.totalUser);
+      setUserInTable(res.data);
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Logout table
+  const handleLogoutTable= async()=>{
+    try {
+      navigation.popToTop();
+      await logOutTableApi();
+    } catch (error) {
+      console.log(error);
+      
+    }
+    
+}
 
   if (loading) {
     return (
@@ -261,7 +328,7 @@ const Menu = ({navigation}) => {
                 horizontal
                 style={{
                   width: '100%',
-                  height: hp(5),                 
+                  height: hp(5),
                 }}>
                 {item.options.map(option => {
                   const isActive = activeOptions[item._id] === option._id;
@@ -272,7 +339,7 @@ const Menu = ({navigation}) => {
 
                   return (
                     <TouchableOpacity
-                    style={{alignSelf:'center'}}
+                      style={{alignSelf: 'center'}}
                       key={option._id}
                       onPress={() => handleChangeOption(item._id, option._id)}>
                       <View
@@ -281,7 +348,7 @@ const Menu = ({navigation}) => {
                             marginRight: wp(3),
                             borderWidth: 1,
                             borderRadius: 5,
-                            paddingHorizontal:wp(1)
+                            paddingHorizontal: wp(1),
                           },
                           activeOptions[item._id] === option._id
                             ? {borderColor: '#E8900C'}
@@ -295,9 +362,7 @@ const Menu = ({navigation}) => {
                   );
                 })}
               </ScrollView>
-            ) : (
-              null
-            )}
+            ) : null}
             {/* Price */}
             <View
               style={{
@@ -342,9 +407,47 @@ const Menu = ({navigation}) => {
     );
   };
 
+  const renderTotalUserItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => {
+          console.log('cc');
+        }}>
+        <View style={styles.userItem}>
+          {/* Image */}
+          <View
+            style={{
+              width: wp(30),
+              height: '100%',
+              padding: 14,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              source={{
+                // If value of Image in API not null, show image : show Image URL
+                uri: item.img_avatar_url
+                  ? item.img_avatar_url
+                  : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
+              }}
+              style={{width: hp(8),
+                height: hp(8),
+                borderRadius: 10,
+                marginRight: 10,}}
+            />
+          </View>
+          <Text style={[styles.menuItemName,{color:'#757575'}]} numberOfLines={1}>
+              {item.fullName}
+            </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {table?.status === 'open' ? (
+      {table?.usageAllowed === 'yes' ? (
         <LinearGradient colors={['white', 'white', 'white', '#F6F6F6']}>
           {/* Header h10 */}
           <View style={styles.headerContainer}>
@@ -360,33 +463,49 @@ const Menu = ({navigation}) => {
               </TouchableOpacity>
               <Text
                 style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
-                Bàn {table?.tableNumber}
+                Bàn {table?.data.tableNumber}
               </Text>
             </View>
 
-            <TouchableOpacity onPress={handleCart} style={{marginRight: wp(3)}}>
-              <View
-                style={{
-                  width: hp(2.2),
-                  height: hp(2.2),
-                  backgroundColor: '#E8900C',
-                  borderRadius: 40,
-                  top: hp(-0.8),
-                  right: wp(-2.2),
-                  position: 'absolute',
-                  zIndex: 1,
-                }}>
-                <Text
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: wp(25),
+              }}>
+              {/* Cart */}
+              <TouchableOpacity
+                onPress={handleCart}
+                style={{marginRight: wp(3)}}>
+                <View
                   style={{
-                    alignSelf: 'center',
-                    color: 'white',
-                    fontSize: hp(1.6),
+                    width: hp(2.2),
+                    height: hp(2.2),
+                    backgroundColor: '#E8900C',
+                    borderRadius: 40,
+                    top: hp(-0.8),
+                    right: wp(-2.2),
+                    position: 'absolute',
+                    zIndex: 1,
                   }}>
-                  {quantityCard}
-                </Text>
-              </View>
-              <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
-            </TouchableOpacity>
+                  <Text
+                    style={{
+                      alignSelf: 'center',
+                      color: 'white',
+                      fontSize: hp(1.6),
+                    }}>
+                    {quantityCard}
+                  </Text>
+                </View>
+                <Icon name="shoppingcart" size={hp(3.5)} color="#E8900C" />
+              </TouchableOpacity>
+
+              {/* More Options */}
+              <TouchableOpacity onPress={() => setMoreOptions(true)} style={{}}>
+                <MoreIcon name="more-vertical" size={hp(3.5)} color="#E8900C" />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Menu */}
@@ -424,11 +543,99 @@ const Menu = ({navigation}) => {
               )}
             </View>
           </View>
+
+          {moreOptions && (
+            <BtShitMenu
+              setMoreOptions={setMoreOptions}
+              setShowModal={setShowModal}
+              setShowModalUser={setShowModalUser}
+              onLogoutPress={handleLogoutTable}
+            />
+          )}
+          {/* Modal QR Code */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showModal}
+            onRequestClose={() => setShowModal(false)}>
+            <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Image
+                    style={{width: '80%', height: '80%'}}
+                    source={{uri: softQrCode.data}}
+                  />
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+
+          {/* Modal All User in Table */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showModalUser}
+            onRequestClose={() => setShowModalUser(false)}>
+            <TouchableWithoutFeedback onPress={() => setShowModalUser(false)}>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContentUser}>
+                <Text style={{fontSize: hp(2.5), fontWeight: 'bold', color: '#E8900C', marginStart: wp(3), marginTop: hp(1) }}>
+            Số người trong bàn : {totalUser}
+          </Text>
+                  <FlatList
+                    horizontal
+                    data={userInTable}
+                    keyExtractor={item => item._id.toString()}
+                    renderItem={renderTotalUserItem}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.contentContainer}
+                    style={styles.flatList}
+                  />
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
         </LinearGradient>
       ) : (
         // --------- Screen data undefined
-        <View style={{alignSelf: 'center'}}>
-          <Text> Bàn không khả dụng </Text>
+        <View style={styles.container}>
+          {/* Header h10 */}
+          <View style={styles.headerContainer}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 20,
+                //  backgroundColor: 'red',
+              }}>
+              <TouchableOpacity onPress={handleHome} style={{}}>
+                <Icon style={styles.backIcon} name="left" />
+              </TouchableOpacity>
+              <Text
+                style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
+                Trở lại
+              </Text>
+            </View>
+          </View>
+          <View
+            style={{
+              width: '100%',
+              height: hp(90),
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 10,
+            }}>
+            <Icon name="warning" size={hp(6)} color="#525252" />
+            <Text style={{fontSize: hp(2), fontWeight: 'bold'}}>
+              Bàn không khả dụng
+            </Text>
+            <Text style={{fontSize: hp(2), fontWeight: 'bold'}}>
+              Vui lòng gọi phục vụ để được hỗ trợ
+            </Text>
+            <Text style={{fontSize: hp(2), fontWeight: 'bold'}}>
+              hoặc vào màn hình Hỗ trợ để biết thêm chi tiết
+            </Text>
+          </View>
         </View>
       )}
     </View>
@@ -437,7 +644,7 @@ const Menu = ({navigation}) => {
 
 export default Menu;
 
- const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
@@ -524,4 +731,33 @@ export default Menu;
     color: '#525252',
     marginStart: 20,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  modalContent: {
+    justifyContent: 'center',
+    width: wp(90),
+    height: hp(40),
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 10,
+  },
+  userItem: {
+    width: wp(86),
+    // backgroundColor:'red',
+    justifyContent: 'flex-start',
+    marginVertical: 10,
+    flexDirection: 'row',
+    height: hp(8),
+    alignItems:'center'
+  },
+  modalContentUser: {
+    width: wp(90),
+    height: hp(45),
+    backgroundColor: 'white',
+    borderRadius: 10,
+  }
 });
