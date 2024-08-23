@@ -178,7 +178,7 @@ export const getOrderTableApi = async promotionCode => {
     }
     console.log('promotionCode getOrder Table resquest to sever', promotionCode);
 
-    const url = `v1/tables/${tableId}/orders/get-order-for-client&promotionCode=${promotionCode}`; // Chèn idTable vào URL
+    const url = `v1/tables/${tableId}/orders/get-order-for-client?promotionCode=${promotionCode}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
