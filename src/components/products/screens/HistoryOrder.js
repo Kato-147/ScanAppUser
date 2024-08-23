@@ -17,12 +17,12 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icon2 from 'react-native-vector-icons/Ionicons';
 import {getHistoryOrder} from '../ProductsHTTP';
-import { formatDate } from './DetailHistoryOrder';
+import {formatDate} from './DetailHistoryOrder';
 
 const HistoryOrder = ({navigation}) => {
   const [items, setitems] = useState([]);
   const [loading, setLoading] = useState(true);
- 
+
   //Back to Profile Screen
   const handleBack = () => {
     console.log('>>>>>> Click Back Button');
@@ -36,7 +36,7 @@ const HistoryOrder = ({navigation}) => {
   const historyOrder = async () => {
     try {
       const response = await getHistoryOrder();
-      // console.log(response);
+      console.log(response.data);
       if (response.status === 'success') {
         setitems(response.data);
       }
@@ -44,17 +44,23 @@ const HistoryOrder = ({navigation}) => {
     } catch (error) {
       setError(error.message);
       console.log('======OrderTable=====', error);
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
 
-    //Loading
-    if (loading) {
-      return (<View style={[styles.container, {alignItems:'center', justifyContent:'center'}]}>
+  //Loading
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          {alignItems: 'center', justifyContent: 'center'},
+        ]}>
         <ActivityIndicator size="large" color="#0000ff" />
-      </View>);
-    }
+      </View>
+    );
+  }
 
   const handleDetail = item => {
     navigation.navigate('DetailHistoryOrder', {item});
@@ -66,9 +72,18 @@ const HistoryOrder = ({navigation}) => {
         activeOpacity={0.5}
         onPress={() => handleDetail(item)}
         style={styles.itemContainer}>
-
         <View style={styles.imageItem}>
-          {item.paymentMethod === 'ZaloPay' ? (<Image style={styles.image} source={require('../../../images/zaloPay.png')} />):(<Image style={styles.image} source={require('../../../images/cash.png')}  />)}
+          {item.paymentMethod === 'ZaloPay' ? (
+            <Image
+              style={styles.image}
+              source={require('../../../images/zaloPay.png')}
+            />
+          ) : (
+            <Image
+              style={styles.image}
+              source={require('../../../images/cash.png')}
+            />
+          )}
         </View>
 
         <View
@@ -77,7 +92,6 @@ const HistoryOrder = ({navigation}) => {
             width: wp(75),
             alignItems: 'center',
             justifyContent: 'center',
-            
           }}>
           <Text style={styles.textItem}>
             Bạn đã thanh toán thành công hóa đơn{' '}
@@ -85,11 +99,16 @@ const HistoryOrder = ({navigation}) => {
               {item.appTransactionId}
             </Text>
           </Text>
-          <View style={{flexDirection:'row', justifyContent:'space-between', width:'100%', padding:5}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              width: '100%',
+              padding: 5,
+            }}>
             <Text>Thời gian : </Text>
-            <Text>{formatDate(item.createdAt)}</Text>
+            <Text style={{color: '#E8900C'}}>{formatDate(item.createdAt)}</Text>
           </View>
-          
         </View>
       </TouchableOpacity>
     );
@@ -109,8 +128,7 @@ const HistoryOrder = ({navigation}) => {
       </View>
 
       <View>
-        
-        { items.length === 0 ? (
+        {items.length === 0 ? (
           <View />
         ) : (
           <FlatList
@@ -175,16 +193,17 @@ const styles = StyleSheet.create({
     width: wp(21),
     alignItems: 'center',
     justifyContent: 'center',
-    height:'100%',
-    borderRadius: 10
+    height: '100%',
+    borderRadius: 10,
   },
   textItem: {
     fontWeight: 'bold',
     fontSize: hp(2.2),
+    color: '#333',
   },
-  image:{
+  image: {
     width: wp(20),
     height: wp(20),
-    borderRadius:10
-  }
+    borderRadius: 10,
+  },
 });

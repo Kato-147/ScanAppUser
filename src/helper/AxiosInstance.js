@@ -5,7 +5,7 @@ const AxiosInstance = async (contentType = 'application/json') => {
   const token = await AsyncStorage.getItem('token');
 
   const axiosInstance = axios.create({
-    baseURL: 'https://pro2052-restaurant-api.onrender.com/',
+    baseURL: 'http://192.168.1.247:8000/',
   });
 
   axiosInstance.interceptors.request.use(
