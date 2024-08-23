@@ -22,14 +22,14 @@ import {
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('oroki147@gmail.com');
   const [password, setPassword] = useState('Tt123456');
-   // const [email, setEmail] = useState('');
+  // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('')
   const [fcmToken, setfcmToken] = useState([]);
 
-  console.log('--------fcm  Token in login---------',fcmToken);
-  
+  console.log('--------fcm  Token in login---------', fcmToken);
+
   // get fcmToken from AsynStorage
-  useMemo(()=>{
+  useMemo(() => {
     const retrieveFCMToken = async () => {
       try {
         const token = await AsyncStorage.getItem('fcmToken');
@@ -38,11 +38,14 @@ const Login = ({navigation}) => {
         }
       } catch (error) {
         console.log(error);
-        ToastAndroid.show('Có lỗi xảy ra, vui lòng khỏi động lại ứng dụng', ToastAndroid.SHORT);
+        ToastAndroid.show(
+          'Có lỗi xảy ra, vui lòng khỏi động lại ứng dụng',
+          ToastAndroid.SHORT,
+        );
       }
     };
     retrieveFCMToken();
-  },[])
+  }, []);
 
   const handleRegister = () => {
     navigation.navigate('Register');
@@ -113,10 +116,10 @@ const Login = ({navigation}) => {
             placeholder={'Mật khẩu'}
             onChangeText={setPassword}
           />
-          <TouchableOpacity
-          activeOpacity={0.5}
-          style={{alignSelf:'flex-end'}}>
-          <Text style={{color:'white', alignSelf:'flex-end', margin:5}}>Quên mật khẩu ?</Text>
+          <TouchableOpacity activeOpacity={0.5} style={{alignSelf: 'flex-end'}}>
+            <Text style={{color: 'white', alignSelf: 'flex-end', margin: 5}}>
+              Quên mật khẩu ?
+            </Text>
           </TouchableOpacity>
 
           {/* button login */}

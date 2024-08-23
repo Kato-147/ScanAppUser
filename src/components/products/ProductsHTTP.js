@@ -74,9 +74,8 @@ export const getMenuItem = async categoryId => {
 // Get Table
 export const getTables = async (tableId, tableType) => {
   try {
+    console.log('Table type request to sever : ', tableType, tableId);
 
-    console.log('Table type request to sever : ', tableType ,tableId);
-    
     const url = `v1/tables/${tableId}?type=${tableType}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request không cần body
@@ -87,7 +86,7 @@ export const getTables = async (tableId, tableType) => {
       'tableNumber',
       JSON.stringify(res.data.tableNumber),
     );
-   
+
     return res; // Trả về dữ liệu từ API
   } catch (err) {
     if (err?.response) {
@@ -138,9 +137,8 @@ export const postOrder = async () => {
   }
 };
 
-
 //get Order user
-export const getOrderUserApi = async (promotionCode) => {
+export const getOrderUserApi = async promotionCode => {
   try {
     const id = await AsyncStorage.getItem('idTable');
     const tableId = JSON.parse(id).tableId;
@@ -176,7 +174,10 @@ export const getOrderTableApi = async promotionCode => {
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    console.log('promotionCode getOrder Table resquest to sever', promotionCode);
+    console.log(
+      'promotionCode getOrder Table resquest to sever',
+      promotionCode,
+    );
 
     const url = `v1/tables/${tableId}/orders/get-order-for-client?promotionCode=${promotionCode}`; // Chèn idTable vào URL
 
@@ -254,11 +255,11 @@ export const paymentCodUser = async promotionCode => {
 };
 
 // Pay for user with ZaloPay
-export const paymentZaloUser = async (promotionCode) => {
+export const paymentZaloUser = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const userId = await AsyncStorage.getItem('userID');
   const id = await AsyncStorage.getItem('idTable');
-    const tableId = JSON.parse(id).tableId;
+  const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
@@ -268,7 +269,7 @@ export const paymentZaloUser = async (promotionCode) => {
     console.log('body --------- ', body);
     const url = `v1/payments/zalopayment/${tableId}?userId=true`;
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.post(url,body);
+    const res = await axiosInstance.post(url, body);
     return res;
   } catch (err) {
     if (err.response) {
@@ -315,11 +316,11 @@ export const paymentCodTable = async promotionCode => {
 };
 
 // Pay for table with ZaloPay
-export const paymentZaloTable = async (promotionCode) => {
+export const paymentZaloTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const userId = await AsyncStorage.getItem('userID');
   const id = await AsyncStorage.getItem('idTable');
-    const tableId = JSON.parse(id).tableId;
+  const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
@@ -329,7 +330,7 @@ export const paymentZaloTable = async (promotionCode) => {
     console.log('body --------- ', body);
     const url = `v1/payments/zalopayment/${tableId}`;
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.post(url,body);
+    const res = await axiosInstance.post(url, body);
     return res;
   } catch (err) {
     if (err.response) {
@@ -373,7 +374,8 @@ export const getHistoryOrder = async () => {
     const url = `v1/payments/payments-history`;
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
-    // Trả về dữ liệu từ API
+    const data = response.data;
+
     return response;
   } catch (error) {
     if (error.response) {
@@ -427,7 +429,9 @@ export const getUserInTableApi = async () => {
   } catch (error) {
     if (error.response) {
       console.log('API error:', error.response.data);
-      throw new Error(error.response.data.message || 'Lỗi get all user in table');
+      throw new Error(
+        error.response.data.message || 'Lỗi get all user in table',
+      );
     } else if (error.request) {
       console.log('No response from API:', error.request);
       throw new Error('Không có phản hồi từ máy chủ');
@@ -439,7 +443,7 @@ export const getUserInTableApi = async () => {
 };
 
 // Logout table in menu
-export const logOutTableApi = async()=>{
+export const logOutTableApi = async () => {
   try {
     const url = `v1/tables/table-in-use`;
     const axiosInstance = await AxiosInstance();
@@ -449,7 +453,9 @@ export const logOutTableApi = async()=>{
   } catch (error) {
     if (error.response) {
       console.log('API error:', error.response.data);
-      throw new Error(error.response.data.message || 'Lỗi get all user in table');
+      throw new Error(
+        error.response.data.message || 'Lỗi get all user in table',
+      );
     } else if (error.request) {
       console.log('No response from API:', error.request);
       throw new Error('Không có phản hồi từ máy chủ');
@@ -458,4 +464,46 @@ export const logOutTableApi = async()=>{
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
   }
-}
+};
+
+export const createReview = async body => {
+  try {
+    const url = `v1/reviews`;
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.post(url, body);
+    return response;
+  } catch (error) {
+    if (error.response) {
+      console.log('API error:', error.response.data);
+      throw new Error(error.response.data.message || 'Lỗi tạo đánh giá');
+    } else if (error.request) {
+      console.log('No response from API:', error.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', error.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+export const getMenuItemDetails = async menuItemId => {
+  try {
+    const url = `v1/menu-items/menuItem-details/${menuItemId}`;
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.get(url);
+    return response;
+  } catch (error) {
+    if (error.response) {
+      console.log('API error:', error.response.data);
+      throw new Error(
+        error.response.data.message || 'Lỗi get menu item details',
+      );
+    } else if (error.request) {
+      console.log('No response from API:', error.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', error.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};

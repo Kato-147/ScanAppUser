@@ -154,5 +154,6 @@ const styles = StyleSheet.create({
   },
   infoValueText: {
     width: wp(50),
+    color: '#333', 
   },
 });

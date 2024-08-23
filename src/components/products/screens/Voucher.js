@@ -79,7 +79,9 @@ const Voucher = ({navigation}) => {
         {/* in4 */}
         <View style={styles.detailsContainer}>
           {/* Name */}
-          <Text style={{fontSize: hp(2), fontWeight: 'bold'}} numberOfLines={2}>
+          <Text
+            style={{fontSize: hp(2), fontWeight: 'bold', color: 'black'}}
+            numberOfLines={2}>
             {item.description}
           </Text>
           {/* Code & copyButton */}
@@ -91,7 +93,10 @@ const Voucher = ({navigation}) => {
               justifyContent: 'space-between',
               paddingEnd: wp(5),
             }}>
-            <Text style={{width: wp(50)}}> Mã: {item.code}</Text>
+            <Text style={{width: wp(50), color: 'black'}}>
+              {' '}
+              Mã: {item.code}
+            </Text>
             <TouchableOpacity
               onPress={() => copyToClipboard(item.code)}
               style={{
@@ -216,14 +221,14 @@ const Voucher = ({navigation}) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                     <Image
-              style={styles.errorImage}
-              source={{
-                uri: 'https://cdn-icons-png.flaticon.com/256/3405/3405177.png',
-              }}
-            />
-            <Text style={styles.errorText}>Hiện không có voucher</Text>
-                  </View>
+                  <Image
+                    style={styles.errorImage}
+                    source={{
+                      uri: 'https://cdn-icons-png.flaticon.com/256/3405/3405177.png',
+                    }}
+                  />
+                  <Text style={styles.errorText}>Hiện không có voucher</Text>
+                </View>
               ) : (
                 <FlatList
                   // numColumns={2}
