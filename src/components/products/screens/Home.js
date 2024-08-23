@@ -88,6 +88,8 @@ const Home = props => {
   //   return unsubscribe;
   // }, []);
 
+  
+// Xem các Key trong asynStorage
   useEffect(() => {
     const getAllKeys = async () => {
       try {

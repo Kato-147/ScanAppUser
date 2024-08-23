@@ -18,6 +18,7 @@ import IconLogout from 'react-native-vector-icons/MaterialIcons';
 import {infoProfile} from '../ProductsHTTP';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
+import { logOutApi } from '../../users/UserHTTP';
 
 const Profile = ({navigation}) => {
   const [userInfo, setUserInfo] = useState(null);
@@ -74,7 +75,15 @@ const Profile = ({navigation}) => {
   const handleLogout = async () => {
     console.log('click log out');
     try {
+
+      await logOutApi();
+
       // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
+      // await AsyncStorage.removeItem('tableNumber');
+      // await AsyncStorage.removeItem('fcmToken');
+      // await AsyncStorage.removeItem('token');
+      // await AsyncStorage.removeItem('userID');
+
       await AsyncStorage.clear();
 
       // Chuyển sang màn hình chính
@@ -82,9 +91,7 @@ const Profile = ({navigation}) => {
         index: 0,
         routes: [{ name: 'Splash' }],
       });
-      
-      const token = await AsyncStorage.getItem('token');
-      console.log("asyncStorage------------", token);
+  
       console.log('Logged out and navigated to Login screen.');
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);
