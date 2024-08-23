@@ -10,10 +10,10 @@ PushNotification.configure({
 
   // (required) Called when a remote or local notification is opened or received
   onNotification: function (notification) {
-    console.log('NOTIFICATION:', notification);
+    console.log('NOTIFICATION ---onforceGroundOnclick---:', notification);
 
    // Kiểm tra màu sắc của thông báo
-  if (notification.color === 'blue') {
+  if (notification.data.type === "events") {
     // Nếu màu là xanh dương, mở một URL hoặc deep link
     Linking.openURL('myapp://order'); // Thay thế 'your-app-scheme' bằng scheme của ứng dụng
   }

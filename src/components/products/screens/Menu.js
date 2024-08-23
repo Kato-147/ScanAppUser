@@ -97,13 +97,12 @@ const Menu = ({navigation}) => {
       console.log('ID Table từ AsyncStorage', idtable, tableType);
 
       const table = await getTables(idtable, tableType);
-      console.log('===table==========', table);
+      console.log('===table==========', table.data.tableNumber);
 
       setTable(table);
     } catch (error) {
       console.error('Table error', error);
     } finally {
-      console.log('done finaly get table');
       setLoading(false);
     }
   };
@@ -112,9 +111,6 @@ const Menu = ({navigation}) => {
   const loadCategories = async () => {
     try {
       const data = await getCategories();
-      console.log('====================================');
-      console.log(data);
-      console.log('====================================');
       setCategories(data);
       if (data.length > 0) {
         setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
@@ -123,7 +119,6 @@ const Menu = ({navigation}) => {
     } catch (error) {
       console.error(error);
     } finally {
-      console.log('done finaly get category');
       setLoading(false);
     }
   };

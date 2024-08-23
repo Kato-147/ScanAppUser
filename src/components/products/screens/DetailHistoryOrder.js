@@ -20,7 +20,7 @@ import BottomSheetHistoryOrder from '../../fragment/BottomSheetHistoryOrder';
 import Dialog from 'react-native-dialog';
 import StarRating from 'react-native-star-rating-widget';
 import Toast from 'react-native-toast-message';
-import toastConfig from '../screens/toastConfig';
+import toastConfig from '../../../helper/toastConfig';
 import {createReview} from '../ProductsHTTP';
 
 export const formatDate = isoString => {
@@ -89,6 +89,7 @@ const DetailHistoryOrder = ({route, navigation}) => {
       setVisible(false);
     }
   };
+
 
   //Back to HistoryOrder Screen
   const handleBack = () => {

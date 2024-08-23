@@ -2,7 +2,6 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  KeyboardAvoidingView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -15,7 +14,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
-import Icon2 from 'react-native-vector-icons/Ionicons';
 import {getHistoryOrder} from '../ProductsHTTP';
 import {formatDate} from './DetailHistoryOrder';
 
@@ -36,7 +34,7 @@ const HistoryOrder = ({navigation}) => {
   const historyOrder = async () => {
     try {
       const response = await getHistoryOrder();
-      console.log(response.data);
+     // console.log(response.data);
       if (response.status === 'success') {
         setitems(response.data);
       }

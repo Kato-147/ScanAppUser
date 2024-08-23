@@ -79,9 +79,6 @@ export const getTables = async (tableId, tableType) => {
     const url = `v1/tables/${tableId}?type=${tableType}`; // Endpoint API
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request không cần body
-    console.log('===================api get table=================');
-    console.log(res);
-    console.log('====================================');
     await AsyncStorage.setItem(
       'tableNumber',
       JSON.stringify(res.data.tableNumber),
@@ -374,8 +371,6 @@ export const getHistoryOrder = async () => {
     const url = `v1/payments/payments-history`;
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
-    const data = response.data;
-
     return response;
   } catch (error) {
     if (error.response) {

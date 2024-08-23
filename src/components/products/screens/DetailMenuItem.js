@@ -5,10 +5,17 @@ import {
   ScrollView,
   ActivityIndicator,
   Image,
+  TouchableOpacity
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {getMenuItemDetails} from '../ProductsHTTP';
 import StarRating from 'react-native-star-rating-widget';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/AntDesign';
+import { checkPrice } from './Oder';
 
 const DetailMenuItem = ({route, navigation}) => {
   const {item} = route.params;
@@ -50,76 +57,115 @@ const DetailMenuItem = ({route, navigation}) => {
     );
   }
 
-  return (
-    <ScrollView style={styles.container}>
-      {itemDetail && (
-        <>
-          <Image
-            style={styles.image}
-            source={{uri: itemDetail.menuItem.image_url}}
-            resizeMode="cover"
-          />
-          <Text style={styles.title}>{itemDetail.menuItem.name}</Text>
-          <Text style={styles.engName}>{itemDetail.menuItem.engName}</Text>
-          <Text style={styles.price}>{itemDetail.menuItem.price} VND</Text>
-          <Text style={styles.description}>
-            {itemDetail.menuItem.description}
-          </Text>
-          <View style={styles.ratingContainer}>
-            <StarRating
-              rating={itemDetail.menuItem.rating}
-              size={24}
-              isDisabled={true}
-              halfStarEnabled={true}
-              onChange={() => {}}
-            />
-            <Text style={styles.ratingText}>
-              {itemDetail.menuItem.rating} / 5
-            </Text>
-          </View>
+  const handleBack=()=>{
+    console.log('go Back');
+    navigation.goBack();
+  }
 
-          <Text style={styles.reviewTitle}>
-            Reviews ({itemDetail.reviewCount}):
-          </Text>
-          {itemDetail.reviews &&
-            itemDetail.reviews.map((review, index) => (
-              <View key={review._id} style={styles.review}>
-                <View style={styles.reviewHeader}>
-                  <Image
-                    style={styles.avatar}
-                    source={{uri: review.userId.img_avatar_url}}
-                  />
-                  <View style={styles.userInfo}>
-                    <Text style={styles.reviewUser}>
-                      {review.userId.fullName}
-                    </Text>
-                    <Text style={styles.orderDate}>
-                      Order Date:{' '}
-                      {new Date(review.orderCreatedAt).toLocaleDateString()}
-                    </Text>
+  function formatNumber(num) {
+    return Math.round(num * 10) / 10;
+  }
+
+  return (
+    <View style={styles.container}>
+      <View
+        style={{
+          height: hp(10),
+          position: 'absolute',
+          zIndex: 2,
+          top: 0,
+          left: 0,
+          right: 0,
+          paddingHorizontal: 5
+        }}>
+        <TouchableOpacity
+        activeOpacity={1}
+        onPress={()=> handleBack()}
+          style={{
+            width: hp(5),
+            height: hp(5),
+            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+            borderRadius: 7,
+            alignItems:'center',
+            justifyContent:'center',
+            margin: 7,
+          }}>
+          <Icon name="left" size={hp(4)} />
+        </TouchableOpacity>
+      </View>
+      <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{}}>
+        {itemDetail && (
+          <>
+            <Image
+              style={styles.image}
+              source={{uri: itemDetail.menuItem.image_url}}
+              resizeMode="cover"
+            />
+            <Text style={styles.title}>{itemDetail.menuItem.name}</Text>
+            <Text style={styles.engName}>{itemDetail.menuItem.engName}</Text>
+            <Text style={styles.price}>{checkPrice(itemDetail.menuItem.price)} VND</Text>
+            <Text style={styles.description}>
+              {itemDetail.menuItem.description}
+            </Text>
+            <View style={styles.ratingContainer}>
+              <StarRating
+                rating={itemDetail.menuItem.rating}
+                size={24}
+                isDisabled={true}
+                halfStarEnabled={true}
+                onChange={() => {}}
+              />
+              <Text style={styles.ratingText}>
+                {formatNumber(itemDetail.menuItem.rating)} / 5
+              </Text>
+            </View>
+
+            <Text style={styles.reviewTitle}>
+              Reviews ({itemDetail.reviewCount}):
+            </Text>
+            {itemDetail.reviews &&
+              itemDetail.reviews.map((review, index) => (
+                <View key={review._id} style={styles.review}>
+                  <View style={styles.reviewHeader}>
+                    <Image
+                      style={styles.avatar}
+                      source={{uri: review.userId.img_avatar_url}}
+                    />
+                    <View style={styles.userInfo}>
+                      <Text style={styles.reviewUser}>
+                        {review.userId.fullName}
+                      </Text>
+                      <Text style={styles.orderDate}>
+                        Order Date:{' '}
+                        {new Date(review.orderCreatedAt).toLocaleDateString()}
+                      </Text>
+                    </View>
                   </View>
+                  <StarRating
+                    rating={review.rating}
+                    size={20}
+                    isDisabled={true}
+                    halfStarEnabled={true}
+                    onChange={() => {}}
+                  />
+                  <Text style={styles.comment}>{review.comment}</Text>
                 </View>
-                <StarRating
-                  rating={review.rating}
-                  size={20}
-                  isDisabled={true}
-                  halfStarEnabled={true}
-                  onChange={() => {}}
-                />
-                <Text style={styles.comment}>{review.comment}</Text>
-              </View>
-            ))}
-        </>
-      )}
-    </ScrollView>
+              ))}
+          </>
+        )}
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    display: 'flex',
     backgroundColor: '#f0f0f0',
-    padding: 20,
+    position: 'relative',
+    paddingHorizontal: wp(2)
   },
   loadingContainer: {
     flex: 1,
@@ -155,7 +201,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 22,
-    color: '#28a745',
+    color: '#E8900C',
     marginVertical: 10,
   },
   description: {
@@ -192,6 +238,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
+    width: wp(95),
+    alignSelf:'center'
   },
   reviewHeader: {
     flexDirection: 'row',
