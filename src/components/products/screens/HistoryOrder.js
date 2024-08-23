@@ -1,6 +1,7 @@
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   StyleSheet,
   Text,
@@ -16,12 +17,12 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icon2 from 'react-native-vector-icons/Ionicons';
 import {getHistoryOrder} from '../ProductsHTTP';
+import { formatDate } from './DetailHistoryOrder';
 
 const HistoryOrder = ({navigation}) => {
   const [items, setitems] = useState([]);
   const [loading, setLoading] = useState(true);
  
-
   //Back to Profile Screen
   const handleBack = () => {
     console.log('>>>>>> Click Back Button');
@@ -65,15 +66,18 @@ const HistoryOrder = ({navigation}) => {
         activeOpacity={0.5}
         onPress={() => handleDetail(item)}
         style={styles.itemContainer}>
+
         <View style={styles.imageItem}>
-          <Icon2 name="checkmark-done" color="#E8900C" size={wp(10)} />
+          {item.paymentMethod === 'ZaloPay' ? (<Image style={styles.image} source={require('../../../images/zaloPay.png')} />):(<Image style={styles.image} source={require('../../../images/cash.png')}  />)}
         </View>
+
         <View
           style={{
             height: '100%',
             width: wp(75),
             alignItems: 'center',
             justifyContent: 'center',
+            
           }}>
           <Text style={styles.textItem}>
             Bạn đã thanh toán thành công hóa đơn{' '}
@@ -81,6 +85,11 @@ const HistoryOrder = ({navigation}) => {
               {item.appTransactionId}
             </Text>
           </Text>
+          <View style={{flexDirection:'row', justifyContent:'space-between', width:'100%', padding:5}}>
+            <Text>Thời gian : </Text>
+            <Text>{formatDate(item.createdAt)}</Text>
+          </View>
+          
         </View>
       </TouchableOpacity>
     );
@@ -166,9 +175,16 @@ const styles = StyleSheet.create({
     width: wp(21),
     alignItems: 'center',
     justifyContent: 'center',
+    height:'100%',
+    borderRadius: 10
   },
   textItem: {
     fontWeight: 'bold',
     fontSize: hp(2.2),
   },
+  image:{
+    width: wp(20),
+    height: wp(20),
+    borderRadius:10
+  }
 });

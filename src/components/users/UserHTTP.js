@@ -176,3 +176,25 @@ export const getInfoApi = async () => {
   }
 };
 
+//Menu no Login api
+export const getMenuNoLoginApi = async()=>{
+  try {
+    const url = `v1/tables/get-menu`;
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.get(url);
+    return res;
+  } catch (err) {
+    //xử lý lỗi chi tiết
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.data.message || 'gọi Menu no login thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+    
+  }
+}
