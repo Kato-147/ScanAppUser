@@ -20,6 +20,21 @@ const Splash = ({navigation}) => {
     requestUserPermission();
   }, []);
 
+  // Xem các Key trong asynStorage
+  // useEffect(() => {
+  //   const getAllKeys = async () => {
+  //     try {
+  //       const keys = await AsyncStorage.getAllKeys();
+  //       console.log('All keys:', keys);
+  //     } catch (error) {
+  //       console.error('Error getting keys:', error);
+  //     }
+  //   };
+
+  //   // Gọi hàm để xem các key
+  //   getAllKeys();
+  // }, []);
+
   //Animation logo
   useEffect(() => {
     ring1padding.value = 0;

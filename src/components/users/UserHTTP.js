@@ -198,3 +198,19 @@ export const getMenuNoLoginApi = async()=>{
     
   }
 }
+
+
+//Logout
+
+export const logOutApi = async()=>{
+  try {
+    const url = `v1/users/logout`;
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.get(url);
+    console.log('-----Logout Api----------',res);
+    
+    return res;
+  } catch (error) {
+    console.log('---Logout Api---',error);
+  }
+}

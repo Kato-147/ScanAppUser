@@ -16,6 +16,7 @@ import DetailHistoryOrder from '../products/screens/DetailHistoryOrder';
 import Help from '../products/screens/Help';
 import DetailNews from '../products/screens/DetailNews';
 import MenuNoLogin from '../users/screens/MenuNoLogin';
+import DetailMenuItem from '../products/screens/DetailMenuItem';
 import {useLinkTo} from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
 
@@ -61,6 +62,7 @@ const Navigation = () => {
       <Stack.Screen name="DetailHistoryOrder" component={DetailHistoryOrder} />
       <Stack.Screen name="DetailNews" component={DetailNews} />
       <Stack.Screen name="MenuNoLogin" component={MenuNoLogin} />
+      <Stack.Screen name="DetailMenuItem" component={DetailMenuItem} />
     </Stack.Navigator>
   );
 };

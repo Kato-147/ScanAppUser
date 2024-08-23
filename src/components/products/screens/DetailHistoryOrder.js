@@ -17,6 +17,11 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import IconBill from 'react-native-vector-icons/FontAwesome5';
 import {checkPrice, mergeOrderItems} from './Oder';
 import BottomSheetHistoryOrder from '../../fragment/BottomSheetHistoryOrder';
+import Dialog from 'react-native-dialog';
+import StarRating from 'react-native-star-rating-widget';
+import Toast from 'react-native-toast-message';
+import toastConfig from '../../../helper/toastConfig';
+import {createReview} from '../ProductsHTTP';
 
 export const formatDate = isoString => {
   const date = new Date(isoString);
@@ -36,8 +41,55 @@ const DetailHistoryOrder = ({route, navigation}) => {
   const {item} = route.params;
   const [historyItems, sethistoryItems] = useState([]);
   const [status, setStatus] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [selectedMenuItemId, setSelectedMenuItemId] = useState(null);
 
-  
+  const showDialog = (orderId, menuItemId) => {
+    setSelectedMenuItemId(menuItemId);
+    setVisible(true);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
+
+  const handleAddReview = async () => {
+    const body = {
+      menuItemId: selectedMenuItemId,
+      orderId: item.orderId,
+      rating: rating,
+      comment: comment,
+    };
+
+    try {
+      const response = await createReview(body);
+      if (response.status === 'success') {
+        Toast.show({
+          type: 'success',
+          text1: 'Đánh giá thành công',
+          text2: 'Cảm ơn bạn đã đánh giá!',
+        });
+        setVisible(false);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Đánh giá thất bại',
+          text2: response.message,
+        });
+        setVisible(false);
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Đánh giá thất bại',
+        text2: error.message,
+      });
+      setVisible(false);
+    }
+  };
+
 
   //Back to HistoryOrder Screen
   const handleBack = () => {
@@ -47,7 +99,10 @@ const DetailHistoryOrder = ({route, navigation}) => {
 
   useEffect(() => {
     loadItems();
-    // console.log(item);
+    // Log orderId from item.items
+    item.items.forEach(order => {
+      console.log('orderId:', order.orderId);
+    });
   }, []);
 
   const loadItems = () => {
@@ -57,7 +112,10 @@ const DetailHistoryOrder = ({route, navigation}) => {
 
   const renderItem = ({item}) => {
     return (
-      <TouchableOpacity activeOpacity={1} style={styles.itemContainer}>
+      <TouchableOpacity
+        activeOpacity={1}
+        style={styles.itemContainer}
+        onPress={() => showDialog(item.orderId, item.menuItemId)}>
         {/* Image wp30 */}
         <View
           style={{
@@ -97,7 +155,6 @@ const DetailHistoryOrder = ({route, navigation}) => {
     <LinearGradient
       colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
       style={styles.container}>
-      {/* Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={handleBack}>
           <Icon name="arrowleft" size={24} color="#E8900C" />
@@ -105,32 +162,50 @@ const DetailHistoryOrder = ({route, navigation}) => {
         <Text style={styles.headerText}>BÀN {item.tableNumber} </Text>
       </View>
 
-      {/* <Text>Người thanh toán: {item.userPay.fullName}</Text> */}
-     
-
       <View style={{height: hp(80)}}>
         <FlatList
           data={historyItems}
-          // keyExtractor={item => item._id.toString()}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: 20, marginTop: 5}}
         />
       </View>
 
-      
-      <View style={{width:wp(100), alignItems:'center', justifyContent:'center'}}>
-      <TouchableOpacity
-        style={styles.infoContainer}
-        onPress={() => setStatus(true)}>
-          <Text style={{color: 'white', fontSize: hp(2.2), fontWeight:'bold'}}>
+      <View
+        style={{
+          width: wp(100),
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <TouchableOpacity
+          style={styles.infoContainer}
+          onPress={() => setStatus(true)}>
+          <Text style={{color: 'white', fontSize: hp(2.2), fontWeight: 'bold'}}>
             Xem chi tiết hóa đơn
           </Text>
-       
-      </TouchableOpacity>
+        </TouchableOpacity>
       </View>
-      
+
       {status && <BottomSheetHistoryOrder item={item} setStatus={setStatus} />}
+
+      <Dialog.Container visible={visible}>
+        <Dialog.Title>Đánh giá món ăn</Dialog.Title>
+        <StarRating
+          starSize={40}
+          defaultRating={1}
+          rating={rating}
+          color="#E8900C"
+          onChange={newRating => setRating(Math.max(newRating, 1))}
+        />
+        <Dialog.Input
+          placeholder="Nhập bình luận của bạn"
+          value={comment}
+          onChangeText={text => setComment(text)}
+        />
+        <Dialog.Button label="Hủy" onPress={handleCancel} />
+        <Dialog.Button label="Gửi" onPress={handleAddReview} />
+      </Dialog.Container>
+      <Toast config={toastConfig} ref={ref => Toast.setRef(ref)} />
     </LinearGradient>
   );
 };
@@ -143,12 +218,12 @@ const styles = StyleSheet.create({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-   // backgroundColor:'green',
+    // backgroundColor:'green',
   },
   headerContainer: {
     height: hp(8),
     width: wp(100),
-  //  backgroundColor: 'green',
+    //  backgroundColor: 'green',
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -189,6 +264,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: hp(2.2),
     fontWeight: 'bold',
+    color: '#333',
   },
   price: {
     fontSize: 14,
@@ -215,7 +291,6 @@ const styles = StyleSheet.create({
     borderColor: '#E8900C',
     width: wp(70),
     justifyContent: 'center',
-   
   },
   infoCard: {
     flexDirection: 'row',

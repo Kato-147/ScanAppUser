@@ -97,13 +97,12 @@ const Menu = ({navigation}) => {
       console.log('ID Table từ AsyncStorage', idtable, tableType);
 
       const table = await getTables(idtable, tableType);
-      console.log('===table==========', table);
+      console.log('===table==========', table.data.tableNumber);
 
       setTable(table);
     } catch (error) {
       console.error('Table error', error);
-    } finally{
-      console.log('done finaly get table');
+    } finally {
       setLoading(false);
     }
   };
@@ -112,9 +111,6 @@ const Menu = ({navigation}) => {
   const loadCategories = async () => {
     try {
       const data = await getCategories();
-      console.log('====================================');
-      console.log(data);
-      console.log('====================================');
       setCategories(data);
       if (data.length > 0) {
         setActiveCategory(data[0]._id); // Chọn mục đầu tiên làm mặc định
@@ -122,9 +118,7 @@ const Menu = ({navigation}) => {
       }
     } catch (error) {
       console.error(error);
-    } 
-    finally {
-      console.log('done finaly get category');
+    } finally {
       setLoading(false);
     }
   };
@@ -209,16 +203,14 @@ const Menu = ({navigation}) => {
   };
 
   // Logout table
-  const handleLogoutTable= async()=>{
+  const handleLogoutTable = async () => {
     try {
       navigation.popToTop();
       await logOutTableApi();
     } catch (error) {
       console.log(error);
-      
     }
-    
-}
+  };
 
   if (loading) {
     return (
@@ -294,7 +286,7 @@ const Menu = ({navigation}) => {
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {
-          console.log(item.name);
+          navigation.navigate('DetailMenuItem', {item});
         }}>
         <View style={styles.menuItem}>
           {/* Image */}
@@ -431,15 +423,19 @@ const Menu = ({navigation}) => {
                   ? item.img_avatar_url
                   : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr6WsCGy-o3brXcj2cmXGkHM_fE_p0gy4X8w&s',
               }}
-              style={{width: hp(8),
+              style={{
+                width: hp(8),
                 height: hp(8),
                 borderRadius: 10,
-                marginRight: 10,}}
+                marginRight: 10,
+              }}
             />
           </View>
-          <Text style={[styles.menuItemName,{color:'#757575'}]} numberOfLines={1}>
-              {item.fullName}
-            </Text>
+          <Text
+            style={[styles.menuItemName, {color: '#757575'}]}
+            numberOfLines={1}>
+            {item.fullName}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -544,7 +540,7 @@ const Menu = ({navigation}) => {
             </View>
           </View>
 
-{/* More options */}
+          {/* More options */}
           {moreOptions && (
             <BtShitMenu
               setMoreOptions={setMoreOptions}
@@ -580,9 +576,16 @@ const Menu = ({navigation}) => {
             <TouchableWithoutFeedback onPress={() => setShowModalUser(false)}>
               <View style={styles.modalContainer}>
                 <View style={styles.modalContentUser}>
-                <Text style={{fontSize: hp(2.5), fontWeight: 'bold', color: '#E8900C', marginStart: wp(3), marginTop: hp(1) }}>
-            Số người trong bàn : {totalUser}
-          </Text>
+                  <Text
+                    style={{
+                      fontSize: hp(2.5),
+                      fontWeight: 'bold',
+                      color: '#E8900C',
+                      marginStart: wp(3),
+                      marginTop: hp(1),
+                    }}>
+                    Số người trong bàn : {totalUser}
+                  </Text>
                   <FlatList
                     horizontal
                     data={userInTable}
@@ -753,12 +756,12 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     flexDirection: 'row',
     height: hp(8),
-    alignItems:'center'
+    alignItems: 'center',
   },
   modalContentUser: {
     width: wp(90),
     height: hp(45),
     backgroundColor: 'white',
     borderRadius: 10,
-  }
+  },
 });

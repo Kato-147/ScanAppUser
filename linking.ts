@@ -11,7 +11,8 @@ const config = {
       // },
       HistoryOrder:{
         path:'HistoryOrder'
-    }
+    },
+    
     },
    
   };

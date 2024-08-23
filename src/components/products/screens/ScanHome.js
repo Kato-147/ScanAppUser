@@ -24,7 +24,6 @@ const ScanHome = ({navigation}) => {
   const [data, setData] = useState('scan something');
   const [scanning, setScanning] = useState(true); // Trạng thái để quản lý việc kích hoạt máy quét
 
-  
   const handleMenu = async scannedData => {
     if (scannedData) {
       // Lưu dữ liệu vào AsyncStorage nếu cần
@@ -35,11 +34,11 @@ const ScanHome = ({navigation}) => {
   };
 
   // bàn 3 6679893df3da9df0bfcf3da9
-  const fastGo = async()=>{
-    const cc = {'tableId':"6679893df3da9df0bfcf3da9","type":"hardQRCode"}
+  const fastGo = async () => {
+    const cc = {tableId: '6679893df3da9df0bfcf3da9', type: 'hardQRCode'};
     await AsyncStorage.setItem('idTable', JSON.stringify(cc));
     navigation.replace('Menu');
-  }
+  };
 
   const handleBack = () => {
     console.log('back to Home');
@@ -63,7 +62,14 @@ const ScanHome = ({navigation}) => {
       showMarker={true}
       // topp
       topContent={
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', display: 'flex', width: wp(100), paddingHorizontal: wp(10)}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            display: 'flex',
+            width: wp(100),
+            paddingHorizontal: wp(10),
+          }}>
           <TouchableOpacity onPress={handleBack}>
             <Icon style={styles.backIcon} name="left" />
           </TouchableOpacity>
@@ -73,9 +79,8 @@ const ScanHome = ({navigation}) => {
       }
       // Bottom
       bottomContent={
-        <TouchableOpacity
-          onPress={() => fastGo()}>
-          <Text> Menu</Text>
+        <TouchableOpacity onPress={() => fastGo()}>
+          <Text style={{fontSize: hp(2), color: 'black'}}> Menu</Text>
         </TouchableOpacity>
       }
     />
