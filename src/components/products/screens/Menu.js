@@ -544,6 +544,7 @@ const Menu = ({navigation}) => {
             </View>
           </View>
 
+{/* More options */}
           {moreOptions && (
             <BtShitMenu
               setMoreOptions={setMoreOptions}

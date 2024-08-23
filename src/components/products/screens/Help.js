@@ -1,4 +1,10 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React from 'react';
 import {
   widthPercentageToDP as wp,
@@ -6,6 +12,7 @@ import {
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import AccodianHelp from '../../fragment/AccodianHelp';
 
 const Help = ({navigation}) => {
   const handleBack = () => {
@@ -24,19 +31,38 @@ const Help = ({navigation}) => {
         <Text style={styles.headerText}>HỖ TRỢ </Text>
       </View>
       {/* body */}
-      <View>
-        <Text style={{fontSize: 28}}>Muốn gì thì hỏi phục vụ</Text>
-      </View>
+      <ScrollView showsVerticalScrollIndicator={false} style={{height: hp(74)}}>
+        {data.map((item, index) => (
+          <AccodianHelp
+            key={index.toString()}
+            title={item.title}
+            description={item.description}
+          />
+        ))}
+      </ScrollView>
 
       {/* footer */}
-      <View style={{height: hp(18), width: wp(100), backgroundColor: '#E8900C', flexDirection:'row'}}>
-        <View style={{height:'100%', width: wp(60), paddingStart: wp(2), justifyContent:'center', gap: 5}} >
-      <Text style={{color: 'white', }}>
-        Liên hệ với chúng tôi qua Email:
-      </Text>
-      <Text style={{color: 'white', }}>deptrainhatthegioi@gmail.com </Text>
-      <Text style={{color: 'white', }}>Địa chỉ : </Text>
-      <Text style={{color: 'white', }}>Tòa T Cao đẳng FPT Polytechnic HCM</Text>
+      <View
+        style={{
+          height: hp(18),
+          width: wp(100),
+          backgroundColor: '#E8900C',
+          flexDirection: 'row',
+        }}>
+        <View
+          style={{
+            height: '100%',
+            width: wp(60),
+            paddingStart: wp(2),
+            justifyContent: 'center',
+            gap: 5,
+          }}>
+          <Text style={{color: 'white'}}>Liên hệ với chúng tôi qua Email:</Text>
+          <Text style={{color: 'white'}}>deptrainhatthegioi@gmail.com </Text>
+          <Text style={{color: 'white'}}>Địa chỉ : </Text>
+          <Text style={{color: 'white'}}>
+            Tòa T Cao đẳng FPT Polytechnic HCM
+          </Text>
         </View>
         {/* Map */}
         <View style={styles.mapContainer}>
@@ -109,3 +135,18 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
 });
+
+const data = [
+  {
+    id: 1,
+    title: 'Cách thay đổi mật khẩu',
+    description:
+      'Ở màn hình "người dùng", nhấn vào nút "Thay đổi mật khẩu" ở phần "Cài đặt" để tới màn hình "Thay đổi mật khẩu". Nhập mật khẩu cũ sau đó nhập mật khẩu bạn muốn thay đổi và nhập lại mật khẩu mới. Nhấn nút "Xác nhận" để tiến hành thay đổi mật khẩu.',
+  },
+  {
+    id: 2,
+    title: 'Màn hình Menu hiển thị lỗi sau khi đã quét mã QR',
+    description: ' - Kiểm tra bạn đã vào bàn khác trước đó hay chưa. Nếu đã vào bàn khác ở trước đó, vui lòng chọn dấu ba chấm góc phải trên cùng màn hình để thoát bàn và vào bàn hiện tại. \n - Nếu bàn đã có người vào trước, vui lòng quét mã QR của người vào trước để xem menu. \n - Bàn cần ở trạng thái "mở" khách hàng mới vào được, vui lòng liên hệ phục vụ để mở trạng thái bàn. \n - Nếu có lỗi khác vui lòng liên hệ phục vụ hoặc với chúng tôi qua thông tin ở dưới màn hình.',
+  },
+  {id: 3, title: 'Lỗi khác', description: 'Vui lòng gọi phục vụ'},
+];

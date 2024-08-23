@@ -138,35 +138,6 @@ export const postOrder = async () => {
   }
 };
 
-// get Order User
-export const getOrderTable = async promotionCode => {
-  try {
-    const id = await AsyncStorage.getItem('idTable');
-    const tableId = JSON.parse(id).tableId;
-    if (!tableId) {
-      throw new Error('ID Table không tồn tại');
-    }
-    const body = promotionCode;
-    console.log('body getOrder table resquest to sever', body);
-    const url = `v1/tables/${tableId}/orders?&promotionCode=${body}`; // Chèn idTable vào URL
-
-    const axiosInstance = await AxiosInstance();
-    const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
-    // Trả về dữ liệu từ API
-    return response;
-  } catch (err) {
-    if (err.response) {
-      console.log('API error:', err.response.data);
-      throw new Error(err.response.data.message || 'Chưa đặt món table');
-    } else if (err.request) {
-      console.log('No response from API:', err.request);
-      throw new Error('Không có phản hồi từ máy chủ');
-    } else {
-      console.log('Error setting up request:', err.message);
-      throw new Error('Lỗi khi thiết lập yêu cầu');
-    }
-  }
-};
 
 //get Order user
 export const getOrderUserApi = async (promotionCode) => {
@@ -176,9 +147,8 @@ export const getOrderUserApi = async (promotionCode) => {
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const body = promotionCode;
-    console.log('body getOrder User resquest to sever', body);
-    const url = `v1/tables/${tableId}/orders/get-order-for-client?userId=true`; // Endpoint API
+    console.log('promotionCode getOrder User resquest to sever', promotionCode);
+    const url = `v1/tables/${tableId}/orders/get-order-for-client?userId=true&promotionCode=${promotionCode}`; // Endpoint API
 
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url); // GET request và gửi token user
@@ -206,9 +176,9 @@ export const getOrderTableApi = async promotionCode => {
     if (!tableId) {
       throw new Error('ID Table không tồn tại');
     }
-    const body = promotionCode;
-    console.log('body getOrder table resquest to sever', body);
-    const url = `v1/tables/${tableId}/orders/get-order-for-client`; // Chèn idTable vào URL
+    console.log('promotionCode getOrder Table resquest to sever', promotionCode);
+
+    const url = `v1/tables/${tableId}/orders/get-order-for-client?promotionCode=${promotionCode}`; // Chèn idTable vào URL
 
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
