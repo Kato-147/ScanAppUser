@@ -102,12 +102,12 @@ const Oder = ({}) => {
   const [deleted, setdeleted] = useState([]);
   const [totalOrder, settotalOrder] = useState(totalOrder);
   const [totalTable, settotalTable] = useState(totalTable);
+  const [discount, setDiscount] = useState(0);
   const [orderType, setorderType] = useState('user'); //table
   const isFocused = useIsFocused();
   const [promotionCode, setpromotionCode] = useState('');
   const [orderUserItems, setOrderUserItems] = useState([]);
   const [orderTableItems, setorderTableItems] = useState([]);
-
 
   useEffect(() => {
     if (isFocused) {
@@ -130,7 +130,8 @@ const Oder = ({}) => {
       if (response.status === 'success') {
         setOrderUserItems(response.data);
         settotalOrder(response.totalAmount);
-        setError(null);
+        setDiscount(response.discountAmount);
+        setError(response.promotionError);
       } else {
         console.log('Failed to fetch orderUser data:', response?.data);
       }
@@ -149,7 +150,8 @@ const Oder = ({}) => {
       if (response.status === 'success') {
         setorderTableItems(response.data);
         settotalTable(response.totalAmount);
-        setError(null);
+        setDiscount(response.discountAmount);
+        setError(response.promotionError);
       } else {
         console.log('Failed to fetch orderUser data:', response?.data);
       }
@@ -160,7 +162,6 @@ const Oder = ({}) => {
       setLoading(false);
     }
   };
-
 
   const onclickUser = async () => {
     setorderType('user');
@@ -322,7 +323,6 @@ const Oder = ({}) => {
       console.log('handle Apply Voucher', error);
     }
   };
-
 
   // Hàm tính tổng tiền
   function totalMoney() {
@@ -546,20 +546,38 @@ const Oder = ({}) => {
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* Total Price */}
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                padding: wp(6),
-                width: wp(100),
-              }}>
-              <Text style={styles.totalText}>Tổng tiền : </Text>
-              <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
-                {totalMoney()} đ{' '}
-              </Text>
+            <View>
+              {discount > 0 ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
+                    width: wp(100),
+                  }}>
+                  <Text style={styles.discountText}>Giảm giá : </Text>
+                  <Text style={styles.discountText}>
+                    {checkPrice(discount)} đ{' '}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.errorText}>{error}</Text>
+              )}
+              {/* Total Price */}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 10,
+                  paddingVertical: 10,
+                  width: wp(100),
+                }}>
+                <Text style={styles.totalText}>Tổng tiền : </Text>
+                <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
+                  {totalMoney()} đ{' '}
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -679,7 +697,7 @@ const styles = StyleSheet.create({
     width: hp(24),
   },
   title: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#525252',
   },
@@ -687,7 +705,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 3,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
@@ -721,6 +739,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 1,
   },
+
+  discountText: {
+    fontSize: hp(2),
+    color: '#32CD32',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
   errorContainer: {
     width: '100%',
     height: '100%',
@@ -731,7 +756,14 @@ const styles = StyleSheet.create({
     gap: hp(5),
   },
   errorText: {
-    fontSize: hp(2.2),
+    fontSize: hp(1.5),
+    color: '#FF6347',
+    backgroundColor: '#F6F6F6',
+    padding: hp(1),
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignContent: 'center',
+    textAlign: 'center',
   },
   errorImage: {
     width: hp(10),
