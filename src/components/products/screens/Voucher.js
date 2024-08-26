@@ -50,6 +50,7 @@ const Voucher = ({navigation}) => {
       if (response.status === 'success') {
         setvoucherItems(response.data.promotions);
       }
+      console.log('voucherItems', response.data.promotions);
       return response;
     } catch (error) {
       console.log('err>>', error);
@@ -107,6 +108,11 @@ const Voucher = ({navigation}) => {
               <CopyIcon name="content-copy" size={wp(5)} color="#ffffff" />
             </TouchableOpacity>
           </View>
+          {/* End Date */}
+          <Text style={{color: 'black'}}>
+            Hạn sử dụng: {new Date(item.endDate).toLocaleDateString()}
+          </Text>
+         
         </View>
       </TouchableOpacity>
     );
