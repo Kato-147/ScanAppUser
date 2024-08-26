@@ -9,6 +9,7 @@ import {
     FlatList,
     TouchableOpacity,
     Image,
+    Alert,
   } from 'react-native';
   import React, { useState } from 'react';
   import Icon from 'react-native-vector-icons/AntDesign'
@@ -17,8 +18,12 @@ import {
     heightPercentageToDP as hp,
   } from 'react-native-responsive-screen';
 import { checkPrice } from '../products/screens/Oder';
+import { deleteOrder } from '../products/ProductsHTTP';
+import toastConfig from '../../helper/toastConfig';
+import Toast from 'react-native-toast-message';
 
-const AccodianUserOrder = ({title,quantity, items}) => {
+const AccodianUserOrder = ({title,quantity, items,setdeleted}) => {
+
     const [opened, setOpened] = useState(false);
 
     if (
@@ -36,6 +41,35 @@ const AccodianUserOrder = ({title,quantity, items}) => {
       });
       setOpened(!opened);
     }
+
+      // Hủy món
+  const handleDeleteItems = async itemId => {
+    console.log(itemId);
+    try {
+      if (!itemId) {
+        throw new Error('Item ID is required');
+      }
+      const response = await deleteOrder( itemId);
+      setdeleted(response);
+      response.status === 'success' && Toast.show({
+        type: 'success',
+        text1: 'Hủy món thành công',
+        text2:'Món đã được hủy'
+      })
+        
+      
+      console.log(response);
+      return response;
+    } catch (error) {
+      error && Toast.show({
+        type: 'error',
+        text1: 'Hủy món không thành công',
+        text2: error
+      })
+      console.log('Error handling delete items:', error);
+      // Có thể thông báo cho người dùng hoặc xử lý lỗi theo cách khác
+    }
+  };
 
   
     return (
@@ -94,7 +128,7 @@ const AccodianUserOrder = ({title,quantity, items}) => {
                     {/* Icon */}
                  <TouchableOpacity
                    onPress={() => {
-                    // handleDeleteItems(item._id);
+                     handleDeleteItems(item._id);
                    }}
                    style={{
                      marginTop: hp(1),
@@ -111,6 +145,7 @@ const AccodianUserOrder = ({title,quantity, items}) => {
             ))}
           </View>
         )}
+          
       </View>
     );
 }

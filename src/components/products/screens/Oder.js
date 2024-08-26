@@ -39,6 +39,8 @@ import {RadioButton} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AccodianUserOrder from '../../fragment/AccodianUserOrder';
 import AccodianTableOrder from '../../fragment/AccodianTableOrder';
+import Toast from 'react-native-toast-message';
+import toastConfig from '../../../helper/toastConfig';
 const {PayZaloBridge} = NativeModules;
 
 // const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
@@ -108,6 +110,9 @@ const Oder = ({}) => {
   const [promotionCode, setpromotionCode] = useState('');
   const [orderUserItems, setOrderUserItems] = useState([]);
   const [orderTableItems, setorderTableItems] = useState([]);
+
+ 
+
 
   useEffect(() => {
     if (isFocused) {
@@ -200,30 +205,7 @@ const Oder = ({}) => {
   //   );
   // }
 
-  // Hủy món
-  const handleDeleteItems = async itemId => {
-    console.log(itemId);
-    try {
-      const tableId = await AsyncStorage.getItem('idTable');
-      if (!tableId) {
-        throw new Error('Table ID not found');
-      }
-      if (!itemId) {
-        throw new Error('Item ID is required');
-      }
-      const response = await deleteOrder(tableId, itemId);
-      setdeleted(response.data);
-      console.log(
-        'Order deleted successfully:------',
-        response.data.items.length,
-      );
 
-      return response;
-    } catch (error) {
-      console.log('Error handling delete items:', error);
-      // Có thể thông báo cho người dùng hoặc xử lý lỗi theo cách khác
-    }
-  };
 
   // Hàm xử lý khi người dùng nhấn nút thanh toán
   const handlePayment = promotionCode => {
@@ -363,6 +345,7 @@ const Oder = ({}) => {
                 title={item.orderCount}
                 quantity={item.totalQuantityOfOrderCount}
                 items={item.items}
+                setdeleted={setdeleted}
               />
             ))}
           </ScrollView>
@@ -598,6 +581,9 @@ const Oder = ({}) => {
               <Text style={styles.orderButtonText}>Thanh toán</Text>
             </TouchableOpacity>
           </View>
+
+          <Toast config={toastConfig}  />
+
         </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
