@@ -28,6 +28,7 @@ const MenuNoLogin = ({navigation}) => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState('');
   const [menuItems, setMenuItems] = useState([]);
+  const [activeOptions, setActiveOptions] = useState({});
 
   const [table, setTable] = useState('');
   //  const [idTable, setidTable] = useState(tableId)
@@ -43,7 +44,7 @@ const MenuNoLogin = ({navigation}) => {
     // setidTable(tableId);
     getTableNumber();
     loadCategories();
-    loadMenuItems();
+    //loadMenuItems();
     // loadCategories();
   }, []);
 
@@ -137,6 +138,8 @@ const MenuNoLogin = ({navigation}) => {
       </LinearGradient>
     );
   }
+
+
 
   const renderCategoryItem = ({item}) => {
     const isActive = item._id === activeCategory;
@@ -251,31 +254,6 @@ const MenuNoLogin = ({navigation}) => {
               <Text style={styles.menuItemPrice}>
                 {checkPrice(item.price)} đ
               </Text>
-
-              {/* Button Add ItemMenu */}
-              <TouchableOpacity onPress={() => handleAddToCart(item)}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    borderColor: '#E8900C',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: hp(10),
-                    padding: hp(0.5),
-                  }}>
-                  <Icon name="shoppingcart" size={hp(2.8)} color="#E8900C" />
-                  <Text
-                    style={{
-                      fontSize: hp(2),
-                      fontWeight: 500,
-                      color: '#E8900C',
-                    }}>
-                    Thêm
-                  </Text>
-                </View>
-              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -301,7 +279,7 @@ const MenuNoLogin = ({navigation}) => {
               </TouchableOpacity>
               <Text
                 style={{fontSize: hp(3), fontWeight: '600', color: '#525252'}}>
-                Vui lòng đăng nhập để đặt món
+                Vui lòng đăng nhập !
               </Text>
             </View>
           </View>
