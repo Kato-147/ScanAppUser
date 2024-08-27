@@ -17,6 +17,7 @@ import Help from '../products/screens/Help';
 import DetailNews from '../products/screens/DetailNews';
 import MenuNoLogin from '../users/screens/MenuNoLogin';
 import DetailMenuItem from '../products/screens/DetailMenuItem';
+import ResetPassword from '../users/screens/ResetPassword';
 import {useLinkTo} from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
 
@@ -63,6 +64,7 @@ const Navigation = () => {
       <Stack.Screen name="DetailNews" component={DetailNews} />
       <Stack.Screen name="MenuNoLogin" component={MenuNoLogin} />
       <Stack.Screen name="DetailMenuItem" component={DetailMenuItem} />
+      <Stack.Screen name="ResetPassword" component={ResetPassword} />
     </Stack.Navigator>
   );
 };
