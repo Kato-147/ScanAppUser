@@ -18,7 +18,7 @@ import IconLogout from 'react-native-vector-icons/MaterialIcons';
 import {infoProfile} from '../ProductsHTTP';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
-import { logOutApi } from '../../users/UserHTTP';
+import {logOutApi} from '../../users/UserHTTP';
 
 const Profile = ({navigation}) => {
   const [userInfo, setUserInfo] = useState(null);
@@ -26,9 +26,7 @@ const Profile = ({navigation}) => {
   const [error, setError] = useState(null);
   const isFocused = useIsFocused();
 
-  const [log, setlog] = useState('')
-
-  
+  const [log, setlog] = useState('');
 
   useEffect(() => {
     if (isFocused) {
@@ -36,8 +34,8 @@ const Profile = ({navigation}) => {
         try {
           const data = await infoProfile();
           setUserInfo(data);
-          setlog(data.data.user.email)
-          console.log( 'userInfo -->>>>>>>>>>',log);
+          setlog(data.data.user.email);
+          console.log('userInfo -->>>>>>>>>>', log);
         } catch (err) {
           setError(err.message);
           ToastAndroid.show(err.message, ToastAndroid.SHORT);
@@ -89,7 +87,6 @@ const Profile = ({navigation}) => {
   const handleLogout = async () => {
     console.log('click log out');
     try {
-
       await logOutApi();
 
       // Xóa dữ liệu người dùng khỏi bộ nhớ cục bộ
@@ -103,9 +100,9 @@ const Profile = ({navigation}) => {
       // Chuyển sang màn hình chính
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Splash' }],
+        routes: [{name: 'Splash'}],
       });
-  
+
       console.log('Logged out and navigated to Login screen.');
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);
@@ -197,15 +194,19 @@ const Profile = ({navigation}) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-        onPress={()=>{navigation.navigate('HistoryOrder')}}
-        style={styles.optionsetting}>
+          onPress={() => {
+            navigation.navigate('HistoryOrder');
+          }}
+          style={styles.optionsetting}>
           <Text style={styles.textOptionsetting}>Lịch sử đơn hàng</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 
         <TouchableOpacity
-        onPress={()=>{navigation.navigate('Help')}}
-        style={styles.optionsetting}>
+          onPress={() => {
+            navigation.navigate('Help');
+          }}
+          style={styles.optionsetting}>
           <Text style={styles.textOptionsetting}>Hỗ trợ</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
