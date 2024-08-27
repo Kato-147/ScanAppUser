@@ -12,19 +12,21 @@ import React, {useEffect, useMemo, useState} from 'react';
 import CustomInput from '../../fragment/CustomInput';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import LinearGradient from 'react-native-linear-gradient';
-import {login} from '../UserHTTP';
+import {login, forgotPassword} from '../UserHTTP';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import Toast from 'react-native-toast-message';
+import Dialog from 'react-native-dialog';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('oroki147@gmail.com');
   const [password, setPassword] = useState('Tt123456');
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('')
   const [fcmToken, setfcmToken] = useState([]);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
 
   console.log('--------fcm  Token in login---------', fcmToken);
 
@@ -92,6 +94,35 @@ const Login = ({navigation}) => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (forgotEmail === '') {
+      Toast.show({type: 'error', text1: 'Vui lòng nhập email'});
+      return;
+    }
+
+    try {
+      const response = await forgotPassword(forgotEmail);
+      if (response.status === 'success') {
+        Toast.show({
+          type: 'success',
+          text1: 'Email đặt lại mật khẩu đã được gửi',
+        });
+        navigation.navigate('ResetPassword', {email: forgotEmail});
+        setIsDialogVisible(false);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Có lỗi xảy ra, vui lòng thử lại',
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra, vui lòng thử lại',
+      });
+      console.log('Error in handleForgotPassword:', error.message);
+    }
+  };
   return (
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback
@@ -116,7 +147,12 @@ const Login = ({navigation}) => {
             placeholder={'Mật khẩu'}
             onChangeText={setPassword}
           />
-          <TouchableOpacity activeOpacity={0.5} style={{alignSelf: 'flex-end'}}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            style={{alignSelf: 'flex-end'}}
+            onPress={() => {
+              setIsDialogVisible(true);
+            }}>
             <Text style={{color: 'white', alignSelf: 'flex-end', margin: 5}}>
               Quên mật khẩu ?
             </Text>
@@ -154,8 +190,24 @@ const Login = ({navigation}) => {
               kiện {'\n'} & Chính sách bảo mật của chúng tôi
             </Text>
           </View>
+          <Toast ref={ref => Toast.setRef(ref)} />
         </LinearGradient>
       </TouchableWithoutFeedback>
+
+      {/* Dialog for forgot password */}
+      <Dialog.Container visible={isDialogVisible}>
+        <Dialog.Title>Quên mật khẩu</Dialog.Title>
+        <Dialog.Description>
+          Vui lòng nhập email của bạn để nhận liên kết đặt lại mật khẩu.
+        </Dialog.Description>
+        <Dialog.Input
+          placeholder="Email"
+          onChangeText={setForgotEmail}
+          value={forgotEmail}
+        />
+        <Dialog.Button label="Hủy" onPress={() => setIsDialogVisible(false)} />
+        <Dialog.Button label="Gửi" onPress={handleForgotPassword} />
+      </Dialog.Container>
     </KeyboardAvoidingView>
   );
 };
