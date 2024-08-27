@@ -111,9 +111,6 @@ const Oder = ({}) => {
   const [orderUserItems, setOrderUserItems] = useState([]);
   const [orderTableItems, setorderTableItems] = useState([]);
 
- 
-
-
   useEffect(() => {
     if (isFocused) {
       orderUser(promotionCode);
@@ -226,15 +223,11 @@ const Oder = ({}) => {
     // }
   };
 
-  // Hàm xử lý thanh toán tiền mặt
+  // Hàm xử lý thanh toán tiền mặt user
   const handlePaymentCOD = async promotionCode => {
     console.log('COD');
     try {
-      await paymentCodUser(promotionCode);
-      Alert.alert(
-        'Chờ phục vụ xác nhận ... ',
-        'Vui lòng chờ phục vụ xác nhận thanh toán !',
-      );
+     Alert.alert('Không thể thanh toán !','Quý khách không thể thanh toán tiền mặt theo hóa đơn cá nhân.')
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
@@ -247,6 +240,11 @@ const Oder = ({}) => {
     console.log('Zalo');
     try {
       const response = await paymentZaloUser(promotionCode);
+      Toast.show({
+        type: 'success',
+        text1: 'Chờ phục vụ xác nhận ...',
+        text2: response.message
+      })
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
@@ -255,8 +253,12 @@ const Oder = ({}) => {
         payOrder();
       }
     } catch (error) {
-      console.log('-------------', error);
-      Alert.alert(`Lỗi thanh toán: ${error.message}`);
+      console.log('------error-pay zalo user------', err);
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra, vui lòng liên hệ phục vụ',
+        text2: err.message
+      })
     }
   };
 
@@ -265,14 +267,19 @@ const Oder = ({}) => {
     console.log('pay cod table');
     try {
       await paymentCodTable(promotionCode);
-      Alert.alert(
-        'Chờ phục vụ xác nhận ... ',
-        'Vui lòng chờ phục vụ xác nhận thanh toán !',
-      );
+      Toast.show({
+        type: 'success',
+        text1: 'Chờ phục vụ xác nhận ...',
+        text2: 'Vui lòng chờ phục vụ xác nhận thanh toán !'
+      })
     } catch (err) {
       // setError(err.message);
-      console.log('------error-------', err);
-      Alert.alert(`Lỗi thanh toán: ${err.message}`);
+      console.log('------error-- pay cash table-----', err);
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra, vui lòng liên hệ phục vụ',
+        text2: err.message
+      })
     }
   };
 
@@ -281,6 +288,11 @@ const Oder = ({}) => {
     console.log(' pay Zalo table');
     try {
       const response = await paymentZaloTable(promotionCode);
+      Toast.show({
+        type: 'success',
+        text1: 'Chờ phục vụ xác nhận ...',
+        text2: response.message
+      })
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
@@ -289,8 +301,12 @@ const Oder = ({}) => {
         payOrder();
       }
     } catch (error) {
-      console.log('-------------', error);
-      Alert.alert(`Lỗi thanh toán: ${error.message}`);
+      console.log('------error-pay zalo table------', err);
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra, vui lòng liên hệ phục vụ',
+        text2: err.message
+      })
     }
   };
 
