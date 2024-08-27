@@ -283,12 +283,14 @@ export const paymentZaloUser = async promotionCode => {
 export const paymentCodTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const id = await AsyncStorage.getItem('idTable');
+  const userID = await AsyncStorage.getItem('userID');
     const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
       voucher: promotionCode,
       tableId: tableId,
+      userIdCash: userID,
     };
     console.log('body --------- ', body);
 
