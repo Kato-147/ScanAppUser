@@ -210,7 +210,14 @@ const Menu = ({navigation}) => {
       
        const res = await logOutTableApi();
        console.log('-----logOut table------',res);
-       res.status === 'success' && navigation.popToTop();
+       if(res.status === 'success'){
+        navigation.popToTop();
+        Toast.show({
+          type: 'success',
+          text1: 'Đã thoát khỏi bàn',
+          text2: 'Bạn có thể quét bàn khác'
+        })
+       }
        return res
     } catch (error) {
       Toast.show({
