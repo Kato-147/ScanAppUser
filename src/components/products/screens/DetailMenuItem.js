@@ -5,7 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {getMenuItemDetails} from '../ProductsHTTP';
@@ -15,7 +15,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { checkPrice } from './Oder';
+import {checkPrice} from './Oder';
 
 const DetailMenuItem = ({route, navigation}) => {
   const {item} = route.params;
@@ -57,10 +57,9 @@ const DetailMenuItem = ({route, navigation}) => {
     );
   }
 
-  const handleBack=()=>{
-    console.log('go Back');
+  const handleBack = () => {
     navigation.goBack();
-  }
+  };
 
   function formatNumber(num) {
     return Math.round(num * 10) / 10;
@@ -76,26 +75,24 @@ const DetailMenuItem = ({route, navigation}) => {
           top: 0,
           left: 0,
           right: 0,
-          paddingHorizontal: 5
+          paddingHorizontal: 5,
         }}>
         <TouchableOpacity
-        activeOpacity={1}
-        onPress={()=> handleBack()}
+          activeOpacity={1}
+          onPress={handleBack}
           style={{
             width: hp(5),
             height: hp(5),
             backgroundColor: 'rgba(255, 255, 255, 0.75)',
             borderRadius: 7,
-            alignItems:'center',
-            justifyContent:'center',
+            alignItems: 'center',
+            justifyContent: 'center',
             margin: 7,
           }}>
           <Icon name="left" size={hp(4)} />
         </TouchableOpacity>
       </View>
-      <ScrollView
-      showsVerticalScrollIndicator={false}
-      style={{}}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {itemDetail && (
           <>
             <Image
@@ -105,7 +102,9 @@ const DetailMenuItem = ({route, navigation}) => {
             />
             <Text style={styles.title}>{itemDetail.menuItem.name}</Text>
             <Text style={styles.engName}>{itemDetail.menuItem.engName}</Text>
-            <Text style={styles.price}>{checkPrice(itemDetail.menuItem.price)} VND</Text>
+            <Text style={styles.price}>
+              {checkPrice(itemDetail.menuItem.price)} VND
+            </Text>
             <Text style={styles.description}>
               {itemDetail.menuItem.description}
             </Text>
@@ -137,6 +136,9 @@ const DetailMenuItem = ({route, navigation}) => {
                       <Text style={styles.reviewUser}>
                         {review.userId.fullName}
                       </Text>
+                      <Text style={styles.reputationPoints}>
+                        Điểm uy tín: {review.userId.reputationPoints} points
+                      </Text>
                       <Text style={styles.orderDate}>
                         Order Date:{' '}
                         {new Date(review.orderCreatedAt).toLocaleDateString()}
@@ -165,7 +167,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#f0f0f0',
     position: 'relative',
-    paddingHorizontal: wp(2)
+    paddingHorizontal: wp(2),
   },
   loadingContainer: {
     flex: 1,
@@ -239,7 +241,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
     width: wp(95),
-    alignSelf:'center'
+    alignSelf: 'center',
   },
   reviewHeader: {
     flexDirection: 'row',
@@ -259,6 +261,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+  },
+  reputationPoints: {
+    fontSize: 14,
+    color: '#007AFF',
+    marginTop: 2,
   },
   orderDate: {
     fontSize: 14,
