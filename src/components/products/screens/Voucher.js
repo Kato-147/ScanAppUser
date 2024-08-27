@@ -50,7 +50,6 @@ const Voucher = ({navigation}) => {
       if (response.status === 'success') {
         setvoucherItems(response.data.promotions);
       }
-      console.log('voucherItems', response.data.promotions);
       return response;
     } catch (error) {
       console.log('err>>', error);

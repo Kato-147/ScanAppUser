@@ -10,6 +10,14 @@ import messaging from '@react-native-firebase/messaging';
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
+  if(remoteMessage.data.type === 'events'){
+    console.log('-------NHẬN NOTI THÔNG BÁO-backGround---');
+  } 
+  if(remoteMessage.data.type === 'afterPayment'){
+    await AsyncStorage.removeItem('idTable');
+    await AsyncStorage.removeItem('tableNumber');
+    console.log('-------NHẬN NOTI THANH TOÁN THÀNH CÔNG-backGround---');
+  }
 });
 
 

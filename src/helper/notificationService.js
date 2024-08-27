@@ -51,6 +51,14 @@ const displayNotification = (title, body) => {
 messaging().onMessage(async remoteMessage => {
   const {title, body} = remoteMessage.notification;
   displayNotification(title, body);
+  if(remoteMessage.data.type === 'events'){
+    console.log('-------NHẬN NOTI THÔNG BÁO--pushnoti--');
+  } 
+  if(remoteMessage.data.type === 'afterPayment'){
+    await AsyncStorage.removeItem('idTable');
+    await AsyncStorage.removeItem('tableNumber');
+    console.log('-------NHẬN NOTI THANH TOÁN THÀNH CÔNG--pushnoti--');
+  }
 });
 
 //cấu hình back ground

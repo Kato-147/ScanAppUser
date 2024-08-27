@@ -202,32 +202,89 @@ const Oder = ({}) => {
   //   );
   // }
 
-
-
   // Hàm xử lý khi người dùng nhấn nút thanh toán
-  const handlePayment = promotionCode => {
+
+  const handlePayment = (orderTableItems, orderUserItems, promotionCode) => {
     if (orderType === 'user' && selectedMethod === 'COD') {
       handlePaymentCOD(promotionCode);
     }
     if (orderType === 'user' && selectedMethod === 'Zalo') {
-      handlePaymentZalo(promotionCode);
+      checkPaymentZaloUser(orderUserItems, promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'COD') {
-      handlePaymentCodTable(promotionCode);
+      checkPaymentCodTable(orderTableItems, promotionCode);
     }
     if (orderType === 'table' && selectedMethod === 'Zalo') {
-      handlePaymentZaloTable(promotionCode);
+      checkPaymentZaloTable(orderTableItems, promotionCode)
     }
-    // } else{
-    //   ToastAndroid.show('co loi xay ra!', ToastAndroid.SHORT);
-    // }
+  };
+
+  const checkPaymentZaloUser = (orderUserItems, promotionCode) => {
+    if (Array.isArray(orderUserItems) && orderUserItems.length > 0) {
+      orderUserItems.forEach(order => {
+        const loading = order.items.filter(item => item.status === 'loading');
+        if (loading.length > 0) {
+          Toast.show({
+            type: 'error',
+            text1: 'Không thể thanh toán',
+            text2: 'Đang có món chưa hoàn thành',
+          });
+        }else{
+          handlePaymentZalo(promotionCode);
+        }
+        
+      });
+    } else {
+      console.error('orderUserItems is not a valid array');
+    }
+  };
+
+  const checkPaymentCodTable = (orderTableItems, promotionCode) => {
+    if (Array.isArray(orderTableItems) && orderTableItems.length > 0) {
+      const loading = orderTableItems.filter(item => item.status === 'loading');
+      
+      if (loading.length > 0) {
+        Toast.show({
+          type: 'error',
+          text1: 'Không thể thanh toán',
+          text2: 'Đang có món chưa hoàn thành',
+        });
+      }else{
+        handlePaymentCodTable(promotionCode);
+      }
+     
+    } else {
+      console.error('orderUserItems is not a valid array');
+    }
+  };
+
+  const checkPaymentZaloTable = (orderTableItems, promotionCode) => {
+    if (Array.isArray(orderTableItems) && orderTableItems.length > 0) {
+      const loading = orderTableItems.filter(item => item.status === 'loading');
+      
+      if (loading.length > 0) {
+        Toast.show({
+          type: 'error',
+          text1: 'Không thể thanh toán',
+          text2: 'Đang có món chưa hoàn thành',
+        });
+      }else{
+        handlePaymentZaloTable(promotionCode);
+      }
+     
+    } else {
+      console.error('orderUserItems is not a valid array');
+    }
   };
 
   // Hàm xử lý thanh toán tiền mặt user
   const handlePaymentCOD = async promotionCode => {
     console.log('COD');
     try {
-     Alert.alert('Không thể thanh toán !','Quý khách không thể thanh toán tiền mặt theo hóa đơn cá nhân.')
+      Alert.alert(
+        'Không thể thanh toán !',
+        'Quý khách không thể thanh toán tiền mặt theo hóa đơn cá nhân.',
+      );
     } catch (err) {
       // setError(err.message);
       console.log('-------------', err);
@@ -243,8 +300,8 @@ const Oder = ({}) => {
       Toast.show({
         type: 'success',
         text1: 'Chờ phục vụ xác nhận ...',
-        text2: response.message
-      })
+        text2: response.message,
+      });
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
@@ -257,8 +314,8 @@ const Oder = ({}) => {
       Toast.show({
         type: 'error',
         text1: 'Có lỗi xảy ra, vui lòng liên hệ phục vụ',
-        text2: err.message
-      })
+        text2: err.message,
+      });
     }
   };
 
@@ -270,16 +327,16 @@ const Oder = ({}) => {
       Toast.show({
         type: 'success',
         text1: 'Chờ phục vụ xác nhận ...',
-        text2: 'Vui lòng chờ phục vụ xác nhận thanh toán !'
-      })
+        text2: 'Vui lòng chờ phục vụ xác nhận thanh toán !',
+      });
     } catch (err) {
       // setError(err.message);
       console.log('------error-- pay cash table-----', err);
       Toast.show({
         type: 'error',
         text1: 'Có lỗi xảy ra, vui lòng liên hệ phục vụ',
-        text2: err.message
-      })
+        text2: err.message,
+      });
     }
   };
 
@@ -291,8 +348,8 @@ const Oder = ({}) => {
       Toast.show({
         type: 'success',
         text1: 'Chờ phục vụ xác nhận ...',
-        text2: response.message
-      })
+        text2: response.message,
+      });
       if (response.return_code === 1) {
         const payOrder = async () => {
           var payZP = NativeModules.PayZaloBridge;
@@ -305,8 +362,8 @@ const Oder = ({}) => {
       Toast.show({
         type: 'error',
         text1: 'Có lỗi xảy ra, vui lòng liên hệ phục vụ',
-        text2: err.message
-      })
+        text2: err.message,
+      });
     }
   };
 
@@ -400,6 +457,7 @@ const Oder = ({}) => {
                 image={item.image_url}
                 options={item.options}
                 userOrders={item.userOrders}
+                status={item.status}
               />
             ))}
           </ScrollView>
@@ -587,7 +645,7 @@ const Oder = ({}) => {
               onPress={() =>
                 totalMoney() == 0
                   ? console.log('Không thanh toán vì không có giá tiền')
-                  : handlePayment(promotionCode)
+                  : handlePayment( orderTableItems ,orderUserItems, promotionCode)
               }
               style={
                 totalMoney() == 0
@@ -598,8 +656,7 @@ const Oder = ({}) => {
             </TouchableOpacity>
           </View>
 
-          <Toast config={toastConfig}  />
-
+          <Toast config={toastConfig} />
         </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

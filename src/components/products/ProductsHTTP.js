@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
-import {ToastAndroid} from 'react-native';
 
 // infor user profile
 export const infoProfile = async () => {
@@ -283,12 +282,14 @@ export const paymentZaloUser = async promotionCode => {
 export const paymentCodTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const id = await AsyncStorage.getItem('idTable');
+  const userID = await AsyncStorage.getItem('userID');
     const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
       voucher: promotionCode,
       tableId: tableId,
+      userIdCash: userID,
     };
     console.log('body --------- ', body);
 

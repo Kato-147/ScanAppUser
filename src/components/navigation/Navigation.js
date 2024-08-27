@@ -32,14 +32,10 @@ const Navigation = () => {
     messaging().onNotificationOpenedApp(remoteMessage => {
       console.log(
         'Notification caused app to open from background state:',
-        remoteMessage.notification,
+        remoteMessage,
       );
-      // const {title, body} = remoteMessage.notification;
-      // if (title && body) {
-      //   addNotificationToStorage({title, body}); // Add notification to AsyncStorage
-       
-      // }
-      linkTo('/HistoryOrder');
+      
+    //  linkTo('/HistoryOrder');
     });
   }, []);
 

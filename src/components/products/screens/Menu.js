@@ -47,7 +47,7 @@ const Menu = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
   const [softQrCode, setSoftQrCode] = useState('');
   const [showModalUser, setShowModalUser] = useState(false);
-  const [userInTable, setUserInTable] = useState('');
+  const [userInTable, setUserInTable] = useState([]);
   const [totalUser, setTotalUser] = useState(0);
 
   // Back to home function
@@ -99,6 +99,12 @@ const Menu = ({navigation}) => {
       console.log('ID Table từ AsyncStorage', idtable, tableType);
 
       const table = await getTables(idtable, tableType);
+      table.usageAllowed === 'no' &&Toast.show({
+        type: 'error',
+        text1: 'Bàn không khả dụng',
+        text2: table.message
+      })
+      
       console.log('===table==========', table.data.tableNumber);
 
       setTable(table);
@@ -604,11 +610,10 @@ const Menu = ({navigation}) => {
                     Số người trong bàn : {totalUser}
                   </Text>
                   <FlatList
-                    horizontal
                     data={userInTable}
                     keyExtractor={item => item._id.toString()}
                     renderItem={renderTotalUserItem}
-                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.contentContainer}
                     style={styles.flatList}
                   />
