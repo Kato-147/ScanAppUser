@@ -68,6 +68,20 @@ const Profile = ({navigation}) => {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{error}</Text>
+        <View
+        style={{
+          backgroundColor: 'white',
+          borderRadius: 10,
+          marginVertical: 20,
+          justifyContent: 'space-between',
+        }}>
+        <TouchableOpacity style={styles.optionsetting} onPress={handleLogout}>
+          <Text style={[styles.textOptionsetting, {color: '#FF3333'}]}>
+            Đăng xuất
+          </Text>
+          <IconLogout name="logout" style={styles.iconOptionsetting} />
+        </TouchableOpacity>
+      </View>
       </View>
     );
   }

@@ -25,6 +25,7 @@ const AccodianTableOrder = ({
   image,
   options,
   userOrders,
+  status
 }) => {
   const [opened, setOpened] = useState(false);
 
@@ -69,6 +70,8 @@ const AccodianTableOrder = ({
             ) : (
               <Text style={styles.options}>{options}</Text>
             )}
+
+            <Text style={styles.price}>Trạng thái : {status === 'loading' ? 'Đang làm' : 'Đã xong'}</Text>
           </View>
 
           <View
@@ -92,7 +95,7 @@ const AccodianTableOrder = ({
             <TouchableOpacity
               key={index}
               activeOpacity={1}
-              style={[styles.itemContainer,{paddingHorizontal: wp(3)}]}>
+              style={[styles.itemContainer, {paddingHorizontal: wp(3)}]}>
               <View
                 style={{
                   width: wp(25),
@@ -102,18 +105,15 @@ const AccodianTableOrder = ({
                 }}>
                 <Image
                   source={{uri: item.img_avatar_url}}
-                  style={{  width: wp(20),
-                    height: wp(20),
-                    borderRadius: 10,}}
+                  style={{width: wp(20), height: wp(20), borderRadius: 10}}
                 />
               </View>
-<View style={styles.detailsContainer}>
-<Text style={styles.name}>{item.fullName}</Text>
-</View>
+              <View style={styles.detailsContainer}>
+                <Text style={styles.name}>{item.fullName}</Text>
+              </View>
 
-
-<View></View>
-
+              <View>
+              </View>
             </TouchableOpacity>
           ))}
         </View>

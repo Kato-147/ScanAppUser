@@ -70,7 +70,8 @@ const AccodianUserOrder = ({title,quantity, items,setdeleted}) => {
       // Có thể thông báo cho người dùng hoặc xử lý lỗi theo cách khác
     }
   };
-
+ 
+  const showStatus=(item)=> item.status === 'loading' ? 'Đang làm' : 'Đã xong'
   
     return (
       <View style={styles.container}>
@@ -115,6 +116,9 @@ const AccodianUserOrder = ({title,quantity, items,setdeleted}) => {
                  ) : (
                    <Text style={styles.options}>{item.options}</Text>
                  )}
+                 <Text style={styles.price}>
+                   Trạng thái : {showStatus(item)}
+                 </Text>
                </View>
        
                <View

@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AxiosInstance from '../../helper/AxiosInstance';
-import {ToastAndroid} from 'react-native';
 
 // infor user profile
 export const infoProfile = async () => {
