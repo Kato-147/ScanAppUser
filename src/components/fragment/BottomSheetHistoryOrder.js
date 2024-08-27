@@ -6,6 +6,7 @@ import {
   Animated,
   Pressable,
   Button,
+  Image,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import {
@@ -16,7 +17,6 @@ import {formatDate} from '../products/screens/DetailHistoryOrder';
 import {checkPrice} from '../products/screens/Oder';
 
 const BottomSheetHistoryOrder = ({setStatus, item}) => {
-
   const slide = React.useRef(new Animated.Value(300)).current;
 
   const slideUp = () => {
@@ -48,6 +48,7 @@ const BottomSheetHistoryOrder = ({setStatus, item}) => {
       setStatus(false);
     }, 250);
   };
+
   return (
     <Pressable onPress={closeModal} style={styles.backdrop}>
       <Pressable style={{width: '100%', height: '40%'}}>
@@ -59,12 +60,13 @@ const BottomSheetHistoryOrder = ({setStatus, item}) => {
           <View style={styles.infoContainer}>
             <View style={styles.infoCard}>
               <Text style={styles.infoKeyText}>Tài khoản gọi món: </Text>
-              <Text style={styles.infoValueText}>
-                {item.userOrder[0].fullName}
-              </Text>
+              <View style={styles.infoValueText}>
+                {item.userOrder.map((user, index) => (
+                  <Text key={index}>{user.fullName}</Text>
+                ))}
+              </View>
             </View>
 
-            {/* <Text>Người thanh toán: {item.userPay.fullName}</Text> */}
             <View>
               <View style={styles.infoCard}>
                 <Text style={styles.infoKeyText}>Thời gian tạo đơn: </Text>
@@ -82,13 +84,48 @@ const BottomSheetHistoryOrder = ({setStatus, item}) => {
 
             <View style={styles.infoCard}>
               <Text style={styles.infoKeyText}>Phương thức thanh toán: </Text>
-              <Text style={styles.infoValueText}>{item.paymentMethod === 'Cash' ? 'Tiền mặt' : 'ZaloPay'}</Text>
+              <Text style={styles.infoValueText}>
+                {item.paymentMethod === 'Cash' ? 'Tiền mặt' : 'ZaloPay'}
+              </Text>
             </View>
+
+            {item.voucher && (
+              <View style={styles.infoCard}>
+                <Text style={styles.infoKeyText}>Voucher: </Text>
+                <Text style={styles.infoValueText}>{item.voucher}</Text>
+              </View>
+            )}
+
+            {item.amountDiscount && (
+              <View style={styles.infoCard}>
+                <Text style={styles.infoKeyText}>Tiền giảm: </Text>
+                <Text style={styles.infoValueText}>
+                  {item.amountDiscount} đ
+                </Text>
+              </View>
+            )}
+
             <View style={styles.infoCard}>
               <Text style={styles.infoKeyText}>Tổng tiền: </Text>
               <Text style={styles.infoValueText}>
                 {checkPrice(item.amount)} đ
               </Text>
+            </View>
+            <View style={styles.infoCard}>
+              <Text style={styles.infoKeyText}>Người thanh toán: </Text>
+              <Text style={styles.infoValueText}>{item.userPay.fullName}</Text>
+            </View>
+            <View style={styles.infoCard}>
+              <Image
+                source={{uri: item.userPay.img_avatar_url}}
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: 50,
+                  borderWidth: 1,
+                  borderColor: '#000',
+                }}
+              />
             </View>
           </View>
         </Animated.View>
@@ -154,6 +191,6 @@ const styles = StyleSheet.create({
   },
   infoValueText: {
     width: wp(50),
-    color: '#333', 
+    color: '#333',
   },
 });
