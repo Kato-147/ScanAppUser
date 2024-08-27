@@ -197,46 +197,43 @@ export const getOrderTableApi = async promotionCode => {
 };
 
 // DeleteOrder
-export const deleteOrder = async (tableId, itemId) => {
+export const deleteOrder = async ( itemId) => {
   try {
+
+    const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
+
     if (!tableId || !itemId) {
       throw new Error('Invalid tableId or itemId');
     }
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.delete(
-      `v1/tables/${tableId}/orders/items/${itemId}`,
+      `v1/tables/${tableId}/orders/items/${itemId}?specifiedTime=180`,
     );
     return response; // Trả về phản hồi từ API nếu cần
   } catch (error) {
-    if (error.response.data.message === 'Time out to delete') {
-      ToastAndroid.show('Hết thời gian để hủy món', ToastAndroid.SHORT);
-    }
-    if (
-      error.response.data.message === "You cannot delete other people's item"
-    ) {
-      ToastAndroid.show('Không thể hủy món của người khác', ToastAndroid.SHORT);
-    }
-    console.log('Error deleting order:', error.response.data);
-    throw error; // Đảm bảo lỗi được truyền ra ngoài
+  //  console.log('Error deleting order:', error.response.data.message);
+    throw error.response.data.message; // Đảm bảo lỗi được truyền ra ngoài
   }
 };
 
 // Pay for user with cash
 export const paymentCodUser = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
-  const userId = await AsyncStorage.getItem('userID');
+  const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
       voucher: promotionCode,
-      userId: userId,
+      tableId: tableId,
     };
     console.log('body --------- ', body);
 
     const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.post(url, body);
-    return res.data;
+    return res;
   } catch (err) {
     if (err.response) {
       console.log('API error:', err.response.data);
@@ -285,19 +282,21 @@ export const paymentZaloUser = async promotionCode => {
 // Pay for table with cash
 export const paymentCodTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
-  const userId = await AsyncStorage.getItem('userID');
+  const id = await AsyncStorage.getItem('idTable');
+    const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
       voucher: promotionCode,
-      userId: userId,
+      tableId: tableId,
     };
     console.log('body --------- ', body);
 
     const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.post(url, body);
-    return res.data;
+    
+    return res;
   } catch (err) {
     if (err.response) {
       console.log('API error:', err.response.data);
@@ -443,6 +442,7 @@ export const logOutTableApi = async () => {
     const url = `v1/tables/table-in-use`;
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.patch(url);
+    
     // Trả về dữ liệu từ API
     return response;
   } catch (error) {

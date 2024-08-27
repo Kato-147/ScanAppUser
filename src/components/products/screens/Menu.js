@@ -31,6 +31,8 @@ import {useIsFocused} from '@react-navigation/native';
 import {checkPrice} from './Oder';
 import MoreIcon from 'react-native-vector-icons/Feather';
 import BtShitMenu from '../../fragment/BtShitMenu';
+import Toast from 'react-native-toast-message';
+import toastConfig from '../../../helper/toastConfig';
 
 const Menu = ({navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -205,9 +207,24 @@ const Menu = ({navigation}) => {
   // Logout table
   const handleLogoutTable = async () => {
     try {
-      navigation.popToTop();
-      await logOutTableApi();
+      
+       const res = await logOutTableApi();
+       console.log('-----logOut table------',res);
+       if(res.status === 'success'){
+        navigation.popToTop();
+        Toast.show({
+          type: 'success',
+          text1: 'Đã thoát khỏi bàn',
+          text2: 'Bạn có thể quét bàn khác'
+        })
+       }
+       return res
     } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Không thể thoát bàn',
+        text2: error.message
+      })
       console.log(error);
     }
   };
@@ -642,6 +659,7 @@ const Menu = ({navigation}) => {
           </View>
         </View>
       )}
+      <Toast config={toastConfig}  />
     </View>
   );
 };

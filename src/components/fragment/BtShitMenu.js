@@ -58,6 +58,11 @@ const BtShitMenu = ({setMoreOptions, setShowModal,setShowModalUser, onLogoutPres
         setMoreOptions(false);
     }
 
+    const logoutTable = () =>{
+      onLogoutPress();
+      closeBtSheet();
+    }
+
    
 
     return (
@@ -77,7 +82,7 @@ const BtShitMenu = ({setMoreOptions, setShowModal,setShowModalUser, onLogoutPres
                     <Icon name ="keyboard-arrow-right" style={styles.icon}/>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={onLogoutPress} activeOpacity={1} style={styles.onclick}>
+                <TouchableOpacity onPress={()=>logoutTable()} activeOpacity={1} style={styles.onclick}>
                     <Text style={styles.text}>Thoát khỏi bàn</Text>
                     <Icon name ="keyboard-arrow-right" style={styles.icon}/>
                 </TouchableOpacity>

@@ -28,6 +28,8 @@ import {cutStr} from './Cart';
 import {formatDate} from './DetailHistoryOrder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import Toast from 'react-native-toast-message';
+import toastConfig from '../../../helper/toastConfig';
 
 // export const addNotificationToStorage = async (notification) => {
 //   try {
@@ -188,6 +190,7 @@ const Home = props => {
             Ngày đăng :{formatDate(item.createdAt)}
           </Text>
         </View>
+       
       </TouchableOpacity>
     );
   };
@@ -320,7 +323,9 @@ const Home = props => {
               )}
             </View>
           </View>
+          <Toast config={toastConfig}  />
         </LinearGradient>
+        
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
