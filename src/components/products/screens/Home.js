@@ -97,6 +97,7 @@ const Home = props => {
       try {
         const keys = await AsyncStorage.getAllKeys();
         console.log('All keys:', keys);
+       
       } catch (error) {
         console.error('Error getting keys:', error);
       }

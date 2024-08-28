@@ -34,8 +34,12 @@ const Navigation = () => {
         'Notification caused app to open from background state:',
         remoteMessage,
       );
+      if(remoteMessage.data.type === 'events'){
+        linkTo('/tab');
+      }else if(remoteMessage.data.type === 'afterPayment'){
+        linkTo('/HistoryOrder');
+      }
       
-    //  linkTo('/HistoryOrder');
     });
   }, []);
 

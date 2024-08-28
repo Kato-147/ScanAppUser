@@ -69,6 +69,7 @@ const DetailNews = ({route, navigation}) => {
             </Text>
 
             <Text style={styles.description}>{itemNews.item.summary}</Text>
+            <Text style={styles.description}>{itemNews.item.content}</Text>
           </View>
         </View>
       </ScrollView>

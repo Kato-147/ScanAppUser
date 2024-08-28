@@ -11,6 +11,9 @@ const config = {
     DetailHistoryOrder:{
         path:'DetailHistoryOrder'
     },
+    tab:{
+        path:'tab'
+    },
     
     },
    

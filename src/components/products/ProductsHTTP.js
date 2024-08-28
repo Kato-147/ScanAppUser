@@ -224,7 +224,7 @@ export const paymentCodUser = async promotionCode => {
   try {
     const body = {
       tableNumber: tableNumber,
-      voucher: promotionCode,
+      promotionCode: promotionCode,
       tableId: tableId,
     };
     console.log('body --------- ', body);
@@ -250,14 +250,17 @@ export const paymentCodUser = async promotionCode => {
 // Pay for user with ZaloPay
 export const paymentZaloUser = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
-  const userId = await AsyncStorage.getItem('userID');
   const id = await AsyncStorage.getItem('idTable');
-  const tableId = JSON.parse(id).tableId;
+  const userID = await AsyncStorage.getItem('userID');
+ 
+  
+    const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
       promotionCode: promotionCode,
-      userId: userId,
+      tableId: tableId,
+      userIdCash: userID,
     };
     console.log('body --------- ', body);
     const url = `v1/payments/zalopayment/${tableId}?userId=true`;
@@ -315,15 +318,18 @@ export const paymentCodTable = async promotionCode => {
 // Pay for table with ZaloPay
 export const paymentZaloTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
-  const userId = await AsyncStorage.getItem('userID');
   const id = await AsyncStorage.getItem('idTable');
-  const tableId = JSON.parse(id).tableId;
+  const userID = await AsyncStorage.getItem('userID');
+    const tableId = JSON.parse(id).tableId;
+    
   try {
     const body = {
       tableNumber: tableNumber,
       promotionCode: promotionCode,
-      userId: userId,
+      tableId: tableId,
+      userIdCash: userID,
     };
+    
     console.log('body --------- ', body);
     const url = `v1/payments/zalopayment/${tableId}`;
     const axiosInstance = await AxiosInstance();
