@@ -19,6 +19,7 @@ import MenuNoLogin from '../users/screens/MenuNoLogin';
 import DetailMenuItem from '../products/screens/DetailMenuItem';
 import {useLinkTo} from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
+import Payment from '../products/screens/Payment';
 
 
 const Stack = createNativeStackNavigator();
@@ -59,6 +60,7 @@ const Navigation = () => {
       <Stack.Screen name="DetailNews" component={DetailNews} />
       <Stack.Screen name="MenuNoLogin" component={MenuNoLogin} />
       <Stack.Screen name="DetailMenuItem" component={DetailMenuItem} />
+      <Stack.Screen name="Payment" component={Payment} />
     </Stack.Navigator>
   );
 };
