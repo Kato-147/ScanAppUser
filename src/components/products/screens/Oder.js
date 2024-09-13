@@ -218,6 +218,7 @@ const Oder = ({}) => {
       checkPaymentZaloTable(orderTableItems, promotionCode)
     }
   };
+  //test
 
   const checkPaymentZaloUser = (orderUserItems, promotionCode) => {
     if (Array.isArray(orderUserItems) && orderUserItems.length > 0) {
