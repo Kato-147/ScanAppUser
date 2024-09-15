@@ -97,7 +97,7 @@ export const checkPrice = amount => {
     : formattedIntegerPart;
 };
 
-const Oder = ({}) => {
+const Oder = ({navigation}) => {
   const [selectedMethod, setSelectedMethod] = useState('COD');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -186,38 +186,25 @@ const Oder = ({}) => {
     );
   }
 
-  // if (error) {
-  //   return (
-  //     <LinearGradient
-  //       colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
-  //       style={styles.errorContainer}>
-  //       <Image
-  //         style={styles.errorImage}
-  //         source={{
-  //           uri: 'https://i.pinimg.com/564x/55/96/49/559649030e6667d7f8d50fc15afbbd20.jpg',
-  //         }}
-  //       />
-  //       <Text style={styles.errorText}>Bạn chưa đặt món nào cả</Text>
-  //     </LinearGradient>
-  //   );
-  // }
-
   // Hàm xử lý khi người dùng nhấn nút thanh toán
 
-  const handlePayment = (orderTableItems, orderUserItems, promotionCode) => {
-    if (orderType === 'user' && selectedMethod === 'COD') {
-      handlePaymentCOD(promotionCode);
-    }
-    if (orderType === 'user' && selectedMethod === 'Zalo') {
-      checkPaymentZaloUser(orderUserItems, promotionCode);
-    }
-    if (orderType === 'table' && selectedMethod === 'COD') {
-      checkPaymentCodTable(orderTableItems, promotionCode);
-    }
-    if (orderType === 'table' && selectedMethod === 'Zalo') {
-      checkPaymentZaloTable(orderTableItems, promotionCode)
-    }
+  const handlePayment = (orderTableItems, orderUserItems, promotionCode,totalTable) => {
+   navigation.navigate('Payment', {orderTableItems,totalTable})
   };
+  // const handlePayment = (orderTableItems, orderUserItems, promotionCode) => {
+  //   if (orderType === 'user' && selectedMethod === 'COD') {
+  //     handlePaymentCOD(promotionCode);
+  //   }
+  //   if (orderType === 'user' && selectedMethod === 'Zalo') {
+  //     checkPaymentZaloUser(orderUserItems, promotionCode);
+  //   }
+  //   if (orderType === 'table' && selectedMethod === 'COD') {
+  //     checkPaymentCodTable(orderTableItems, promotionCode);
+  //   }
+  //   if (orderType === 'table' && selectedMethod === 'Zalo') {
+  //     checkPaymentZaloTable(orderTableItems, promotionCode)
+  //   }
+  // };
 
   const checkPaymentZaloUser = (orderUserItems, promotionCode) => {
     if (Array.isArray(orderUserItems) && orderUserItems.length > 0) {
@@ -643,16 +630,14 @@ const Oder = ({}) => {
           <View style={{height: hp(10)}}>
             <TouchableOpacity
               onPress={() =>
-                totalMoney() == 0
-                  ? console.log('Không thanh toán vì không có giá tiền')
-                  : handlePayment( orderTableItems ,orderUserItems, promotionCode)
+                handlePayment( orderTableItems ,orderUserItems, promotionCode,totalTable)
               }
               style={
                 totalMoney() == 0
                   ? [styles.orderButton, {backgroundColor: '#a0a0a0a0'}]
                   : styles.orderButton
               }>
-              <Text style={styles.orderButtonText}>Thanh toán</Text>
+              <Text style={styles.orderButtonText}>Xem hóa đơn</Text>
             </TouchableOpacity>
           </View>
 
