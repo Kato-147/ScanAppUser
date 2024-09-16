@@ -36,7 +36,6 @@ import {useIsFocused} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {RadioButton} from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import AccodianUserOrder from '../../fragment/AccodianUserOrder';
 import AccodianTableOrder from '../../fragment/AccodianTableOrder';
 import Toast from 'react-native-toast-message';
@@ -145,7 +144,7 @@ const Oder = ({navigation}) => {
     }
   };
 
-  // gọi api load order theo user (new)
+  // gọi api load order theo table
   const orderTable = async promotionCode => {
     try {
       const response = await getOrderTableApi(promotionCode);
@@ -500,130 +499,7 @@ const Oder = ({navigation}) => {
 
           {/* Order Item */}
 
-          <View style={{height: hp(40)}}>{handleFlatlist()}</View>
-
-          {/* Voucher & payment method */}
-          <View style={{height: hp(35)}}>
-            <View>
-              {/* Voucher */}
-              <View style={styles.voucherContainer}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 10,
-                  }}>
-                  <Icon
-                    name="tagso"
-                    size={24}
-                    color={totalMoney() == 0 ? '#a0a0a0' : '#E8900C'}
-                  />
-
-                  <TextInput
-                    // value={query}
-                    placeholder="Nhập mã giảm giá"
-                    style={
-                      totalMoney() == 0
-                        ? [styles.voucherTextInput, {borderColor: '#a0a0a0'}]
-                        : styles.voucherTextInput
-                    }
-                    onChangeText={setpromotionCode}
-                  />
-                </View>
-
-                <TouchableOpacity
-                  onPress={() => handleApplyVoucher(promotionCode)}
-                  style={{
-                    backgroundColor: totalMoney() == 0 ? '#a0a0a0' : '#E8900C',
-                    padding: hp(1.2),
-                    borderRadius: 8,
-                  }}>
-                  <Text style={{color: 'white', fontSize: hp(2)}}>Áp dụng</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Payment method */}
-              <View style={{paddingHorizontal: 10}}>
-                <Text style={styles.title}>Phương thức thanh toán</Text>
-
-                <TouchableOpacity
-                  activeOpacity={1}
-                  style={styles.optionContainer}
-                  onPress={() => setSelectedMethod('COD')}>
-                  <View style={styles.optionContent}>
-                    <Image
-                      source={{
-                        uri: 'https://e7.pngegg.com/pngimages/199/428/png-clipart-paper-computer-icons-money-banknote-united-states-dollar-banknote-rectangle-sign.png',
-                      }}
-                      style={styles.logo}
-                    />
-                    <Text style={styles.optionText}>Thanh toán tiền mặt</Text>
-                  </View>
-                  <RadioButton
-                    value="COD"
-                    status={selectedMethod === 'COD' ? 'checked' : 'unchecked'}
-                    onPress={() => setSelectedMethod('COD')}
-                    color="#E8900C"
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  activeOpacity={1}
-                  style={styles.optionContainer}
-                  onPress={() => setSelectedMethod('Zalo')}>
-                  <View style={styles.optionContent}>
-                    <Image
-                      source={{
-                        uri: 'https://www.plusweb.vn/uploads/public/2021/06/03/1622682588188_zalopay.png',
-                      }}
-                      style={styles.logo}
-                    />
-                    <Text style={styles.optionText}>Ví điện tử ZaloPay</Text>
-                  </View>
-
-                  <RadioButton
-                    value="Zalo"
-                    status={selectedMethod === 'Zalo' ? 'checked' : 'unchecked'}
-                    onPress={() => setSelectedMethod('Zalo')}
-                    color="#E8900C"
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View>
-              {discount > 0 ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 10,
-                    paddingVertical: 10,
-                    width: wp(100),
-                  }}>
-                  <Text style={styles.discountText}>Giảm giá : </Text>
-                  <Text style={styles.discountText}>
-                    {checkPrice(discount)} đ{' '}
-                  </Text>
-                </View>
-              ) : (
-                <Text style={styles.errorText}>{error}</Text>
-              )}
-              {/* Total Price */}
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  paddingHorizontal: 10,
-                  paddingVertical: 10,
-                  width: wp(100),
-                }}>
-                <Text style={styles.totalText}>Tổng tiền : </Text>
-                <Text style={[styles.totalText, {fontSize: hp(2.2)}]}>
-                  {totalMoney()} đ{' '}
-                </Text>
-              </View>
-            </View>
-          </View>
+          <View style={{height: hp(74.5)}}>{handleFlatlist()}</View>
 
           {/* Button Order */}
 

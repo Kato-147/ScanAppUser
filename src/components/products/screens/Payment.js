@@ -2,6 +2,7 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
+  NativeModules,
   StyleSheet,
   Text,
   TextInput,
@@ -9,7 +10,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -18,21 +19,57 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import { RadioButton } from 'react-native-paper';
 import { checkPrice } from './Oder';
-import { useRoute } from '@react-navigation/native';
+import { useIsFocused, useRoute } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import toastConfig from '../../../helper/toastConfig';
+import { getOrderTableApi } from '../ProductsHTTP';
+const {PayZaloBridge} = NativeModules;
+
 
 const Payment = ({navigation}) => {
-  const route = useRoute();
-  const { orderTableItems, totalTable } = route.params;
   const [selectedMethod, setSelectedMethod] = useState('COD');
   const [promotionCode, setpromotionCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [error, setError] = useState(null);
+  const [totalTable, settotalTable] = useState(totalTable);
+  const isFocused = useIsFocused();
+  const [loading, setLoading] = useState(true);
+  const [orderTableItems, setorderTableItems] = useState([]);
 
+
+  useEffect(() => {
+    if (isFocused) {
+      orderTable(promotionCode);
+    }
+  }, [
+    isFocused,
+    handleApplyVoucher,
+  ]);
 
   //Back to Order
   const handleBack = () => {
     console.log('>>>>>> Click Back Button');
     navigation.goBack();
+  };
+
+   // gọi api load order theo table
+   const orderTable = async promotionCode => {
+    try {
+      const response = await getOrderTableApi(promotionCode);
+      if (response.status === 'success') {
+        setorderTableItems(response.data);
+        settotalTable(response.totalAmount);
+        setDiscount(response.discountAmount);
+        setError(response.promotionError);
+      } else {
+        console.log('Failed to fetch orderUser data:', response?.data);
+      }
+    } catch (error) {
+      setError(error.message);
+      console.log('=====loadOrderUser======', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
     //Hàm xử lý khi người dùng nhấn nút apply Voucher
@@ -184,6 +221,17 @@ const Payment = ({navigation}) => {
                 </View>
               </View>
             </View>
+            {/* Button Order */}
+
+          <View style={{height: hp(10)}}>
+            <TouchableOpacity
+             
+              style={
+                styles.orderButton
+              }>
+              <Text style={styles.orderButtonText}>Thanh toán</Text>
+            </TouchableOpacity>
+          </View>
           </View>
         </LinearGradient>
       </TouchableWithoutFeedback>
@@ -284,5 +332,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'center',
     textAlign: 'center',
+  },
+  orderButton: {
+    backgroundColor: '#E8900C',
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginHorizontal: wp(10),
+  },
+  orderButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
