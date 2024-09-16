@@ -19,10 +19,10 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import { RadioButton } from 'react-native-paper';
 import { checkPrice } from './Oder';
-import { useIsFocused, useRoute } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import toastConfig from '../../../helper/toastConfig';
-import { getOrderTableApi } from '../ProductsHTTP';
+import { getOrderTableApi, paymentCodTable, paymentZaloTable } from '../ProductsHTTP';
 const {PayZaloBridge} = NativeModules;
 
 
@@ -35,6 +35,7 @@ const Payment = ({navigation}) => {
   const isFocused = useIsFocused();
   const [loading, setLoading] = useState(true);
   const [orderTableItems, setorderTableItems] = useState([]);
+  
 
 
   useEffect(() => {
@@ -81,6 +82,54 @@ const Payment = ({navigation}) => {
         console.log('handle Apply Voucher', error);
       }
     };
+
+      // Hàm xử lý thanh toán tiền mặt theo bàn
+  const handlePaymentCodTable = async promotionCode => {
+    console.log('pay cod table');
+    try {
+      await paymentCodTable(promotionCode);
+      Toast.show({
+        type: 'success',
+        text1: 'Chờ phục vụ xác nhận ...',
+        text2: 'Vui lòng chờ phục vụ xác nhận thanh toán !',
+      });
+    } catch (err) {
+      // setError(err.message);
+      console.log('------error-- pay cash table-----', err);
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra, vui lòng liên hệ phục vụ',
+        text2: err.message,
+      });
+    }
+  };
+
+  // Hàm xử lý thanh toán zalo theo bàn
+  const handlePaymentZaloTable = async promotionCode => {
+    console.log(' pay Zalo table');
+    try {
+      const response = await paymentZaloTable(promotionCode);
+      Toast.show({
+        type: 'success',
+        text1: 'Chờ phục vụ xác nhận ...',
+        text2: response.message,
+      });
+      if (response.return_code === 1) {
+        const payOrder = async () => {
+          var payZP = NativeModules.PayZaloBridge;
+          payZP.payOrder(response.order_token);
+        };
+        payOrder();
+      }
+    } catch (error) {
+      console.log('------error-pay zalo table------', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra, vui lòng liên hệ phục vụ',
+        text2: error.message,
+      });
+    }
+  };
 
   return (
     <KeyboardAvoidingView>
@@ -225,7 +274,7 @@ const Payment = ({navigation}) => {
 
           <View style={{height: hp(10)}}>
             <TouchableOpacity
-             
+             onPress={()=>selectedMethod === 'COD' ? handlePaymentCodTable(promotionCode) : handlePaymentZaloTable(promotionCode)}
               style={
                 styles.orderButton
               }>
@@ -233,6 +282,7 @@ const Payment = ({navigation}) => {
             </TouchableOpacity>
           </View>
           </View>
+          <Toast config={toastConfig} />
         </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
