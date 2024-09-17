@@ -5,7 +5,7 @@ const AxiosInstance = async (contentType = 'application/json') => {
   const token = await AsyncStorage.getItem('token');
 
   const axiosInstance = axios.create({
-    baseURL: 'https://79d1-171-233-27-69.ngrok-free.app/',
+    baseURL: 'https://pro2052-restaurant-api.onrender.com/',
     // baseURL: 'https://ngon-api.dangtai.id.vn/',
   });
 

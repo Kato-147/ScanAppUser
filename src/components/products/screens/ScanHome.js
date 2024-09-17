@@ -29,7 +29,7 @@ const ScanHome = ({navigation}) => {
       // Lưu dữ liệu vào AsyncStorage nếu cần
       await AsyncStorage.setItem('idTable', scannedData);
       // Điều hướng đến màn hình Menu
-      navigation.replace('Menu');
+      navigation.navigate('Menu');
     }
   };
 
@@ -37,7 +37,7 @@ const ScanHome = ({navigation}) => {
   const fastGo = async () => {
     const cc = {tableId: '666c5a75c55050edf1b3168e', type: 'softQRCode'};
     await AsyncStorage.setItem('idTable', JSON.stringify(cc));
-    navigation.replace('Menu');
+    navigation.navigate('Menu');
   };
 
   const handleBack = () => {
