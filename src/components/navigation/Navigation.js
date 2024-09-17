@@ -21,6 +21,7 @@ import ResetPassword from '../users/screens/ResetPassword';
 import PaymentStatistics from '../products/screens/PaymentStatistics';
 import {useLinkTo} from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
+import Payment from '../products/screens/Payment';
 
 
 const Stack = createNativeStackNavigator();
@@ -67,6 +68,7 @@ const Navigation = () => {
       <Stack.Screen name="DetailMenuItem" component={DetailMenuItem} />
       <Stack.Screen name="ResetPassword" component={ResetPassword} />
       <Stack.Screen name="PaymentStatistics" component={PaymentStatistics} />
+      <Stack.Screen name="Payment" component={Payment} />
     </Stack.Navigator>
   );
 };

@@ -99,15 +99,15 @@ const AccodianUserOrder = ({title,quantity, items,setdeleted}) => {
                    alignItems: 'center',
                  }}>
                  <Image
-                   source={{uri: item.menuItemId.image_url}}
+                   source={{uri: item.image_url}}
                    style={styles.image}
                  />
                </View>
        
                <View style={styles.detailsContainer}>
-                 <Text style={styles.name}>{item.menuItemId.name}</Text>
+                 <Text style={styles.name}>{item.name}</Text>
                  <Text style={styles.price}>
-                   {checkPrice(item.menuItemId.price)} đ
+                   {checkPrice(item.price)} đ
                  </Text>
        
                  {/* Options */}
