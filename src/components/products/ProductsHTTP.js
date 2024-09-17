@@ -196,9 +196,8 @@ export const getOrderTableApi = async promotionCode => {
 };
 
 // DeleteOrder
-export const deleteOrder = async ( itemId) => {
+export const deleteOrder = async itemId => {
   try {
-
     const id = await AsyncStorage.getItem('idTable');
     const tableId = JSON.parse(id).tableId;
 
@@ -211,7 +210,7 @@ export const deleteOrder = async ( itemId) => {
     );
     return response; // Trả về phản hồi từ API nếu cần
   } catch (error) {
-  //  console.log('Error deleting order:', error.response.data.message);
+    //  console.log('Error deleting order:', error.response.data.message);
     throw error.response.data.message; // Đảm bảo lỗi được truyền ra ngoài
   }
 };
@@ -220,11 +219,11 @@ export const deleteOrder = async ( itemId) => {
 export const paymentCodUser = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const id = await AsyncStorage.getItem('idTable');
-    const tableId = JSON.parse(id).tableId;
+  const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
-      voucher: promotionCode,
+      promotionCode: promotionCode,
       tableId: tableId,
     };
     console.log('body --------- ', body);
@@ -250,14 +249,16 @@ export const paymentCodUser = async promotionCode => {
 // Pay for user with ZaloPay
 export const paymentZaloUser = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
-  const userId = await AsyncStorage.getItem('userID');
   const id = await AsyncStorage.getItem('idTable');
+  const userID = await AsyncStorage.getItem('userID');
+
   const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
       promotionCode: promotionCode,
-      userId: userId,
+      tableId: tableId,
+      userIdCash: userID,
     };
     console.log('body --------- ', body);
     const url = `v1/payments/zalopayment/${tableId}?userId=true`;
@@ -283,7 +284,7 @@ export const paymentCodTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
   const id = await AsyncStorage.getItem('idTable');
   const userID = await AsyncStorage.getItem('userID');
-    const tableId = JSON.parse(id).tableId;
+  const tableId = JSON.parse(id).tableId;
   try {
     const body = {
       tableNumber: tableNumber,
@@ -296,7 +297,7 @@ export const paymentCodTable = async promotionCode => {
     const url = `v1/payments/notification-payment`;
     const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.post(url, body);
-    
+
     return res;
   } catch (err) {
     if (err.response) {
@@ -315,15 +316,18 @@ export const paymentCodTable = async promotionCode => {
 // Pay for table with ZaloPay
 export const paymentZaloTable = async promotionCode => {
   const tableNumber = await AsyncStorage.getItem('tableNumber');
-  const userId = await AsyncStorage.getItem('userID');
   const id = await AsyncStorage.getItem('idTable');
+  const userID = await AsyncStorage.getItem('userID');
   const tableId = JSON.parse(id).tableId;
+
   try {
     const body = {
       tableNumber: tableNumber,
       promotionCode: promotionCode,
-      userId: userId,
+      tableId: tableId,
+      userIdCash: userID,
     };
+
     console.log('body --------- ', body);
     const url = `v1/payments/zalopayment/${tableId}`;
     const axiosInstance = await AxiosInstance();
@@ -346,7 +350,7 @@ export const paymentZaloTable = async promotionCode => {
 // Get all available voucher
 export const getApiVoucher = async () => {
   try {
-    const url = `v1/promotions?isActive=true`;
+    const url = `v1/promotions/get-promotion-for-client?requiredPoints=false`;
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.get(url); // GET request tới URL đã chỉnh sửa
     // Trả về dữ liệu từ API
@@ -362,6 +366,24 @@ export const getApiVoucher = async () => {
       console.log('Error setting up request:', error.message);
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
+  }
+};
+
+export const getMyPromotionsRedeemedAPI = async () => {
+  try {
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.get(
+      'v1/promotions/get-my-promotions-redeemed',
+    );
+    return res;
+  } catch (err) {
+    const errorMessage = err.response
+      ? err.response.data.message
+      : err.request
+      ? 'Không có phản hồi từ máy chủ'
+      : 'Lỗi khi thiết lập yêu cầu';
+    console.error('API error:', errorMessage);
+    throw new Error(errorMessage);
   }
 };
 
@@ -443,7 +465,7 @@ export const logOutTableApi = async () => {
     const url = `v1/tables/table-in-use`;
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.patch(url);
-    
+
     // Trả về dữ liệu từ API
     return response;
   } catch (error) {
@@ -493,6 +515,28 @@ export const getMenuItemDetails = async menuItemId => {
       console.log('API error:', error.response.data);
       throw new Error(
         error.response.data.message || 'Lỗi get menu item details',
+      );
+    } else if (error.request) {
+      console.log('No response from API:', error.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', error.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+export const getPaymentStatistics = async () => {
+  try {
+    const url = `v1/statistics/customer-statistics`;
+    const axiosInstance = await AxiosInstance();
+    const response = await axiosInstance.get(url);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.log('API error:', error.response.data);
+      throw new Error(
+        error.response.data.message || 'Lỗi get payment statistics',
       );
     } else if (error.request) {
       console.log('No response from API:', error.request);

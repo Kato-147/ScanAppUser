@@ -90,7 +90,6 @@ const DetailHistoryOrder = ({route, navigation}) => {
     }
   };
 
-
   //Back to HistoryOrder Screen
   const handleBack = () => {
     console.log('>>>>>> Click Back Button');
@@ -106,8 +105,7 @@ const DetailHistoryOrder = ({route, navigation}) => {
   }, []);
 
   const loadItems = () => {
-    const mergedItems = mergeOrderItems(item.items);
-    sethistoryItems(mergedItems);
+    sethistoryItems(item.items);
   };
 
   const renderItem = ({item}) => {
@@ -146,6 +144,25 @@ const DetailHistoryOrder = ({route, navigation}) => {
             alignItems: 'center',
           }}>
           <Text style={styles.quantity}>x {item.quantity}</Text>
+        </View>
+        <View
+          style={{
+            width: wp(20),
+            height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text>{item.userOrder.fullName}</Text>
+          <Image
+            source={{uri: item.userOrder.img_avatar_url}}
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 50,
+              borderWidth: 1,
+              borderColor: '#000',
+            }}
+          />
         </View>
       </TouchableOpacity>
     );
@@ -205,7 +222,7 @@ const DetailHistoryOrder = ({route, navigation}) => {
         <Dialog.Button label="Hủy" onPress={handleCancel} />
         <Dialog.Button label="Gửi" onPress={handleAddReview} />
       </Dialog.Container>
-      <Toast config={toastConfig} ref={ref => Toast.setRef(ref)} />
+      <Toast config={toastConfig} />
     </LinearGradient>
   );
 };

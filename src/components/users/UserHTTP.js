@@ -155,10 +155,10 @@ export const reSendOtp = async email => {
 };
 
 //get News
-export const getInfoApi = async () => {
+export const getEventsApi = async () => {
   try {
     const url = 'v1/events';
-    const axiosInstance = await AxiosInstance(); // Đợi instance
+    const axiosInstance = await AxiosInstance();
     const res = await axiosInstance.get(url);
     return res;
   } catch (err) {
@@ -176,8 +176,50 @@ export const getInfoApi = async () => {
   }
 };
 
+export const getPromotionRequiredPointsAPI = async () => {
+  try {
+    const url = 'v1/promotions/get-promotion-for-client?requiredPoints=true';
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.get(url);
+    return res;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.data.message);
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+// Redeem promotion
+export const redeemPromotionAPI = async promotionCode => {
+  try {
+    const url = 'v1/promotions/redeem-promotion';
+    const body = {promotionCode};
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.post(url, body);
+    return res;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.data.message);
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
 //Menu no Login api
-export const getMenuNoLoginApi = async()=>{
+export const getMenuNoLoginApi = async () => {
   try {
     const url = `v1/tables/get-menu`;
     const axiosInstance = await AxiosInstance();
@@ -187,7 +229,9 @@ export const getMenuNoLoginApi = async()=>{
     //xử lý lỗi chi tiết
     if (err.response) {
       console.log('API error:', err.response);
-      throw new Error(err.response.data.message || 'gọi Menu no login thất bại');
+      throw new Error(
+        err.response.data.message || 'gọi Menu no login thất bại',
+      );
     } else if (err.request) {
       console.log('No response from API:', err.request);
       throw new Error('Không có phản hồi từ máy chủ');
@@ -195,22 +239,64 @@ export const getMenuNoLoginApi = async()=>{
       console.log('Error setting up request:', err.message);
       throw new Error('Lỗi khi thiết lập yêu cầu');
     }
-    
   }
-}
-
+};
 
 //Logout
 
-export const logOutApi = async()=>{
+export const logOutApi = async () => {
   try {
     const url = `v1/users/logout`;
     const axiosInstance = await AxiosInstance();
-    const res = await axiosInstance.get(url);
-    console.log('-----Logout Api----------',res);
-    
+    const res = await axiosInstance.post(url);
+    console.log('-----Logout Api----------', res);
+
     return res;
   } catch (error) {
-    console.log('---Logout Api---',error);
+    console.log('---Logout Api---', error);
   }
-}
+};
+
+// Forgot Password
+export const forgotPassword = async email => {
+  try {
+    const url = 'v1/users/forgot-password-for-client';
+    const body = {email};
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.post(url, body);
+    return res;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.message || 'Gửi yêu cầu thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
+export const resetPassword = async (email, password, passwordResetCode) => {
+  try {
+    const url = `v1/users/reset-password-for-client`;
+    const body = {email, password, passwordResetCode};
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.patch(url, body);
+    console.log('------Reset Password Api--------', res);
+    return res.data;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.data.message || 'Failed to reset password');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('No response from server');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Error setting up request');
+    }
+  }
+};
