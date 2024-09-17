@@ -22,7 +22,7 @@ import {
 } from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
-import {infoProfile} from '../ProductsHTTP';
+import {infoProfile, getTableInUse} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
 import {
   getEventsApi,
@@ -38,6 +38,7 @@ import Carousel, {Pagination} from 'react-native-snap-carousel';
 const Home = props => {
   const {navigation} = props;
   const [userInfo, setUserInfo] = useState(null);
+  const [tableInUse, setTableInUse] = useState(null);
   const [promotionCode, setPromotionCode] = useState('');
   const [events, setEvents] = useState([]);
   const [promotionRequiredPoints, setPromotionRequiredPoints] = useState([]);
@@ -48,6 +49,7 @@ const Home = props => {
     if (isFocused) {
       getNews();
       fetchProfileInfo();
+      fetchTableInUse();
     }
   }, [isFocused]);
 
@@ -60,9 +62,19 @@ const Home = props => {
     }
   };
 
-  const handleRedeemPromotion = async () => {
+  const fetchTableInUse = async () => {
     try {
-      const response = await redeemPromotionAPI(promotionCode);
+      const table = await getTableInUse();
+      console.log(table);
+      setTableInUse(table.data.tableNumberInUse);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRedeemPromotion = async code => {
+    try {
+      const response = await redeemPromotionAPI(code);
       if (response && response.data) {
         Toast.show({
           type: 'success',
@@ -72,7 +84,7 @@ const Home = props => {
       } else {
         Toast.show({
           type: 'error',
-          text1: 'Đổi mã khuyến mãi thất bại ABC',
+          text1: 'Đổi mã khuyến mãi thất bại',
           text2: response.message,
         });
       }
@@ -160,7 +172,6 @@ const Home = props => {
       <TouchableOpacity
         style={styles.redeemButton}
         onPress={() => {
-          // Implement redeem logic here
           Alert.alert(
             'Đổi mã khuyến mãi',
             `Bạn có chắc chắn muốn đổi mã khuyến mãi với ${item.requiredPoints} điểm?`,
@@ -169,8 +180,7 @@ const Home = props => {
               {
                 text: 'Đồng ý',
                 onPress: () => {
-                  setPromotionCode(item.code);
-                  handleRedeemPromotion();
+                  handleRedeemPromotion(item.code);
                 },
               },
             ],
@@ -218,23 +228,35 @@ const Home = props => {
                     {userInfo.data.user.fullName}
                   </Text>
                   <Text style={styles.userPoints}>
-                    Bạn đang có {userInfo.data.user.reputationPoints} điểm
+                    Điểm: {userInfo.data.user.reputationPoints}
                   </Text>
                 </View>
-                <View
+                <TouchableOpacity
                   style={{
                     position: 'absolute',
                     bottom: 0,
                     right: 50,
                     alignItems: 'center',
                     gap: 5,
+                  }}
+                  onPress={() => {
+                    if (tableInUse) {
+                      navigation.navigate('Menu');
+                    }
                   }}>
                   <Image
-                    source={require('../../../images/user-current.png')}
-                    style={{width: 30, height: 30}}
+                    source={
+                      tableInUse
+                        ? require('../../../images/user-current.png')
+                        : require('../../../images/user-not-current.png')
+                    }
                   />
-                  <Text>Bạn đang ở </Text>
-                </View>
+                  <Text>
+                    {tableInUse
+                      ? `Bạn đang ở bàn ${tableInUse}`
+                      : 'Bạn không ở trong bàn nào'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>
@@ -266,7 +288,6 @@ const Home = props => {
     </KeyboardAvoidingView>
   );
 };
-
 export default Home;
 
 const styles = StyleSheet.create({

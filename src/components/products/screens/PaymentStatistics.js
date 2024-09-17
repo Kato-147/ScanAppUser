@@ -42,12 +42,11 @@ const PaymentStatistics = ({navigation}) => {
     fetchData();
   }, []);
 
-  // Hàm format tiền ngắn gọn (VD: 150000 -> 150k)
   const formatShortAmount = value => {
     if (value >= 1000000) {
-      return (value / 1000000).toFixed(1) + 'M'; // VD: 1.5M
+      return (value / 1000000).toFixed(1) + 'M';
     } else if (value >= 1000) {
-      return (value / 1000).toFixed(0) + 'k'; // VD: 150k
+      return (value / 1000).toFixed(0) + 'k';
     }
     return value.toString();
   };
@@ -140,13 +139,13 @@ const PaymentStatistics = ({navigation}) => {
           backgroundColor: 'white',
           backgroundGradientFrom: 'white',
           backgroundGradientTo: 'white',
-          decimalPlaces: 2, // số thập phân
+          decimalPlaces: 2,
           color: (opacity = 1) => `rgba(232, 144, 12, ${opacity})`,
           style: {
             borderRadius: 16,
           },
           propsForBackgroundLines: {
-            strokeWidth: 0, // Loại bỏ các đường ngang
+            strokeWidth: 0,
           },
           withVerticalLabels: false,
         }}
@@ -156,10 +155,9 @@ const PaymentStatistics = ({navigation}) => {
         }}
         showValuesOnTopOfBars
         fromZero
-        formatYLabel={value => formatShortAmount(parseInt(value))} // Format tiền ngắn gọn
+        formatYLabel={value => formatShortAmount(parseInt(value))}
       />
-
-      {/* Thêm text mô tả phía dưới biểu đồ */}
+      <Text style={styles.descriptionText}>Chi tiết:</Text>
       <View style={styles.descriptionContainer}>
         {description.map((desc, index) => (
           <Text key={index} style={styles.descriptionText}>

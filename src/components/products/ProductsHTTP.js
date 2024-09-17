@@ -98,6 +98,27 @@ export const getTables = async (tableId, tableType) => {
   }
 };
 
+// /table-in-use
+export const getTableInUse = async () => {
+  try {
+    const url = `v1/tables/table-in-use`;
+    const axiosInstance = await AxiosInstance();
+    const res = await axiosInstance.get(url);
+    return res;
+  } catch (err) {
+    if (err.response) {
+      console.log('API error:', err.response);
+      throw new Error(err.response.message || 'Lấy thông tin table thất bại');
+    } else if (err.request) {
+      console.log('No response from API:', err.request);
+      throw new Error('Không có phản hồi từ máy chủ');
+    } else {
+      console.log('Error setting up request:', err.message);
+      throw new Error('Lỗi khi thiết lập yêu cầu');
+    }
+  }
+};
+
 // Create Order in cart
 export const postOrder = async () => {
   try {
