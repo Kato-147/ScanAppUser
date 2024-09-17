@@ -53,6 +53,22 @@ const Home = props => {
     }
   }, [isFocused]);
 
+  // Xem các Key trong asynStorage
+  useEffect(() => {
+    const getAllKeys = async () => {
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        console.log('All keys:', keys);
+       
+      } catch (error) {
+        console.error('Error getting keys:', error);
+      }
+    };
+
+    // Gọi hàm để xem các key
+    getAllKeys();
+  }, []);
+
   const fetchProfileInfo = async () => {
     try {
       const data = await infoProfile();

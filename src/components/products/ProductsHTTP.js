@@ -227,7 +227,7 @@ export const deleteOrder = async itemId => {
     }
     const axiosInstance = await AxiosInstance();
     const response = await axiosInstance.delete(
-      `v1/tables/${tableId}/orders/items/${itemId}?specifiedTime=180`,
+      `v1/tables/${tableId}/orders/items/${itemId}?quantity=1`,
     );
     return response; // Trả về phản hồi từ API nếu cần
   } catch (error) {

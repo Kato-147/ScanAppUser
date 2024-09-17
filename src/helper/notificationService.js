@@ -57,7 +57,9 @@ messaging().onMessage(async remoteMessage => {
   if(remoteMessage.data.type === 'afterPayment'){
    // await AsyncStorage.removeItem('idTable');
    // await AsyncStorage.removeItem('tableNumber');
+
     console.log('-------NHẬN NOTI THANH TOÁN THÀNH CÔNG--pushnoti--');
+    await AsyncStorage.removeItem('idTable');
   }
 });
 
