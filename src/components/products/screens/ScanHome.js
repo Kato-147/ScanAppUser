@@ -35,7 +35,7 @@ const ScanHome = ({navigation}) => {
 
   // bàn 3 6679893df3da9df0bfcf3da9
   const fastGo = async () => {
-    const cc = {tableId: '666c5a75c55050edf1b3168e', type: 'hardQRCode'};
+    const cc = {tableId: '666c5a75c55050edf1b3168e', type: 'softQRCode'};
     await AsyncStorage.setItem('idTable', JSON.stringify(cc));
     navigation.replace('Menu');
   };

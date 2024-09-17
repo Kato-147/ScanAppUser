@@ -17,30 +17,37 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/AntDesign';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import {SliderBox} from 'react-native-image-slider-box';
 import {useIsFocused} from '@react-navigation/native';
-import {getApiVoucher} from '../ProductsHTTP';
+import {getApiVoucher, getMyPromotionsRedeemedAPI} from '../ProductsHTTP';
 import CopyIcon from 'react-native-vector-icons/MaterialIcons';
 import Clipboard from '@react-native-clipboard/clipboard';
+import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 
 const Voucher = ({navigation}) => {
   const isFocused = useIsFocused();
   const [voucherItems, setvoucherItems] = useState([]);
+  const [voucherRedeemed, setvoucherRedeemed] = useState([]);
   const [copyCode, setcopyCode] = useState('');
   const [loading, setloading] = useState(true);
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    {key: 'hot', title: 'Các Voucher hot'},
+    {key: 'mine', title: 'Voucher của tôi'},
+  ]);
 
   const copyToClipboard = code => {
-    console.log('---------------', code);
-    setcopyCode(code);
     Clipboard.setString(copyCode);
-    ToastAndroid.show('Đã sao chép', ToastAndroid.SHORT);
+    ToastAndroid.show(`Đã sao chép ${code} vào bộ nhớ tạm`, ToastAndroid.SHORT);
+    setcopyCode(code);
+    console.log('copyCode:', copyCode);
   };
 
   useEffect(() => {
     if (isFocused) {
       getVoucher();
+      getMyPromotionsRedeemed();
     }
   }, [isFocused]);
 
@@ -58,64 +65,206 @@ const Voucher = ({navigation}) => {
     }
   };
 
-  const renderItem = ({item}) => {
-    //  console.log(item.image, '<<<<<<<<<<<<<');
-    return (
-      <TouchableOpacity
-        style={styles.itemContainer}
-        activeOpacity={1}
-        onPress={() => {
-          console.log(item.id);
-          // navigation.navigate('Detail', { newsId: _id });
-        }}>
-        {/* Image */}
-        <View style={styles.itemFlatlist}>
-          <Image
-            style={styles.imageVoucherItem}
-            source={{uri: 'https://www.themealdb.com/images/meal-icon.png'}}
-          />
-        </View>
-
-        {/* in4 */}
-        <View style={styles.detailsContainer}>
-          {/* Name */}
-          <Text
-            style={{fontSize: hp(2), fontWeight: 'bold', color: 'black'}}
-            numberOfLines={2}>
-            {item.description}
-          </Text>
-          {/* Code & copyButton */}
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingEnd: wp(5),
-            }}>
-            <Text style={{width: wp(50), color: 'black'}}>
-              {' '}
-              Mã: {item.code}
-            </Text>
-            <TouchableOpacity
-              onPress={() => copyToClipboard(item.code)}
-              style={{
-                backgroundColor: '#E8900C',
-                padding: wp(2),
-                borderRadius: 8,
-              }}>
-              <CopyIcon name="content-copy" size={wp(5)} color="#ffffff" />
-            </TouchableOpacity>
-          </View>
-          {/* End Date */}
-          <Text style={{color: 'black'}}>
-            Hạn sử dụng: {new Date(item.endDate).toLocaleDateString()}
-          </Text>
-         
-        </View>
-      </TouchableOpacity>
-    );
+  const getMyPromotionsRedeemed = async () => {
+    try {
+      const response = await getMyPromotionsRedeemedAPI();
+      if (response.status === 'success') {
+        setvoucherRedeemed(response.data.promotionsRedeemed);
+      }
+      return response;
+    } catch (error) {
+      console.error('Error fetching promotions:', error);
+    } finally {
+      setloading(false);
+    }
   };
+
+  const renderItem = ({item}) => (
+    <TouchableOpacity
+      style={styles.itemContainer}
+      activeOpacity={1}
+      onPress={() => {
+        console.log(item._id);
+      }}>
+      <View style={styles.itemFlatlist}>
+        <Image
+          style={styles.imageVoucherItem}
+          source={{uri: 'https://www.themealdb.com/images/meal-icon.png'}}
+        />
+      </View>
+      <View style={styles.detailsContainer}>
+        <Text
+          style={{fontSize: hp(2), fontWeight: 'bold', color: 'black'}}
+          numberOfLines={2}>
+          {item.description}
+        </Text>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingEnd: wp(5),
+          }}>
+          <Text style={{width: wp(50), color: 'black'}}>Mã: {item.code}</Text>
+          <TouchableOpacity
+            onPress={() => copyToClipboard(item.code)}
+            style={{
+              backgroundColor: '#E8900C',
+              padding: wp(2),
+              borderRadius: 8,
+            }}>
+            <CopyIcon name="content-copy" size={wp(5)} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+        <Text style={{color: 'black'}}>
+          Hạn sử dụng: {new Date(item.endDate).toLocaleDateString()}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderRedeemedItem = ({item}) => (
+    <TouchableOpacity
+      style={styles.itemContainer}
+      activeOpacity={1}
+      onPress={() => {
+        console.log(item.promotionId);
+      }}>
+      <View style={styles.itemFlatlist}>
+        <Image
+          style={styles.imageVoucherItem}
+          source={{uri: 'https://www.themealdb.com/images/meal-icon.png'}}
+        />
+      </View>
+      <View style={styles.detailsContainer}>
+        <Text
+          style={{
+            fontSize: hp(2),
+            fontWeight: 'bold',
+            color: 'black',
+            marginBottom: 5,
+          }}
+          numberOfLines={2}>
+          {item.description}
+        </Text>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingEnd: wp(5),
+            marginBottom: 5,
+          }}>
+          <Text style={{width: wp(50), color: 'black'}}>
+            {' '}
+            Mã: {item.promotionCode}
+          </Text>
+          <TouchableOpacity
+            onPress={() => copyToClipboard(item.promotionCode)}
+            style={{
+              backgroundColor: '#E8900C',
+              padding: wp(2),
+              borderRadius: 8,
+            }}>
+            <CopyIcon name="content-copy" size={wp(5)} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+        <Text style={{color: 'black', marginBottom: 5}}>
+          Lượt dùng: {item.usageCount}
+        </Text>
+        <Text style={{color: 'black'}}>
+          Đã đổi lúc: {new Date(item.redeemedAt).toLocaleDateString()}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const HotVouchers = () => (
+    <View style={{height: hp(45)}}>
+      {loading ? (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : voucherItems.length === 0 ? (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Image
+            style={styles.errorImage}
+            source={{
+              uri: 'https://cdn-icons-png.flaticon.com/256/3405/3405177.png',
+            }}
+          />
+          <Text style={styles.errorText}>Hiện không có voucher</Text>
+        </View>
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={voucherItems}
+          renderItem={renderItem}
+          keyExtractor={item => item._id.toString()}
+          contentContainerStyle={styles.menuList}
+        />
+      )}
+    </View>
+  );
+
+  const MyVouchers = () => (
+    <View style={{height: hp(45)}}>
+      {loading ? (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : voucherRedeemed.length === 0 ? (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Image
+            style={styles.errorImage}
+            source={{
+              uri: 'https://cdn-icons-png.flaticon.com/256/3405/3405177.png',
+            }}
+          />
+          <Text style={styles.errorText}>Hiện không có voucher</Text>
+        </View>
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={voucherRedeemed}
+          renderItem={renderRedeemedItem}
+          keyExtractor={item => item.promotionId.toString()}
+          contentContainerStyle={styles.menuList}
+        />
+      )}
+    </View>
+  );
+
+  const renderScene = SceneMap({
+    hot: HotVouchers,
+    mine: MyVouchers,
+  });
 
   return (
     <KeyboardAvoidingView>
@@ -123,7 +272,6 @@ const Voucher = ({navigation}) => {
         <LinearGradient
           colors={['#ffffff', '#ffffff', '#ffffff', '#F6F6F6']}
           style={styles.container}>
-          {/* Header */}
           <View
             style={{
               width: wp(100),
@@ -158,12 +306,10 @@ const Voucher = ({navigation}) => {
             </Text>
           </View>
 
-          {/* Baner */}
           <View
             style={{
               width: wp(100),
               height: hp(20),
-              //  backgroundColor: 'yellow',
               alignSelf: 'center',
               justifyContent: 'center',
               marginBottom: 20,
@@ -176,76 +322,26 @@ const Voucher = ({navigation}) => {
               paginationBoxVerticalPadding={20}
               autoplay
               circleLoop
-              // resizeMethod={'resize'}
-              // resizeMode={'cover'}
-              // paginationBoxStyle={styles.paginationBox}
               dotStyle={styles.dotStyle}
               ImageComponentStyle={styles.imageStyle}
               imageLoadingColor="#2196F3"
             />
           </View>
 
-          {/* Vouchers hot */}
-
-          <View style={{height: hp(55)}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 10,
-                margin: 15,
-              }}>
-              <Icon2 name="fire-alt" size={24} color="#E8900C" />
-              <Text
-                style={{
-                  fontSize: hp(2.3),
-                  fontWeight: '500',
-                  color: 'black',
-                  marginTop: 5,
-                }}>
-                Các Voucher hot
-              </Text>
-            </View>
-
-            <View style={{height: hp(45)}}>
-              {loading ? (
-                <View
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <ActivityIndicator size="large" color="#0000ff" />
-                </View>
-              ) : voucherItems.length === 0 ? (
-                <View
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Image
-                    style={styles.errorImage}
-                    source={{
-                      uri: 'https://cdn-icons-png.flaticon.com/256/3405/3405177.png',
-                    }}
-                  />
-                  <Text style={styles.errorText}>Hiện không có voucher</Text>
-                </View>
-              ) : (
-                <FlatList
-                  // numColumns={2}
-                  showsVerticalScrollIndicator={false}
-                  data={voucherItems}
-                  renderItem={renderItem}
-                  keyExtractor={item => item._id.toString()}
-                  contentContainerStyle={styles.menuList}
-                />
-              )}
-            </View>
-          </View>
+          <TabView
+            navigationState={{index, routes}}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{width: wp(100)}}
+            renderTabBar={props => (
+              <TabBar
+                {...props}
+                indicatorStyle={{backgroundColor: '#E8900C'}}
+                style={{backgroundColor: 'white'}}
+                labelStyle={{color: 'black', fontWeight: 'bold'}}
+              />
+            )}
+          />
         </LinearGradient>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -271,28 +367,8 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   imageStyle: {
-    // borderRadius: 15,
     width: '100%',
     height: '100%',
-    // marginTop: 5,
-  },
-  seeVoucherContainer: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    marginVertical: 20,
-    height: hp(6.5),
-    marginHorizontal: 24,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E8900C',
-  },
-  iconVoucher: {},
-  voucherText: {
-    color: 'black',
-    fontSize: hp(2),
   },
   imageVoucherItem: {
     width: wp(25),
@@ -308,7 +384,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     width: wp(100),
-    height: hp(12),
+    height: hp(15),
     marginVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',

@@ -222,7 +222,7 @@ const DetailHistoryOrder = ({route, navigation}) => {
         <Dialog.Button label="Hủy" onPress={handleCancel} />
         <Dialog.Button label="Gửi" onPress={handleAddReview} />
       </Dialog.Container>
-      <Toast config={toastConfig} ref={ref => Toast.setRef(ref)} />
+      <Toast config={toastConfig} />
     </LinearGradient>
   );
 };

@@ -99,6 +99,9 @@ const Menu = ({navigation}) => {
       console.log('ID Table từ AsyncStorage', idtable, tableType);
 
       const table = await getTables(idtable, tableType);
+      console.log('====================================');
+      console.log(table);
+      console.log('====================================');
       table.usageAllowed === 'no' &&Toast.show({
         type: 'error',
         text1: 'Bàn không khả dụng',

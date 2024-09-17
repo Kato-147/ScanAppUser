@@ -67,19 +67,19 @@ const Profile = ({navigation}) => {
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{error}</Text>
         <View
-        style={{
-          backgroundColor: 'white',
-          borderRadius: 10,
-          marginVertical: 20,
-          justifyContent: 'space-between',
-        }}>
-        <TouchableOpacity style={styles.optionsetting} onPress={handleLogout}>
-          <Text style={[styles.textOptionsetting, {color: '#FF3333'}]}>
-            Đăng xuất
-          </Text>
-          <IconLogout name="logout" style={styles.iconOptionsetting} />
-        </TouchableOpacity>
-      </View>
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 10,
+            marginVertical: 20,
+            justifyContent: 'space-between',
+          }}>
+          <TouchableOpacity style={styles.optionsetting} onPress={handleLogout}>
+            <Text style={[styles.textOptionsetting, {color: '#FF3333'}]}>
+              Đăng xuất
+            </Text>
+            <IconLogout name="logout" style={styles.iconOptionsetting} />
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -117,6 +117,11 @@ const Profile = ({navigation}) => {
   const handleUpdatePassword = () => {
     console.log('>>>>>>>> click to UpdatePassword Screen');
     navigation.navigate('UpdatePassword');
+  };
+
+  const handlePaymentStatistics = () => {
+    console.log('>>>>>>>> click to PaymentStatistics Screen');
+    navigation.navigate('PaymentStatistics');
   };
 
   return (
@@ -199,6 +204,13 @@ const Profile = ({navigation}) => {
           }}
           style={styles.optionsetting}>
           <Text style={styles.textOptionsetting}>Lịch sử đơn hàng</Text>
+          <Icon name="right" style={styles.iconOptionsetting} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handlePaymentStatistics}
+          style={styles.optionsetting}>
+          <Text style={styles.textOptionsetting}>Thống kê thanh toán</Text>
           <Icon name="right" style={styles.iconOptionsetting} />
         </TouchableOpacity>
 
