@@ -187,23 +187,10 @@ const Oder = ({navigation}) => {
 
   // Hàm xử lý khi người dùng nhấn nút thanh toán
 
-  const handlePayment = (orderTableItems, orderUserItems, promotionCode,totalTable) => {
+  const handlePayment = (orderTableItems,totalTable) => {
    navigation.navigate('Payment', {orderTableItems,totalTable})
   };
-  // const handlePayment = (orderTableItems, orderUserItems, promotionCode) => {
-  //   if (orderType === 'user' && selectedMethod === 'COD') {
-  //     handlePaymentCOD(promotionCode);
-  //   }
-  //   if (orderType === 'user' && selectedMethod === 'Zalo') {
-  //     checkPaymentZaloUser(orderUserItems, promotionCode);
-  //   }
-  //   if (orderType === 'table' && selectedMethod === 'COD') {
-  //     checkPaymentCodTable(orderTableItems, promotionCode);
-  //   }
-  //   if (orderType === 'table' && selectedMethod === 'Zalo') {
-  //     checkPaymentZaloTable(orderTableItems, promotionCode)
-  //   }
-  // };
+
 
   const checkPaymentZaloUser = (orderUserItems, promotionCode) => {
     if (Array.isArray(orderUserItems) && orderUserItems.length > 0) {

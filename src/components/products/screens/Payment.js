@@ -83,6 +83,43 @@ const Payment = ({navigation}) => {
       }
     };
 
+    const checkPaymentCodTable = (orderTableItems, promotionCode) => {
+      if (Array.isArray(orderTableItems) && orderTableItems.length > 0) {
+        const loading = orderTableItems.filter(item => item.status === 'loading');
+        
+        if (loading.length > 0) {
+          Toast.show({
+            type: 'error',
+            text1: 'Không thể thanh toán',
+            text2: 'Đang có món chưa hoàn thành',
+          });
+        }else{
+          handlePaymentCodTable(promotionCode);
+        }
+       
+      } else {
+        console.error('orderUserItems is not a valid array');
+      }
+    };
+  
+    const checkPaymentZaloTable = (orderTableItems, promotionCode) => {
+      if (Array.isArray(orderTableItems) && orderTableItems.length > 0) {
+        const loading = orderTableItems.filter(item => item.status === 'loading');
+        
+        if (loading.length > 0) {
+          Toast.show({
+            type: 'error',
+            text1: 'Không thể thanh toán',
+            text2: 'Đang có món chưa hoàn thành',
+          });
+        }else{
+          handlePaymentZaloTable(promotionCode);
+        }
+       
+      } else {
+        console.error('orderUserItems is not a valid array');
+      }
+    };
       // Hàm xử lý thanh toán tiền mặt theo bàn
   const handlePaymentCodTable = async promotionCode => {
     console.log('pay cod table');
@@ -274,7 +311,7 @@ const Payment = ({navigation}) => {
 
           <View style={{height: hp(10)}}>
             <TouchableOpacity
-             onPress={()=>selectedMethod === 'COD' ? handlePaymentCodTable(promotionCode) : handlePaymentZaloTable(promotionCode)}
+             onPress={()=>selectedMethod === 'COD' ? checkPaymentCodTable(orderTableItems,promotionCode) : checkPaymentZaloTable(orderTableItems,promotionCode)}
               style={
                 styles.orderButton
               }>
