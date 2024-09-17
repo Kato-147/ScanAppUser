@@ -7,6 +7,7 @@ import {
   Keyboard,
   FlatList,
   TouchableOpacity,
+  ImageBackground,
   Image,
   ActivityIndicator,
   Alert,
@@ -23,89 +24,25 @@ import LinearGradient from 'react-native-linear-gradient';
 import {useIsFocused} from '@react-navigation/native';
 import {infoProfile} from '../ProductsHTTP';
 import Loading from '../../fragment/Loading';
-import {getInfoApi, getNewsApi} from '../../users/UserHTTP';
-import {cutStr} from './Cart';
-import {formatDate} from './DetailHistoryOrder';
+import {
+  getEventsApi,
+  getPromotionRequiredPointsAPI,
+  redeemPromotionAPI,
+} from '../../users/UserHTTP';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import Toast from 'react-native-toast-message';
 import toastConfig from '../../../helper/toastConfig';
-
-// export const addNotificationToStorage = async (notification) => {
-//   try {
-//     const currentNotifications = await AsyncStorage.getItem('notifications');
-//     let notifications = [];
-
-//     if (currentNotifications) {
-//       notifications = JSON.parse(currentNotifications);
-//     }
-
-//     notifications.push(notification); // Add new notification to array
-
-//     const serializedNotifications = JSON.stringify(notifications); // Convert to JSON string
-//     await AsyncStorage.setItem('notifications', serializedNotifications); // Store in AsyncStorage
-//   } catch (error) {
-//     console.error('Error adding notification to storage:', error);
-//   }
-// };
+import Carousel, {Pagination} from 'react-native-snap-carousel';
 
 const Home = props => {
   const {navigation} = props;
   const [userInfo, setUserInfo] = useState(null);
-  const [news, setnews] = useState([]);
+  const [promotionCode, setPromotionCode] = useState('');
+  const [events, setEvents] = useState([]);
+  const [promotionRequiredPoints, setPromotionRequiredPoints] = useState([]);
   const isFocused = useIsFocused();
   const [loading, setloading] = useState(true);
-
-  
-
-  // useEffect(() => {
-  //   const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-  //     console.log('====================================');
-  //     console.log('-----remoteMessage',remoteMessage);
-  //     console.log('====================================');
-  //     if (remoteMessage.notification) {
-  //       const { title, body } = remoteMessage.notification;
-  
-  //       console.log('nè nè nè', remoteMessage.data);
-  
-  //       if (title && body) {
-  //         addNotificationToStorage({ title, body }); // Add notification to AsyncStorage
-  
-  //         Alert.alert(
-  //           title,
-  //           body,
-  //           [
-  //             { text: 'Đóng', style: 'cancel' },
-  //             {
-  //               text: 'Đi tới hóa đơn ' + body,
-  //               onPress: () => navigation.navigate('HistoryOrder'),
-  //             },
-  //           ],
-  //           { cancelable: false }
-  //         );
-  //       }
-  //     }
-  //   });
-  
-  //   return unsubscribe;
-  // }, []);
-
-  
-// Xem các Key trong asynStorage
-  useEffect(() => {
-    const getAllKeys = async () => {
-      try {
-        const keys = await AsyncStorage.getAllKeys();
-        console.log('All keys:', keys);
-       
-      } catch (error) {
-        console.error('Error getting keys:', error);
-      }
-    };
-
-    // Gọi hàm để xem các key
-    getAllKeys();
-  }, []);
 
   useEffect(() => {
     if (isFocused) {
@@ -119,82 +56,132 @@ const Home = props => {
       const data = await infoProfile();
       setUserInfo(data);
     } catch (err) {
-      setError(err.message);
-      ToastAndroid.show(err.message, ToastAndroid.SHORT);
+      console.log(err.message);
+    }
+  };
+
+  const handleRedeemPromotion = async () => {
+    try {
+      const response = await redeemPromotionAPI(promotionCode);
+      if (response && response.data) {
+        Toast.show({
+          type: 'success',
+          text1: 'Đổi mã khuyến mãi thành công',
+          text2: response.message,
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Đổi mã khuyến mãi thất bại ABC',
+          text2: response.message,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Đổi mã khuyến mãi thất bại',
+        text2: error.message,
+      });
     }
   };
 
   const getNews = async () => {
     try {
-      const response = await getInfoApi();
-      setnews(response.data);
+      const response = await getEventsApi();
+      if (response && response.data) {
+        setEvents(response.data);
+      } else {
+        setEvents([]);
+      }
     } catch (error) {
       console.log(error);
+      setEvents([]);
     } finally {
       setloading(false);
     }
   };
 
-  const handleScanHome = () => {
-    navigation.navigate('ScanHome');
+  const getPromotionRequiredPoints = async () => {
+    try {
+      const response = await getPromotionRequiredPointsAPI();
+      if (response && response.data) {
+        setPromotionRequiredPoints(response.data.promotions);
+      } else {
+        setPromotionRequiredPoints([]);
+      }
+    } catch (error) {
+      console.log(error);
+      setPromotionRequiredPoints([]);
+    }
   };
 
-  //Render News
-  const renderItem = ({item}) => {
+  useEffect(() => {
+    getPromotionRequiredPoints();
+  }, []);
+
+  const renderEventItem = ({item}) => {
     return (
       <TouchableOpacity
-        style={styles.itemFlatlist}
-        activeOpacity={1}
-        onPress={() => {
-          console.log(item.id);
-          navigation.navigate('DetailNews', {item});
-        }}>
-        {/* Image */}
-        {item.image_url.length === 0 ? (
-          <View
-            style={{
-              width: wp(25),
-              height: hp(12),
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image
-              style={styles.image}
-              source={{
-                uri: 'https://t3.ftcdn.net/jpg/04/62/93/66/360_F_462936689_BpEEcxfgMuYPfTaIAOC1tCDurmsno7Sp.jpg',
-              }}
-            />
-          </View>
-        ) : (
-          <View
-            style={{
-              width: wp(25),
-              height: hp(12),
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image style={styles.image} source={{uri: item.image_url[0]}} />
-          </View>
-        )}
-
-        {/* info */}
-        <View style={styles.detailsContainer}>
-          <Text
-            numberOfLines={1}
-            style={{fontSize: hp(2.2), fontWeight: 'bold', color: 'black'}}>
-            {item.title}
-          </Text>
-          <Text numberOfLines={1} style={{fontSize: hp(1.8), color: 'black'}}>
-            {item.summary}
-          </Text>
-          <Text numberOfLines={1} style={{fontSize: hp(1.8), color: 'black'}}>
-            Ngày đăng :{formatDate(item.createdAt)}
-          </Text>
+        onPress={() => navigation.navigate('DetailNews', {item})}>
+        <View style={styles.eventContainer}>
+          {/* Image as background */}
+          <ImageBackground
+            source={{uri: item.image_url[0]}}
+            resizeMode="cover"
+            style={styles.eventImage}
+            imageStyle={{borderRadius: 10}}>
+            <View style={styles.overlay} />
+            {/* Overlay for better text visibility */}
+            <View style={styles.eventContent}>
+              <Text
+                style={styles.eventTitle}
+                numberOfLines={1}
+                ellipsizeMode="tail">
+                {item.title}
+              </Text>
+              <Text
+                style={styles.eventSummary}
+                numberOfLines={2}
+                ellipsizeMode="tail">
+                {item.summary}
+              </Text>
+            </View>
+          </ImageBackground>
         </View>
-       
       </TouchableOpacity>
     );
   };
+
+  const renderPromotionItem = ({item}) => (
+    <View style={styles.promotionCard} key={item._id}>
+      <Text style={styles.promotionCode}>{item.code}</Text>
+      <Text style={styles.promotionDescription}>{item.description}</Text>
+      <TouchableOpacity
+        style={styles.redeemButton}
+        onPress={() => {
+          // Implement redeem logic here
+          Alert.alert(
+            'Đổi mã khuyến mãi',
+            `Bạn có chắc chắn muốn đổi mã khuyến mãi với ${item.requiredPoints} điểm?`,
+            [
+              {text: 'Hủy', style: 'cancel'},
+              {
+                text: 'Đồng ý',
+                onPress: () => {
+                  setPromotionCode(item.code);
+                  handleRedeemPromotion();
+                },
+              },
+            ],
+          );
+        }}>
+        <Text style={styles.redeemButtonText}>
+          Đổi với {item.requiredPoints} điểm
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <KeyboardAvoidingView>
@@ -213,120 +200,68 @@ const Home = props => {
                   gap: wp(5),
                 }}>
                 <ActivityIndicator size="large" color="#0000ff" />
-                {/* style={styles.avatarImage} */}
               </View>
             ) : (
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  width: wp(80),
+                  width: wp(100),
                   gap: wp(5),
                 }}>
                 <Image
                   source={{uri: userInfo.data.user.img_avatar_url}}
                   style={styles.avatarImage}
                 />
-                <View style={{gap: 5}}>
-                  <Text>Xin chào !</Text>
-                  <Text
-                    style={{
-                      fontSize: hp(2.2),
-                      letterSpacing: 1,
-                      fontWeight: 'bold',
-                      color: '#000000',
-                      marginStart: wp(3),
-                    }}>
+                <View style={styles.userInfo}>
+                  <Text style={styles.userName}>
                     {userInfo.data.user.fullName}
                   </Text>
+                  <Text style={styles.userPoints}>
+                    Bạn đang có {userInfo.data.user.reputationPoints} điểm
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 50,
+                    alignItems: 'center',
+                    gap: 5,
+                  }}>
+                  <Image
+                    source={require('../../../images/user-current.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <Text>Bạn đang ở </Text>
                 </View>
               </View>
             )}
           </View>
-
-          {/* Body */}
-          <View style={styles.bodyContainer}>
-            {/* Scan Here */}
-            <View
-              style={{
-                justifyContent: 'space-evenly',
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginVertical: hp(8),
-              }}>
-              <Text
-                style={{
-                  marginStart: 24,
-                  fontSize: hp(2.3),
-                  fontWeight: '500',
-                  color: 'white',
-                  marginTop: 10,
-                }}>
-                Quét mã để xem Menu
-              </Text>
-              <TouchableOpacity onPress={handleScanHome}>
-                <IconQr name="qrcode-scan" style={styles.iconQr} />
-              </TouchableOpacity>
-            </View>
-
-            {/* News */}
-            <View style={{height: hp(54), width: wp(100)}}>
-              <Text
-                style={{
-                  fontSize: hp(3),
-                  fontWeight: 'bold',
-                  color: 'black',
-                  marginStart: wp(5),
-                }}>
-                Thông báo
-              </Text>
-              {loading ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    width: wp(100),
-                    gap: wp(5),
-                    justifyContent: 'center',
-                    height: hp(40),
-                  }}>
-                  <ActivityIndicator size="large" color="#0000ff" />
-                  {/* style={styles.avatarImage} */}
-                </View>
-              ) : (
-                <View>
-                  {news.length === 0 ? (
-                    <View
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <Text>Không có thông báo</Text>
-                    </View>
-                  ) : (
-                    <FlatList
-                      //  numColumns={2}
-                      showsVerticalScrollIndicator={false}
-                      style={{
-                        width: '100%',
-                        alignSelf: 'center',
-                        marginTop: hp(2),
-                      }}
-                      data={news}
-                      renderItem={renderItem}
-                     // keyExtractor={item => item.id} // Sử dụng `id` làm key
-                      contentContainerStyle={styles.menuList}
-                    />
-                  )}
-                </View>
-              )}
-            </View>
+          <View style={styles.sliderContainer}>
+            {loading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <FlatList
+                data={events}
+                renderItem={renderEventItem}
+                keyExtractor={item => item._id.toString()} // Use _id here
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              />
+            )}
           </View>
-          <Toast config={toastConfig}  />
+          <View style={styles.promotionContainer}>
+            <Text style={styles.promotionHeader}>Mã khuyến mãi</Text>
+            <FlatList
+              data={promotionRequiredPoints}
+              renderItem={renderPromotionItem}
+              keyExtractor={item => item._id.toString()}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+          <Toast config={toastConfig} />
         </LinearGradient>
-        
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
@@ -338,18 +273,11 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
     backgroundColor: 'white',
-  },
-  iconQr: {
-    color: 'white',
-    fontSize: wp(20),
   },
   headerContainer: {
     height: hp(10),
     width: wp(100),
-    // backgroundColor: '#E8900C',
     backgroundColor: 'white',
     borderBottomEndRadius: 30,
     borderBottomStartRadius: 30,
@@ -358,49 +286,115 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
   },
-  bodyContainer: {
-    //  backgroundColor: 'yellow',
-    display: 'flex',
-    // width: hp(10)
+  userInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: wp(80),
+    gap: wp(5),
   },
   avatarImage: {
     width: hp(6),
     height: hp(6),
     borderRadius: 45,
-    // backgroundColor: 'red',
-    color: 'white',
   },
-  imageStyle: {
-    borderRadius: 15,
-    width: 50,
-    height: 50,
+  userInfo: {
+    gap: 5,
+  },
+  greetingText: {
+    fontSize: hp(2),
+    color: '#000000',
+  },
+  userName: {
+    fontSize: hp(2.2),
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  userPoints: {
+    fontSize: hp(2),
+    color: '#000000',
+  },
+  sliderContainer: {
+    height: hp(35),
     marginTop: 5,
   },
-  itemFlatlist: {
-    width: wp(95),
-    height: hp(12),
-    marginVertical: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    marginHorizontal: wp(2),
+  eventContainer: {
+    width: wp(100),
+    height: hp(35),
+    marginRight: wp(5),
     borderRadius: 10,
+    overflow: 'hidden',
+    padding: 10,
   },
-  menuList: {
-    paddingBottom: 20,
-    marginTop: 5,
-  },
-  image: {
-    width: wp(25),
-    height: wp(25),
-    borderRadius: 10,
-  },
-  detailsContainer: {
+  eventImage: {
     flex: 1,
-    height: '100%',
-    justifyContent: 'space-around',
-    width: wp(50),
-    paddingStart: wp(2),
+    justifyContent: 'flex-end',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  eventContent: {
+    padding: 15,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  eventTitle: {
+    color: '#fff',
+    fontSize: hp(2.5),
+    fontWeight: 'bold',
+  },
+  eventSummary: {
+    color: '#fff',
+    fontSize: hp(2),
+    marginTop: 5,
+  },
+  eventContentText: {
+    color: '#fff',
+    fontSize: hp(1.8),
+    marginTop: 5,
+  },
+  promotionContainer: {
+    marginTop: 5,
+    paddingHorizontal: 20,
+    flex: 1, // Để FlatList có thể cuộn được
+  },
+  promotionHeader: {
+    fontSize: hp(2.5),
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  promotionCard: {
+    padding: 15,
+    backgroundColor: '#FFEBCC',
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  promotionCode: {
+    fontSize: hp(2.2),
+    fontWeight: 'bold',
+    color: '#C96913',
+  },
+  promotionDescription: {
+    fontSize: hp(2),
+    marginVertical: 5,
+  },
+  promotionDetails: {
+    fontSize: hp(1.8),
+    marginBottom: 10,
+  },
+  redeemButton: {
+    backgroundColor: '#C96913',
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  redeemButtonText: {
+    color: '#fff',
+    fontSize: hp(2),
+  },
+  noPromotionsText: {
+    fontSize: hp(2),
+    color: '#777',
+    textAlign: 'center',
   },
 });

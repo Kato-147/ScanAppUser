@@ -48,9 +48,11 @@ const DetailNews = ({route, navigation}) => {
         <View style={styles.bodyContainer}>
           {itemNews.item.image_url.length === 0 ? (
             <Image
-            style={styles.image}
-            source={{uri: 'https://t3.ftcdn.net/jpg/04/62/93/66/360_F_462936689_BpEEcxfgMuYPfTaIAOC1tCDurmsno7Sp.jpg'}}
-          />
+              style={styles.image}
+              source={{
+                uri: 'https://t3.ftcdn.net/jpg/04/62/93/66/360_F_462936689_BpEEcxfgMuYPfTaIAOC1tCDurmsno7Sp.jpg',
+              }}
+            />
           ) : (
             <Image
               style={styles.image}
