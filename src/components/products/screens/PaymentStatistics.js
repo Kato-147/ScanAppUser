@@ -84,7 +84,10 @@ const PaymentStatistics = ({navigation}) => {
     day: {
       title: 'Theo Ngày',
       labels: data.byDay.map(item =>
-        new Date(item.date).toLocaleDateString('vi-VN'),
+        new Date(item.date).toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+        }),
       ),
       data: data.byDay.map(item => item.totalAmount),
       description: data.byDay.map(
@@ -140,14 +143,13 @@ const PaymentStatistics = ({navigation}) => {
           backgroundGradientFrom: 'white',
           backgroundGradientTo: 'white',
           decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(232, 144, 12, ${opacity})`,
+          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
           style: {
             borderRadius: 16,
           },
           propsForBackgroundLines: {
             strokeWidth: 0,
           },
-          withVerticalLabels: false,
         }}
         style={{
           marginVertical: 16,
@@ -157,6 +159,7 @@ const PaymentStatistics = ({navigation}) => {
         fromZero
         formatYLabel={value => formatShortAmount(parseInt(value))}
       />
+
       <Text style={styles.descriptionText}>Chi tiết:</Text>
       <View style={styles.descriptionContainer}>
         {description.map((desc, index) => (
@@ -167,7 +170,6 @@ const PaymentStatistics = ({navigation}) => {
       </View>
     </View>
   );
-
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -270,7 +272,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     margin: 16,
-    padding: 16,
+    padding: 5,
     backgroundColor: 'white',
     borderRadius: 16,
     shadowColor: '#000',
@@ -285,6 +287,7 @@ const styles = StyleSheet.create({
     color: '#E8900C',
   },
   descriptionContainer: {
+    padding: 8,
     marginTop: 16,
   },
   descriptionText: {
