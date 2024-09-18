@@ -57,12 +57,12 @@ const DetailHistoryOrder = ({route, navigation}) => {
 
   const handleAddReview = async () => {
     const body = {
-      menuItemId: selectedMenuItemId,
+      menuItemId: selectedMenuItemId._id,
       orderId: item.orderId,
       rating: rating,
       comment: comment,
     };
-
+    console.log('>>>>>> body:', body.menuItemId);
     try {
       const response = await createReview(body);
       if (response.status === 'success') {
