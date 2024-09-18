@@ -19,6 +19,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Toast from 'react-native-toast-message';
+import toastConfig from '../../../helper/toastConfig';
 import Dialog from 'react-native-dialog';
 
 const Login = ({navigation}) => {
@@ -27,6 +28,7 @@ const Login = ({navigation}) => {
   const [fcmToken, setfcmToken] = useState([]);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   console.log('--------fcm  Token in login---------', fcmToken);
 
@@ -105,10 +107,13 @@ const Login = ({navigation}) => {
       if (response.status === 'success') {
         Toast.show({
           type: 'success',
-          text1: 'Email đặt lại mật khẩu đã được gửi',
+          text1: 'Thành công',
+          text2: 'Vui lòng kiểm tra email của bạn để đặt lại mật khẩu',
         });
-        navigation.navigate('ResetPassword', {email: forgotEmail});
         setIsDialogVisible(false);
+        setTimeout(() => {
+          navigation.navigate('ResetPassword', {email: forgotEmail});
+        }, 2000);
       } else {
         Toast.show({
           type: 'error',
@@ -123,6 +128,7 @@ const Login = ({navigation}) => {
       console.log('Error in handleForgotPassword:', error.message);
     }
   };
+
   return (
     <KeyboardAvoidingView>
       <TouchableWithoutFeedback
@@ -142,11 +148,17 @@ const Login = ({navigation}) => {
             placeholder={'Email'}
             onChangeText={setEmail}
           />
-          <CustomInput
-            containerStyle={{marginTop: 20}}
-            placeholder={'Mật khẩu'}
-            onChangeText={setPassword}
-          />
+          <View style={{marginTop: 20}}>
+            <CustomInput
+              containerStyle={{marginTop: 20}}
+              placeholder={'Mật khẩu'}
+              secureTextEntry={!showPassword}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity
+              style={styles.showPasswordButton}
+              onPress={() => setShowPassword(!showPassword)}></TouchableOpacity>
+          </View>
           <TouchableOpacity
             activeOpacity={0.5}
             style={{alignSelf: 'flex-end'}}
@@ -190,7 +202,7 @@ const Login = ({navigation}) => {
               kiện {'\n'} & Chính sách bảo mật của chúng tôi
             </Text>
           </View>
-          <Toast ref={ref => Toast.setRef(ref)} />
+          <Toast config={toastConfig} />
         </LinearGradient>
       </TouchableWithoutFeedback>
 
@@ -231,7 +243,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   textLogin: {
     fontSize: 17,
     lineHeight: 16,
@@ -268,5 +279,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '500',
+  },
+  showPasswordButton: {
+    position: 'absolute',
+    right: 10,
+    top: 30,
   },
 });

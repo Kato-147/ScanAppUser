@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  ScrollView,
 } from 'react-native';
 import {BarChart} from 'react-native-chart-kit';
 import {Dimensions} from 'react-native';
@@ -123,53 +124,60 @@ const PaymentStatistics = ({navigation}) => {
     },
   };
 
-  const renderChart = (title, labels, data, description) => (
-    <View style={styles.chartContainer}>
-      <Text style={styles.chartTitle}>{title}</Text>
-      <BarChart
-        data={{
-          labels,
-          datasets: [
-            {
-              data,
-            },
-          ],
-        }}
-        width={screenWidth - 50}
-        height={250}
-        yAxisLabel=""
-        chartConfig={{
-          backgroundColor: 'white',
-          backgroundGradientFrom: 'white',
-          backgroundGradientTo: 'white',
-          decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-          propsForBackgroundLines: {
-            strokeWidth: 0,
-          },
-        }}
-        style={{
-          marginVertical: 16,
-          borderRadius: 16,
-        }}
-        showValuesOnTopOfBars
-        fromZero
-        formatYLabel={value => formatShortAmount(parseInt(value))}
-      />
+  const renderChart = (title, labels, data, description) => {
+    const chartWidth = screenWidth - 50;
+    const barWidth = chartWidth / labels.length;
 
-      <Text style={styles.descriptionText}>Chi tiết:</Text>
-      <View style={styles.descriptionContainer}>
-        {description.map((desc, index) => (
-          <Text key={index} style={styles.descriptionText}>
-            {desc}
-          </Text>
-        ))}
+    return (
+      <View style={styles.chartContainer}>
+        <Text style={styles.chartTitle}>{title}</Text>
+        <ScrollView horizontal>
+          <BarChart
+            data={{
+              labels,
+              datasets: [
+                {
+                  data,
+                },
+              ],
+            }}
+            width={Math.max(screenWidth, labels.length * 50)} // Đảm bảo chiều rộng đủ để hiển thị tất cả các cột
+            height={250}
+            yAxisLabel=""
+            chartConfig={{
+              backgroundColor: 'white',
+              backgroundGradientFrom: 'white',
+              backgroundGradientTo: 'white',
+              decimalPlaces: 2,
+              // màu cam theo theme của ứng dụng
+              color: (opacity = 1) => `rgba(232, 144, 12, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
+              propsForBackgroundLines: {
+                strokeWidth: 0,
+              },
+            }}
+            style={{
+              marginVertical: 16,
+              borderRadius: 16,
+            }}
+            fromZero
+            formatYLabel={value => formatShortAmount(parseInt(value))}
+          />
+        </ScrollView>
+        <Text style={styles.descriptionText}>Chi tiết:</Text>
+        <View style={styles.descriptionContainer}>
+          {description.map((desc, index) => (
+            <Text key={index} style={styles.descriptionText}>
+              {desc}
+            </Text>
+          ))}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
+
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -271,14 +279,14 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   chartContainer: {
-    margin: 16,
-    padding: 5,
+    marginHorizontal: 16,
+    padding: 16,
     backgroundColor: 'white',
     borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.25,
-    elevation: 3,
+    elevation: 13,
   },
   chartTitle: {
     fontSize: 18,
