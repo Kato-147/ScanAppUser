@@ -316,7 +316,7 @@ const Payment = ({navigation}) => {
                 styles.orderButton
               }>
               <Text style={styles.orderButtonText}>Thanh toán</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> 
           </View>
           </View>
           <Toast config={toastConfig} />
