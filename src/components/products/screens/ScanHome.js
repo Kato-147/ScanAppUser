@@ -73,7 +73,7 @@ const ScanHome = ({navigation}) => {
           <TouchableOpacity onPress={handleBack}>
             <Icon style={styles.backIcon} name="left" />
           </TouchableOpacity>
-          <Text>{data}</Text>
+          <Text>Quét mã QR để vào bàn</Text>
           <View></View>
         </View>
       }
