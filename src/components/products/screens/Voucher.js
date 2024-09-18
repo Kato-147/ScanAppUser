@@ -40,7 +40,7 @@ const Voucher = ({navigation}) => {
   const copyToClipboard = code => {
     Clipboard.setString(code);
     ToastAndroid.show(`Đã sao chép ${code} vào bộ nhớ tạm`, ToastAndroid.SHORT);
-    setcopyCode(code);
+    setcopyCode(code);  
   };
 
   useEffect(() => {
